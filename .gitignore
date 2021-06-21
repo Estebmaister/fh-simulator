@@ -1,0 +1,5 @@
+# Ignoring lock files for docs editors
+.~lock*
+
+# Ignoring node modules
+/node_modules
