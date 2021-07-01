@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="./img/fav.ico" />
+
+	<title>Fire Heater Sim</title>
+	<meta name="description" content="Fire Heater Simulator" />
+	<meta name="author" content="Esteban Camargo" />
+	<meta name="keywords" content="simulator" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<!-- WhatsApp Description -->
+	<meta property="og:title" content="Fire Heater Simulator" />
+	<meta property="og:description" content="Esteban's public website, curriculum and projects." />
+	<meta property="og:image" content="./img/fav.ico" />
+	<meta property="og:url" content="#" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Fire Heater Sim" />
+
+	<meta name="twitter:title" content="Esteban Camargo (Remoter)" />
+	<meta name="twitter:image" content="./img/fav.ico" />
+	<meta name="twitter:url" content="#" />
+	<meta name="twitter:domain" content="estebmaister.com.ve" />
+	<meta name="twitter:card" content="summary_large_image" />
+
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header id="header">
+    <a class="logo" href="#"><img class="logo" id="header-img" src="./img/logo.png" alt="Logo" /></a>
+
+    <nav id="navbar">
+      <ul id="nav-list">
+        <li class="nav-sec">
+          <a class="nav-link" href="#welcome-section">About</a>
+        </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="#projects">Projects</a>
+        </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="#social-section">Social</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section id="welcome-sect">
+      <h1>Fire heater simulator</h1>
+      <p>Testing page, a simple view for the input and output.</p>
+    </section>
+    <section id="capturer-sect">
+      <form
+        id="fuel-form"
+        method="GET"
+        action=""
+      >
+        <div class="form-input">
+          <input type="number" name="t-amb" id="t-amb" required autocomplete value=""
+            onkeyup="this.setAttribute('value', this.value);" onchange="this.setAttribute('value', this.value);"/>
+          <label class="label-input" id="t-amb-label" for="t-amb">
+            <span class="content-label">T amb. (°C)</span>
+          </label>
+        </div>
+        <div class="rowTab">
+          <div class="labels">
+            <label id="email-label" for="email">*Email: </label>
+          </div>
+          <div class="rightTab">
+            <input
+              type="email"
+              name="email"
+              id="email"
+              class="input-field"
+              required=""
+              placeholder="Enter your Email"
+            />
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+	<footer>
+		<p>
+			<a class="credits" id="profile-link" href="https://github.com/estebmaister/" target="_blank">
+				© USB 2021
+			</a>
+		</p>
+	</footer>
+</body>
+<script src="js/index.js"></script>
+</html>
