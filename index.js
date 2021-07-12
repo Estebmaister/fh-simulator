@@ -1,12 +1,41 @@
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
-const { relative } = require('path');
-const log = console.log
+
+const log = function(...arguments) {
+
+  if (arguments.length === 0) return;
+
+  switch (arguments[0]) {
+    case "info":
+      for (var i = 1; i < arguments.length; i++) {
+        console.log(`{"INFO": "${arguments[i]}"}`);
+      }
+      break;
+    case "error":
+      for (var i = 1; i < arguments.length; i++) {
+        console.error(`{"ERROR": "${arguments[i]}"}`);
+      }
+      break;
+    case "debug":
+      for (var i = 1; i < arguments.length; i++) {
+        console.debug(`{"DEBUG": "${arguments[i]}"}`);
+      }
+      break;
+    default:
+      for (var i = 0; i < arguments.length; i++) {
+        console.log(`{"DEFAULT": "${arguments[i]}"}`);
+      }
+      break;
+  }
+
+}
+console.log = log
 
 function newtonRaphson (f, fp, x0, options) {
+
   var x1, y, yp, tol, maxIter, iter, yph, ymh, yp2h, ym2h, h, hr, verbose, eps;
 
-  // Iterpret variadic forms:
+  // Interpret variadic forms:
   if (typeof fp !== 'function') {
     options = x0;
     x0 = fp;
@@ -72,6 +101,7 @@ const dataPaths = {
   csv: __dirname + "/data.csv",
   json: __dirname + "/data.json"
 }
+
 const tempToK = 273.15
 const tempAmbRef = tempToK + 25; // 298.15
 
@@ -99,7 +129,7 @@ const getData = (fromCSV) => {
   let CompoundsArray = []
   
   if (fromCSV) {
-    log("{INFO: Starting data extraction for Simulator}")
+    log("info","Starting data extraction for Simulator")
     CompoundsArray = parse(fs.readFileSync(dataPaths.csv), {
       columns: true,
       skip_empty_lines: true,
@@ -107,7 +137,7 @@ const getData = (fromCSV) => {
     })
 
     fs.writeFileSync(dataPaths.json, JSON.stringify(CompoundsArray, null, 2))
-    log('{INFO: JSON file successfully updated}');
+    log("info",'JSON file successfully updated');
   } else {
     CompoundsArray = require(dataPaths.json)
   }
@@ -186,11 +216,11 @@ const combustionH = (compound, t, tIni, liquidWater) => {
   if (tIni === undefined) tIni = options.tAmb
 
   if (t === undefined) return (t) => compound.CO2*co2_H(t) + compound.SO2*so2_H(t)
-  + compound.H2O*h2o_H(t) - deltaH(compound)(tIni) - compound.O2*o2_H(tIni)
+    + compound.H2O*h2o_H(t) - deltaH(compound)(tIni) - compound.O2*o2_H(tIni)
   
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
   return ( compound.CO2*co2_H(t) + compound.SO2*so2_H(t) + compound.H2O*h2o_H(t)
-          - deltaH(compound)(tIni) - compound.O2*o2_H(tIni) )
+    - deltaH(compound)(tIni) - compound.O2*o2_H(tIni) )
 }
 
 const adFlame = (fuels, products, tIni, o2required) => {
@@ -232,7 +262,7 @@ const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
 
   if (!checkFuelPercentage(fuels, compounds)) return {}
 
-  log(`{INFO: H2O moles per O2 in air 65% RH):  ${moistAirMolesPerO2(tIniCalc, humidity)}}`)
+  log("info",`H2O moles per O2 in air 65% RH):  ${moistAirMolesPerO2(tIniCalc, humidity)}`)
 
   const products = {
     O2: 0,
@@ -245,7 +275,7 @@ const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
   for (const element of compounds) {
     // Calculating the products of combustion
     for (const product in products) {
-      // log(`{INFO:${element['Formula'] + ' req = ' +}}` product + element[product]*fuels[element['Formula']])
+      // log("info", element['Formula'] + ' req = ' + product + element[product]*fuels[element['Formula']])
       products[product] += element[product]*fuels[element['Formula']]
     }
   }
@@ -259,7 +289,7 @@ const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
   // for (const fuel in fuels) {
   //   if (fuel in products) continue
   //   const compound = compounds.filter(element => element.Formula == fuel)[0]
-  //   log(`{INFO: H of combustion for ${fuel}: ${combustionH(compound)(tIniCalc)/compound.MW} KJ/Kg}` )
+  //   log("info",`H of combustion for ${fuel}: ${combustionH(compound)(tIniCalc)/compound.MW} KJ/Kg` )
   // }
 
   //log(adFlame(fuels, products)(1371))
@@ -299,7 +329,7 @@ let fuels = {
 }
 // log(data[substanceID].Substance + " Cp0(J/g K): " + Cp0(data[substanceID])(tAmb))
 // log(molesOfCombustion(fuels, tAmb, humidity, airExcess))
-log(molesOfCombustion(fuels, options.tAmb, options.humidity, options.airExcess))
+/*log(molesOfCombustion(fuels, options.tAmb, options.humidity, options.airExcess))*/
 // log(combustionH(data[7]).toString())
 // log(deltaH(data[7])(tempAmbRef))
 // log(
@@ -310,3 +340,8 @@ log(molesOfCombustion(fuels, options.tAmb, options.humidity, options.airExcess))
 // log(data[31].h0)
 // log(3*data[6].h0+4*data[31].h0-data[7].h0)
 // log(data[31].Substance + " Cp0(J/g K): " + Cp0(data[31])((tempAmbRef+573.15)/2))
+
+module.exports = {
+  newtonRaphson,
+  options
+};
