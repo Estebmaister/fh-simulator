@@ -1,3 +1,28 @@
+/******************************************************************
+ * Exported functions from this file
+ ******************************************************************
+ * @newtonRaphson (f, fp, x0, options)
+ * @version  1.00
+ * @param   {f function} valid function to find the zero.
+ * @param   {fp function} optional function derivate.
+ * @param   {x0 number} valid number seed.
+ * @param   {options object} valid options object.
+ * @return  {number or false} a number is the iterations reach the result, 
+ *          false if not.
+ * 
+ * @log (level, args)
+ * @version  1.00
+ * @param   {level} optional string like "error", "info" or "debug".
+ * @return  {null} prints to the console.
+ * 
+ * @author  Esteban Camargo
+ * @date    17 Jul 2021
+ * @call    node . true true 25 70 80 1e5
+ * @callParams verbose, check for changes in csv, t_amb, humidity, air_excess, p_amb
+ * 
+ * Note: No check is made for NaN or undefined input numbers.
+ *
+ *****************************************************************/
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
 
@@ -29,7 +54,6 @@ const log = function(...arguments) {
   }
 
 }
-console.log = log
 
 function newtonRaphson (f, fp, x0, options) {
 
@@ -343,5 +367,6 @@ let fuels = {
 
 module.exports = {
   newtonRaphson,
-  options
+  options,
+  log
 };
