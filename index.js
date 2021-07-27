@@ -351,19 +351,19 @@ let fuels = {
   CO2: 0.02,
   C3H8: 0.032,
 }
-// log(data[substanceID].Substance + " Cp0(J/g K): " + Cp0(data[substanceID])(tAmb))
-// log(molesOfCombustion(fuels, tAmb, humidity, airExcess))
-/*log(molesOfCombustion(fuels, options.tAmb, options.humidity, options.airExcess))*/
-// log(combustionH(data[7]).toString())
-// log(deltaH(data[7])(tempAmbRef))
-// log(
-//   combustionH(data[7],500,true) / data[7].MW,
-//   combustionH(data[7],500) / data[7].MW
-// )
-// log(data[6].h0)
-// log(data[31].h0)
-// log(3*data[6].h0+4*data[31].h0-data[7].h0)
-// log(data[31].Substance + " Cp0(J/g K): " + Cp0(data[31])((tempAmbRef+573.15)/2))
+/*
+log(data[substanceID].Substance + " Cp0(J/g K): " + Cp0(data[substanceID])(tAmb))
+log(combustionH(data[7]).toString())
+log(deltaH(data[7])(tempAmbRef))
+log(
+  combustionH(data[7],500,true) / data[7].MW,
+  combustionH(data[7],500) / data[7].MW
+)
+log(data[6].Substance, data[6].h0)
+log(data[31].Substance + " Cp0(J/g K): " + Cp0(data[31])((tempAmbRef+573.15)/2))
+*/
+
+//log(molesOfCombustion(fuels, options.tAmb, options.humidity, options.airExcess))
 
 module.exports = {
   newtonRaphson,
