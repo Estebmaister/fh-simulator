@@ -1,19 +1,10 @@
 /******************************************************************
  * Exported functions from this file
  ******************************************************************
- * @newtonRaphson (f, fp, x0, options)
+ * @molesOfCombustion fuels, options, humidity, airExcess
  * @version  1.00
- * @param   {f function} valid function to find the zero.
- * @param   {fp function} optional function derivate.
- * @param   {x0 number} valid number seed.
- * @param   {options object} valid options object.
- * @return  {number or false} a number is the iterations reach the result, 
- *          false if not.
- * 
- * @log (level, args)
- * @version  1.00
- * @param   {level} optional string like "error", "info" or "debug".
- * @return  {null} prints to the console.
+ * @param   {fuels object} valid i.e. {'CH4': 1}.
+ * @return  {result object} flows, products
  * 
  * @author  Esteban Camargo
  * @date    17 Jul 2021
@@ -26,6 +17,7 @@
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
 const {newtonRaphson, options, log} = require('./js/utils');
+const {radSection} = require('./js/rad');
 
 const dataPaths = {
   csv: __dirname + "/data.csv",
@@ -78,7 +70,7 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
  * second argument set to true.
 */
 const Cp_multicomp = (fuels, molResult) => {
-  if (fuels.length === 0) return 0
+  if (fuels.length === 0) return (t) => 0
   const fuelCompounds = data.filter( element => element.Formula in fuels )
   let i = 0
   const cps = []
@@ -200,7 +192,7 @@ const adFlame = (fuels, products, tIni, o2required) => {
   return (t) => pEnthalpy(t) - enthalpy.reduce((acc, value)=> acc + value)
 }
 
-const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
+const molesOfCombustion = (fuels, options, params) => {
 
   const compounds = data.filter( 
     (element, i, arr) => element.Formula in fuels
@@ -208,7 +200,7 @@ const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
 
   if (!checkFuelPercentage(fuels, compounds)) return {}
 
-  log("info",`H2O moles per O2 in air ${humidity}% RH):  ${moistAirMolesPerO2(tIniCalc, humidity)}`)
+  log("info",`H2O moles per O2 in air ${options.humidity}% RH): ${moistAirMolesPerO2(options.tAmb, options.humidity)}`)
 
   const products = {
     O2: 0,
@@ -221,44 +213,54 @@ const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
   for (const element of compounds) {
     // Calculating the products of combustion
     for (const product in products) {
-      // log("info", element['Formula'] + ' req = ' 
-      // + product + element[product]*fuels[element['Formula']])
+      //log(
+      //  `${element['Formula']} req = ${product} ${element[product]*fuels[element['Formula']]}`
+      //)
       products[product] += element[product]*fuels[element['Formula']]
     }
   }
 
-  const o2excess = products['O2'] * (1 + airExcess)
+  /** Percentage of O2 in excess 100% + x% airExcess */
+  let o2excess = products['O2'] * (1 + options.airExcess)
+  // If O2 requirements are negative 
+  if (products['O2'] <= 0) {
+    o2excess = 0
+    log('error', 'o2 in fuel is greater than needed, airExcess set to 0')
+  }
 
-  products['O2'] = o2excess - products['O2']
+  products['O2'] = o2excess - products['O2'] // Subtracting the O2 used in combustion
   products['N2'] += o2excess * (0.79/0.21)
-  products['H2O'] += o2excess * moistAirMolesPerO2(tIniCalc, humidity)
+  products['H2O'] += o2excess * moistAirMolesPerO2(options.tAmb, options.humidity)
 
-  log("info", "NCV (kJ/kmol): " + ncv(fuels, products, compounds, tIniCalc))
-  //log(adFlame(fuels, products)(1371))
+  params.NCV = -ncv(fuels, products, compounds, options.tAmb)
+  log("info", "NCV (kJ/kmol): " + params.NCV)
   log("info", "adiabatic flame (K): " + 
-    newtonRaphson(adFlame(fuels, products, tIniCalc, o2excess), 1000, options)
+    newtonRaphson(adFlame(fuels, products, options.tAmb, o2excess), 1000, options)
   )
 
-  let total = 0; totalDry = 0
+  let totalPerMol = 0; totalPerM_Dry = 0
   for (const product in products) {
-    total += products[product]
-    if (product !== 'H2O') totalDry += products[product]
+    totalPerMol += products[product]
+    if (product !== 'H2O') totalPerM_Dry += products[product]
   }
   const flows = {
-    TOTAL: total,
-    DRY_TOTAL: totalDry,
-    AC: o2excess * (1 + (0.79/0.21)),
+    TOTAL: totalPerMol,
+    DRY_TOTAL: totalPerM_Dry,
+    AC: o2excess * (1 + (0.79/0.21)), // 
+    'O2%_DRY': 100*products['O2']/totalPerM_Dry,
+    'CO2%_DRY': 100*products['CO2']/totalPerM_Dry,
+    'N2%_DRY': 100*products['N2']/totalPerM_Dry,
+    'O2%_WET': 100*products['O2']/totalPerMol,
+    'CO2%_WET': 100*products['CO2']/totalPerMol,
+    'N2%_WET': 100*products['N2']/totalPerMol,
   }
 
-  flows['O2%_DRY'] = 100*products['O2']/totalDry
-  flows['CO2%_DRY'] = 100*products['CO2']/totalDry
-  flows['N2%_DRY'] = 100*products['N2']/totalDry
+  params.m_flue = params.m_fuel * flows.TOTAL
+  params.m_air = params.m_fuel * flows.AC
 
-  flows['O2%_WET'] = 100*products['O2']/total
-  flows['CO2%_WET'] = 100*products['CO2']/total
-  flows['N2%_WET'] = 100*products['N2']/total
+  log("radiant section Tg: " + radSection(params))
 
-  return {flows, products}
+  return {flows, products, params}
 }
 
 var data = getData(options.processData)
@@ -271,6 +273,33 @@ let fuels = {
   CO2: 0.02,
   C3H8: 0.032,
 }
+// const fuels ={
+//   O2: 0.5,
+//   N2: 0.5,
+// }
+
+let params = {
+  Cp_air: Cp0(data[33], true), /** Function of temp (kJ/kmol-K) */
+  Cp_fuel: Cp_multicomp(fuels, true), /** Function of temp (kJ/kmol-K) */
+  m_fuel: 120, /** (kmol/h) */
+  m_fluid: 225_700, /** (kmol/h) */
+  N: 60, /** - number of tubes in rad section */
+  N_shld: 8, /** - number of shield tubes */
+  L: 20.024, /** (m) effective tube length*/
+  Do: 0.219, /** (m) external diameter rad section */
+  CtoC: 0.394, /** (m) center to center distance of tube */
+  F: 0.97, /** - emissive factor */
+  alpha: 0.835, /** - alpha factor */
+  alpha_shld: 1, /** - alpha shield factor */
+
+  // Temperatures
+  t_in_rad: 210 + options.tempToK, // K (process in rad sect)
+  t_out: 355 + options.tempToK, // K (process global)
+  t_stack: 400 + options.tempToK, // K (flue gases out)
+  t_air: 25 + options.tempToK, // K (atm)
+  t_fuel: 25 + options.tempToK, // K (atm)
+  t_amb: options.tAmb, // K
+}
 /*
 log(combustionH(data[7]).toString())
 log(deltaH(data[7])(options.tempAmbRef))
@@ -280,13 +309,12 @@ log(
 )
 log(data[7].Substance, data[7].h0)
 */
-log("info", `${data[33].Substance} Cp0(kJ/kmol-K): ${Cp0(data[33], true)( (options.tAmb + 15+273.15)*0.5 )}`)
-log("info", `Cp_fuel (kJ/kmol-K): ${Cp_multicomp(fuels, true)(300)}`)
+log("info", `Cp_${data[33].Substance} Cp0(kJ/kmol-K): ${params.Cp_air( (options.tAmb + 15+273.15)*0.5 )}`)
+log("info", `Cp_fuel (kJ/kmol-K): ${params.Cp_fuel(300)}`)
 
-log(molesOfCombustion(fuels, options.tAmb, options.humidity, options.airExcess))
+const result = molesOfCombustion(fuels, options, params)
+log("debug", JSON.stringify(result, null, 2))
 
 module.exports = {
-  newtonRaphson,
-  options,
-  log
+  molesOfCombustion
 };

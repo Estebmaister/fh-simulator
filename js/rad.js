@@ -1,10 +1,9 @@
 /******************************************************************
  * Exported functions from this file
  ******************************************************************
- * @ = () => {
- * } (options)
- @version  1.00
- * @param   {options object} valid options object.
+ * @radSection (params)
+ * @version  1.00
+ * @param   {params object} valid params object.
  * @return  {number or false} a number is the iterations reach the result, 
  *          false if not.
  * Effective Gas Temperature (Tg)
@@ -30,10 +29,18 @@ const {newtonRaphson, options, log} = require('./utils');
  * Q_out = Q_R + Q_shield + Q_losses + Q_flue
  * Q_in(Tg) - Q_out(Tg) ~= 0
 */
-const rad_section = (params) => {
+const radSection = (params) => {
     if (params === null || params === undefined) params = {}
 
     const
+        // Temperatures
+        T_in = params.t_in_rad , // K
+        T_out = params.t_out, // K
+        T_stack = params.t_stack, // K
+        T_air = params.t_air, // K
+        T_fuel = params.t_fuel, // K
+        T_datum = params.t_amb // K
+
         /** (kmol/h) */
         m_fuel = params.m_fuel || 120,
         /** (kmol/h) */
@@ -59,30 +66,17 @@ const rad_section = (params) => {
         /** (kmol/h) */
         m_air = params.m_air || 1_589.014,
         /** (kmol/h) */
-        m_flue = params.m_flue || 1720.9,
+        m_flue = params.m_flue || 1_720.9,
         /** (kJ/kmol) net calorific value */
         NCV = params.ncv || 927_844.41,
         /** (kJ/kmol-K) */
-        Cp_fuel = 39.26,
+        Cp_fuel = params.Cp_fuel((T_fuel + T_datum)*0.5) || 39.26,
+        /** (kJ/kmol-K) */
+        Cp_air = params.Cp_air((T_air + T_datum)*0.5) || 29.142,
         //sigma = 5.67e-11, // (W.m-2.K-4)
         /** (kJ/h.m2.K4) */
         sigma = 2.041e-7,
-        pi = 3.14159,
-
-        // Temperatures
-        t_in = 210, // C (process)
-        t_out = 355, // C
-        t_stack = 400, // C
-        t_air = 25, // C (atm)
-        t_fuel = 25, // C (atm)
-        t_amb = 15, // C (amb)
-        // converted temps
-        T_in = t_in + 273, // K
-        T_out = t_out + 273, // K
-        T_stack = t_stack + 273, // K
-        T_air = t_air + 273, // K
-        T_fuel = t_fuel + 273, // K
-        T_datum = t_amb + 273; // K
+        pi = 3.14159;
 
     // ******* Heat input to the radiant section ********
 
@@ -91,14 +85,10 @@ const rad_section = (params) => {
     /** Q_fluid = m_fluid * Cp_fluid(T_fluid_avg) * DeltaT */
     const Q_fluid = (tIn = T_in, tOut = T_out) =>
         m_fluid * Cp_fluid * ((tOut - tIn))
-
-    /** Molar heat of air (kJ/kg.K) */
-    const Cp_air = (tAir = T_air, tAmb = T_datum) => 
-        33.915 + 1.214e-3*(tAir + tAmb)*0.5;
         
     // Sensible heat of air
     const Q_air = (tAir = T_air, tAmb = T_datum) => 
-        m_air*Cp_air(tAir, tAmb)*(tAir - tAmb);
+        m_air*Cp_air*(tAir - tAmb);
 
     // Combustion heat of fuel
     const Q_rls = m_fuel*NCV;
@@ -157,41 +147,35 @@ const rad_section = (params) => {
     // Equation of effective temperature.
     const y = (Tg) => C*(Tg**4) + D*Tg - B
     // const y1 = (Tg) => 3.6299e-4*(Tg**3) + 7.9153e4
-    const y2 = (Tg) => Q_out(Tg) - Q_in()
-
+    
     //log("info",`Equation for effective gas temperature: ${y.toString()} 
     //${C.toExponential(4)}*Tg**4 + ${D.toExponential(4)}*Tg - ${B.toExponential(4)}`)
-    flame = newtonRaphson(y, 1270, params.options)
-    log(`Effective gas temperature: ${flame.toExponential(2)}`)
+    flame = newtonRaphson(y, 1270, options)
+    log(`Effective gas temperature: ${flame}`)
+    
+    const y2 = (Tg) => Q_out(Tg) - Q_in()
+    flame2 = newtonRaphson(y2, 1270, options)
+    //log(`Second: ${flame2.toExponential(2)}`)
+    log("debug", `{"Effective Gas temperature": ${flame2}, "Tw": ${Tw(T_in,T_out)}` 
+    + `, "Q_in": ${Q_in()}`
+    + `, "Q_rls": ${Q_rls}`
+    + `, "Q_air": ${Q_air()}`
+    + `, "Cp_air": ${Cp_air}`
+    + `, "Q_fuel": ${Q_fuel()}`
+    + `, "Cp_fuel": ${Cp_fuel}`
+    + `, "Q_fluid": ${Q_fluid()}`
 
-    flame2 = newtonRaphson(y2, 1270, params.options)
-    log(`Second: ${flame2}`)
-    // log(`
-    // Effective Gas temperature: ${flame2}
-    // Tw: ${Tw(T_in,T_out)}
+    + `, "Q_out": ${Q_out(flame2)}`
+    + `, "Q_losses": ${Q_losses}`
+    + `, "Q_rad": ${Q_rad(flame2)}`
+    + `, "Q_conv": ${Q_conv(flame2)}`
+    + `, "Q_shld": ${Q_shld(flame2)}`
+    + `, "Q_flue": ${Q_flue(flame2)}`
+    +`}`)
 
-
-    // Q_in =
-    // Q_rls: ${Q_rls}
-    // Q_air: ${Q_air()}
-    // Q_fuel: ${Q_fuel()}
-    // Q_fluid: ${Q_fluid()}
-    // = ${Q_in()}
-
-    // Q_out =
-    // Q_losses: ${Q_losses}
-    // Q_rad: ${Q_rad(flame2)}
-    // Q_conv: ${Q_conv(flame2)}
-    // Q_shld: ${Q_shld(flame2)}
-    // Q_flue: ${Q_flue(flame2)}
-    // = ${Q_out(flame2)}`)
+    return flame2
 }
-
-let params = {
-    options
-}
-rad_section(params)
 
 module.exports = {
-    rad_section
+    radSection
   };
