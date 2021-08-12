@@ -45,7 +45,7 @@ const log = function(...arguments) {
       break;
     case "debug":
       for (var i = 1; i < arguments.length; i++) {
-        console.debug(`{"DEBUG": "${arguments[i]}"}`);
+        console.debug(`{"DEBUG": ${arguments[i]}}`);
       }
       break;
     default:
@@ -94,7 +94,7 @@ function newtonRaphson (f, fp, x0, options) {
       // Check for badly conditioned update (extremely small first deriv relative to function):
       if (Math.abs(yp) <= eps * Math.abs(y)) {
       if (verbose) {
-          console.log('Newton-Raphson: failed to converged due to nearly zero first derivative');
+          log("info", 'Newton-Raphson: failed to converged due to nearly zero first derivative');
       }
       return false;
       }
@@ -105,7 +105,7 @@ function newtonRaphson (f, fp, x0, options) {
       // Check for convergence:
       if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
       if (verbose) {
-          console.log('Newton-Raphson: converged to x = ' + x1 + ' after ' + iter + ' iterations');
+          log("info", `Newton-Raphson: converged to x = ${x1} after ${iter} iterations`);
       }
       return x1;
       }
@@ -115,7 +115,7 @@ function newtonRaphson (f, fp, x0, options) {
   }
 
   if (verbose) {
-      console.log('Newton-Raphson: Maximum iterations reached (' + maxIter + ')');
+      log("info", `Newton-Raphson: Maximum iterations reached (${maxIter})`);
   }
 
   return false;
@@ -130,7 +130,7 @@ const options = {
   // Entry arguments
   verbose: process.argv[2] == "true",
   processData: process.argv[3] == "true",
-  tAmb: tempToK + parseFloat(process.argv[4]) || tempAmbRef,
+  tAmb: tempToK + parseFloat(process.argv[4]) || tempAmbRef - 4,
   humidity: parseFloat(process.argv[5]) || 70,
   airExcess: 0.01 * parseFloat(process.argv[6]) || 0.01 * 80,
   pAtm: parseFloat(process.argv[7]) || 1e5,
@@ -146,7 +146,7 @@ const options = {
   tempAmbRef
 }
 
-if (options.verbose) log(JSON.stringify(options, null, 2))
+if (options.verbose) log("debug",JSON.stringify(options, null, 2))
 
 module.exports = {
   newtonRaphson,
