@@ -1,19 +1,10 @@
 /******************************************************************
  * Exported functions from this file
  ******************************************************************
- * @newtonRaphson (f, fp, x0, options)
+ * @molesOfCombustion fuels, options, humidity, airExcess
  * @version  1.00
- * @param   {f function} valid function to find the zero.
- * @param   {fp function} optional function derivate.
- * @param   {x0 number} valid number seed.
- * @param   {options object} valid options object.
- * @return  {number or false} a number is the iterations reach the result, 
- *          false if not.
- * 
- * @log (level, args)
- * @version  1.00
- * @param   {level} optional string like "error", "info" or "debug".
- * @return  {null} prints to the console.
+ * @param   {fuels object} valid i.e. {'CH4': 1}.
+ * @return  {result object} flows, products
  * 
  * @author  Esteban Camargo
  * @date    17 Jul 2021
@@ -25,129 +16,12 @@
  *****************************************************************/
 const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
-
-const log = function(...arguments) {
-
-  if (arguments.length === 0) return;
-
-  switch (arguments[0]) {
-    case "info":
-      for (var i = 1; i < arguments.length; i++) {
-        console.log(`{"INFO": "${arguments[i]}"}`);
-      }
-      break;
-    case "error":
-      for (var i = 1; i < arguments.length; i++) {
-        console.error(`{"ERROR": "${arguments[i]}"}`);
-      }
-      break;
-    case "debug":
-      for (var i = 1; i < arguments.length; i++) {
-        console.debug(`{"DEBUG": "${arguments[i]}"}`);
-      }
-      break;
-    default:
-      for (var i = 0; i < arguments.length; i++) {
-        console.log(`{"DEFAULT": "${arguments[i]}"}`);
-      }
-      break;
-  }
-
-}
-
-function newtonRaphson (f, fp, x0, options) {
-
-  var x1, y, yp, tol, maxIter, iter, yph, ymh, yp2h, ym2h, h, hr, verbose, eps;
-
-  // Interpret variadic forms:
-  if (typeof fp !== 'function') {
-    options = x0;
-    x0 = fp;
-    fp = null;
-  }
-
-  options = options || {};
-  tol = options.tolerance === undefined ? 1e-7 : options.tolerance;
-  eps = options.epsilon === undefined ? 2.220446049250313e-16 : options.epsilon;
-  maxIter = options.maxIterations === undefined ? 20 : options.maxIterations;
-  h = options.h === undefined ? 1e-4 : options.h;
-  verbose = options.verbose === undefined ? false : options.verbose;
-  hr = 1 / h;
-
-  iter = 0;
-  while (iter++ < maxIter) {
-    // Compute the value of the function:
-    y = f(x0);
-
-    if (fp) {
-      yp = fp(x0);
-    } else {
-      // Needs numerical derivatives:
-      yph = f(x0 + h);
-      ymh = f(x0 - h);
-      yp2h = f(x0 + 2 * h);
-      ym2h = f(x0 - 2 * h);
-
-      yp = ((ym2h - yp2h) + 8 * (yph - ymh)) * hr / 12;
-    }
-
-    // Check for badly conditioned update (extremely small first deriv relative to function):
-    if (Math.abs(yp) <= eps * Math.abs(y)) {
-      if (verbose) {
-        console.log('Newton-Raphson: failed to converged due to nearly zero first derivative');
-      }
-      return false;
-    }
-
-    // Update the guess:
-    x1 = x0 - y / yp;
-
-    // Check for convergence:
-    if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
-      if (verbose) {
-        console.log('Newton-Raphson: converged to x = ' + x1 + ' after ' + iter + ' iterations');
-      }
-      return x1;
-    }
-
-    // Transfer update to the new guess:
-    x0 = x1;
-  }
-
-  if (verbose) {
-    console.log('Newton-Raphson: Maximum iterations reached (' + maxIter + ')');
-  }
-
-  return false;
-}
+const {newtonRaphson, options, log} = require('./js/utils');
+const {radSection} = require('./js/rad');
 
 const dataPaths = {
   csv: __dirname + "/data.csv",
   json: __dirname + "/data.json"
-}
-
-const tempToK = 273.15
-const tempAmbRef = tempToK + 25; // 298.15
-
-// node . true true 25 70 80 1e5
-const options = {
-  // Entry arguments
-  verbose: process.argv[2] == "true",
-  processData: process.argv[3] == "true",
-  tAmb: tempToK + parseFloat(process.argv[4]) || tempAmbRef,
-  humidity: parseFloat(process.argv[5]) || 70,
-  airExcess: 0.01 * parseFloat(process.argv[6]) || 0.01 * 80,
-  pAtm: parseFloat(process.argv[7]) || 1e5,
-  // Newton Raphson arguments
-  tolerance: 1e-2,
-  epsilon: 3e-6,
-  maxIterations: 20,
-  h: 1e-4,
-}
-const substanceID = parseInt(process.argv[8]) || 1
-
-if (options.verbose) {
-  log(options)
 }
 const getData = (fromCSV) => {
   let CompoundsArray = []
@@ -168,22 +42,51 @@ const getData = (fromCSV) => {
   return CompoundsArray
 };
 
-const Cp0 = ({c0, c1, c2, c3}) => {
-  // Cp0 units (kJ/kg K) from table A.6 Van Wylen
-  // if you want mol units multiply bt MW
+/** (kJ/kg K) to call returning function use Kelvin units 
+ * if you want a result in (kJ/kmol K) units, multiply the
+ * result by MW or call this with second argument set to true.
+*/
+const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
+  // Cp equation from table A.6 Van Wylen
+
   // Teta = T(Kelvin)
   return (teta) => {
-    // Approximate forms valid from 250 K to 1200 K.
+    // Approximate equation valid from 250 K to 1200 K.
     if (teta < 250 || teta > 1200) {
       if (options.verbose) log("{WARN: Wrong range for Cp0 formula}")
     }
+    if (c0 === "-") {
+      log("warn", `Wrong Use of Cp0, called for compound ${Substance}`)
+      return 0
+    }
+    if (molResult) return (c0 + c1*(teta*0.001) + c2*(teta*0.001)**2 + c3*(teta*0.001)**3)*MW
     return (c0 + c1*(teta*0.001) + c2*(teta*0.001)**2 + c3*(teta*0.001)**3)
   }
 }
 
+/** (kJ/kg K) argument needs to be a fuel object,
+ * ie: { CH4: 0.323, ... }
+ * if you want a result in (kJ/kmol K) units, call it with 
+ * second argument set to true.
+*/
+const Cp_multicomp = (fuels, molResult) => {
+  if (fuels.length === 0) return (t) => 0
+  const fuelCompounds = data.filter( element => element.Formula in fuels )
+  let i = 0
+  const cps = []
+  for (const fuel in fuels) {
+    const compound = fuelCompounds.filter(element => element.Formula == fuel)[0]
+    cps[i] = (t) => fuels[fuel] * Cp0(compound, molResult)(t)
+    i++
+  }
+  
+  return cps.reduce((acc, value) => ((t) => acc(t) + value(t)), (t) => 0)
+}
+
+/** Temperature should be in K, humidity %[0,100] */
 const moistAirMolesPerO2 = (temperature, relativeHumidity) => {
   // Equation from Reference: Tetens, O., 1930
-  temperature = temperature - tempToK
+  temperature = temperature - options.tempToK
   // ps is the saturation vapour pressure, in pascals,
   // where t is the temperature in degrees Celsius.
   const ps = 610.78*Math.exp(temperature/(temperature+238.3)*17.2694)
@@ -203,14 +106,14 @@ const checkFuelPercentage = (fuels, compounds) => {
   return check1 && check2
 }
 
+/** Units (kJ/kmol) */
 const deltaH = (compound, t) => {
-  // Units (kJ/kmol)
   // Enthalpy of formation plus delta enthalpy
 
   if (compound.Cp0 === '-') {
     if (compound.h0 === '-') {
       if (options.verbose) 
-        log(`{WARN: Wrong Use of deltaH, called for compound ${compound.Substance}}`)
+        log("warn",`Wrong Use of deltaH, called for compound ${compound.Substance}`)
       if (t === undefined) return () => 0
       return 0
     }
@@ -220,13 +123,12 @@ const deltaH = (compound, t) => {
 
   // hf0 + deltaH(tempAmbRef -> t)
   if (t === undefined) return (t) => 
-    compound.h0 + compound.MW * Cp0(compound)((tempAmbRef+t)/2) * (t-tempAmbRef)
-  return compound.h0 + compound.MW * Cp0(compound)((tempAmbRef+t)/2) * (t-tempAmbRef)
+    compound.h0 + compound.MW * Cp0(compound)((options.tempAmbRef+t)/2) * (t-options.tempAmbRef)
+  return compound.h0 + compound.MW * Cp0(compound)((options.tempAmbRef+t)/2) * (t-options.tempAmbRef)
 }
 
+/** (kJ/kmol) Enthalpy of combustion for a certain compound */
 const combustionH = (compound, t, tIni, liquidWater) => {
-  // Units (kJ/kmol)
-  // Enthalpy of combustion for a certain compound
   // hrp = HP − HR // H = H0 + deltaH  // H0 = n(hf)
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
 
@@ -245,6 +147,18 @@ const combustionH = (compound, t, tIni, liquidWater) => {
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
   return ( compound.CO2*co2_H(t) + compound.SO2*so2_H(t) + compound.H2O*h2o_H(t)
     - deltaH(compound)(tIni) - compound.O2*o2_H(tIni) )
+}
+
+/** (kJ/kmol) Enthalpy of combustion for a certain fuel mix */
+const ncv = (fuels, products, compounds, tAmb) => {
+  let value = 0
+  for (const fuel in fuels) {
+    if (fuel in products) continue
+    const compound = compounds.filter(element => element.Formula == fuel)[0]
+    value += fuels[fuel]*combustionH(compound)(tAmb)
+    //log("info",`H of combustion for ${fuel}: ${combustionH(compound)(tAmb)/compound.MW} KJ/Kg` )
+  }
+  return value
 }
 
 const adFlame = (fuels, products, tIni, o2required) => {
@@ -278,7 +192,7 @@ const adFlame = (fuels, products, tIni, o2required) => {
   return (t) => pEnthalpy(t) - enthalpy.reduce((acc, value)=> acc + value)
 }
 
-const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
+const molesOfCombustion = (fuels, options, params) => {
 
   const compounds = data.filter( 
     (element, i, arr) => element.Formula in fuels
@@ -286,7 +200,7 @@ const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
 
   if (!checkFuelPercentage(fuels, compounds)) return {}
 
-  log("info",`H2O moles per O2 in air 65% RH):  ${moistAirMolesPerO2(tIniCalc, humidity)}`)
+  log("info",`H2O moles per O2 in air ${options.humidity}% RH): ${moistAirMolesPerO2(options.tAmb, options.humidity)}`)
 
   const products = {
     O2: 0,
@@ -299,46 +213,54 @@ const molesOfCombustion = (fuels, tIniCalc, humidity, airExcess) => {
   for (const element of compounds) {
     // Calculating the products of combustion
     for (const product in products) {
-      // log("info", element['Formula'] + ' req = ' + product + element[product]*fuels[element['Formula']])
+      //log(
+      //  `${element['Formula']} req = ${product} ${element[product]*fuels[element['Formula']]}`
+      //)
       products[product] += element[product]*fuels[element['Formula']]
     }
   }
 
-  const o2excess = products['O2'] * (1 + airExcess)
+  /** Percentage of O2 in excess 100% + x% airExcess */
+  let o2excess = products['O2'] * (1 + options.airExcess)
+  // If O2 requirements are negative 
+  if (products['O2'] <= 0) {
+    o2excess = 0
+    log('error', 'o2 in fuel is greater than needed, airExcess set to 0')
+  }
 
-  products['O2'] = o2excess - products['O2']
+  products['O2'] = o2excess - products['O2'] // Subtracting the O2 used in combustion
   products['N2'] += o2excess * (0.79/0.21)
-  products['H2O'] += o2excess * moistAirMolesPerO2(tIniCalc, humidity)
+  products['H2O'] += o2excess * moistAirMolesPerO2(options.tAmb, options.humidity)
 
-  // for (const fuel in fuels) {
-  //   if (fuel in products) continue
-  //   const compound = compounds.filter(element => element.Formula == fuel)[0]
-  //   log("info",`H of combustion for ${fuel}: ${combustionH(compound)(tIniCalc)/compound.MW} KJ/Kg` )
-  // }
+  params.NCV = -ncv(fuels, products, compounds, options.tAmb)
+  log("info", "NCV (kJ/kmol): " + params.NCV)
+  log("info", "adiabatic flame (K): " + 
+    newtonRaphson(adFlame(fuels, products, options.tAmb, o2excess), 1000, options)
+  )
 
-  //log(adFlame(fuels, products)(1371))
-  log(newtonRaphson(adFlame(fuels, products, tIniCalc, o2excess), 1000, options))
-
-  let total = 0; totalDry = 0
+  let totalPerMol = 0; totalPerM_Dry = 0
   for (const product in products) {
-    total += products[product]
-    if (product !== 'H2O') totalDry += products[product]
+    totalPerMol += products[product]
+    if (product !== 'H2O') totalPerM_Dry += products[product]
   }
   const flows = {
-    TOTAL: total,
-    DRY_TOTAL: totalDry,
-    AC: o2excess * (1 + (0.79/0.21)),
+    TOTAL: totalPerMol,
+    DRY_TOTAL: totalPerM_Dry,
+    AC: o2excess * (1 + (0.79/0.21)), // 
+    'O2%_DRY': 100*products['O2']/totalPerM_Dry,
+    'CO2%_DRY': 100*products['CO2']/totalPerM_Dry,
+    'N2%_DRY': 100*products['N2']/totalPerM_Dry,
+    'O2%_WET': 100*products['O2']/totalPerMol,
+    'CO2%_WET': 100*products['CO2']/totalPerMol,
+    'N2%_WET': 100*products['N2']/totalPerMol,
   }
 
-  flows['O2%_DRY'] = 100*products['O2']/totalDry
-  flows['CO2%_DRY'] = 100*products['CO2']/totalDry
-  flows['N2%_DRY'] = 100*products['N2']/totalDry
+  params.m_flue = params.m_fuel * flows.TOTAL
+  params.m_air = params.m_fuel * flows.AC
 
-  flows['O2%_WET'] = 100*products['O2']/total
-  flows['CO2%_WET'] = 100*products['CO2']/total
-  flows['N2%_WET'] = 100*products['N2']/total
+  log("radiant section Tg: " + radSection(params))
 
-  return {flows, products}
+  return {flows, products, params}
 }
 
 var data = getData(options.processData)
@@ -351,22 +273,48 @@ let fuels = {
   CO2: 0.02,
   C3H8: 0.032,
 }
-// log(data[substanceID].Substance + " Cp0(J/g K): " + Cp0(data[substanceID])(tAmb))
-// log(molesOfCombustion(fuels, tAmb, humidity, airExcess))
-/*log(molesOfCombustion(fuels, options.tAmb, options.humidity, options.airExcess))*/
-// log(combustionH(data[7]).toString())
-// log(deltaH(data[7])(tempAmbRef))
-// log(
-//   combustionH(data[7],500,true) / data[7].MW,
-//   combustionH(data[7],500) / data[7].MW
-// )
-// log(data[6].h0)
-// log(data[31].h0)
-// log(3*data[6].h0+4*data[31].h0-data[7].h0)
-// log(data[31].Substance + " Cp0(J/g K): " + Cp0(data[31])((tempAmbRef+573.15)/2))
+// const fuels ={
+//   O2: 0.5,
+//   N2: 0.5,
+// }
+
+let params = {
+  Cp_air: Cp0(data[33], true), /** Function of temp (kJ/kmol-K) */
+  Cp_fuel: Cp_multicomp(fuels, true), /** Function of temp (kJ/kmol-K) */
+  m_fuel: 120, /** (kmol/h) */
+  m_fluid: 225_700, /** (kmol/h) */
+  N: 60, /** - number of tubes in rad section */
+  N_shld: 8, /** - number of shield tubes */
+  L: 20.024, /** (m) effective tube length*/
+  Do: 0.219, /** (m) external diameter rad section */
+  CtoC: 0.394, /** (m) center to center distance of tube */
+  F: 0.97, /** - emissive factor */
+  alpha: 0.835, /** - alpha factor */
+  alpha_shld: 1, /** - alpha shield factor */
+
+  // Temperatures
+  t_in_rad: 210 + options.tempToK, // K (process in rad sect)
+  t_out: 355 + options.tempToK, // K (process global)
+  t_stack: 400 + options.tempToK, // K (flue gases out)
+  t_air: 25 + options.tempToK, // K (atm)
+  t_fuel: 25 + options.tempToK, // K (atm)
+  t_amb: options.tAmb, // K
+}
+/*
+log(combustionH(data[7]).toString())
+log(deltaH(data[7])(options.tempAmbRef))
+log(
+  combustionH(data[7],500,true) / data[7].MW,
+  combustionH(data[7],500) / data[7].MW
+)
+log(data[7].Substance, data[7].h0)
+*/
+log("info", `Cp_${data[33].Substance} Cp0(kJ/kmol-K): ${params.Cp_air( (options.tAmb + 15+273.15)*0.5 )}`)
+log("info", `Cp_fuel (kJ/kmol-K): ${params.Cp_fuel(300)}`)
+
+const result = molesOfCombustion(fuels, options, params)
+log("debug", JSON.stringify(result, null, 2))
 
 module.exports = {
-  newtonRaphson,
-  options,
-  log
+  molesOfCombustion
 };
