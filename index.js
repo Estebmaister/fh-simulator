@@ -71,6 +71,9 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
 */
 const Cp_multicomp = (fuels, molResult) => {
   if (fuels.length === 0) return (t) => 0
+  if (!checkFuelPercentage(fuels)) {
+    fuels = normalize(fuels)
+  }
   const fuelCompounds = data.filter( element => element.Formula in fuels )
   let i = 0
   const cps = []
@@ -97,12 +100,26 @@ const moistAirMolesPerO2 = (temperature, relativeHumidity) => {
   return w * 7.655
 }
 
+/** Normalize an object of fuels/products */
+const normalize = (fuels) => {
+  total = Object.values(fuels).reduce((acc, value)=> acc + value)
+  for (const fuel in fuels) {
+    fuels[fuel] = fuels[fuel]/total
+  }
+  return fuels
+}
+
+/** Check if the percentages of the fuels sums 100% 
+ * opt. 2 Check if all the components in the fuels are in the data filtered
+*/
 const checkFuelPercentage = (fuels, compounds) => {
   // Check if the percentages of the fuels sums 100% 
   const check1 = 1 === Object.values(fuels).reduce((acc, value)=> acc + value)
+  if (compounds == undefined) {
+    return check1
+  }
   // Check if all the components in the fuels are in the data filtered
   const check2 = compounds.length === Object.keys(fuels).length
-
   return check1 && check2
 }
 
@@ -234,8 +251,8 @@ const molesOfCombustion = (fuels, options, params) => {
 
   params.NCV = -ncv(fuels, products, compounds, options.tAmb)
   log("info", "NCV (kJ/kmol): " + params.NCV)
-  log("info", "adiabatic flame (K): " + 
-    newtonRaphson(adFlame(fuels, products, options.tAmb, o2excess), 1000, options)
+  log("info", "Adiabatic flame temp (K): " + 
+    newtonRaphson(adFlame(fuels, products, options.tAmb, o2excess), 1400, options)
   )
 
   let totalPerMol = 0; totalPerM_Dry = 0
@@ -255,12 +272,18 @@ const molesOfCombustion = (fuels, options, params) => {
     'N2%_WET': 100*products['N2']/totalPerMol,
   }
 
-  params.m_flue = params.m_fuel * flows.TOTAL
-  params.m_air = params.m_fuel * flows.AC
+  params.m_fuel_seed = 120; /** (kmol/h) */
+  params.m_flue_ratio = flows.TOTAL;
+  params.m_air_ratio = flows.AC;
+  /** Function of temp (kJ/kmol-K) */
+  params.Cp_flue = Cp_multicomp(products, true);
 
-  log("radiant section Tg: " + radSection(params))
+  const rad_result = radSection(params)
 
-  return {flows, products, params}
+  log("Radiant section (K) Tg: " + rad_result[1].Tg)
+  log("Fuel mass (kmol) Tg: " + rad_result[0])
+
+  return {flows, products, params, rad: rad_result[1]}
 }
 
 var data = getData(options.processData)
@@ -274,15 +297,15 @@ let fuels = {
   C3H8: 0.032,
 }
 // const fuels ={
-//   O2: 0.5,
-//   N2: 0.5,
+//   CH4: 1,
 // }
 
 let params = {
   Cp_air: Cp0(data[33], true), /** Function of temp (kJ/kmol-K) */
   Cp_fuel: Cp_multicomp(fuels, true), /** Function of temp (kJ/kmol-K) */
-  m_fuel: 120, /** (kmol/h) */
-  m_fluid: 225_700, /** (kmol/h) */
+  m_fuel_seed: 120, /** (kmol/h) */
+  Cp_fluid: 2.5744 * 105.183, /** (kJ/kmol-K) */
+  m_fluid: 225_700 / 105.183, /** (kmol/h) */
   N: 60, /** - number of tubes in rad section */
   N_shld: 8, /** - number of shield tubes */
   L: 20.024, /** (m) effective tube length*/
@@ -293,11 +316,12 @@ let params = {
   alpha_shld: 1, /** - alpha shield factor */
 
   // Temperatures
-  t_in_rad: 210 + options.tempToK, // K (process in rad sect)
+  t_in_conv: 210 + options.tempToK, // K (process in rad sect)
+  t_in_rad: 250 + options.tempToK, // K (process in rad sect)
   t_out: 355 + options.tempToK, // K (process global)
-  t_stack: 400 + options.tempToK, // K (flue gases out)
-  t_air: 25 + options.tempToK, // K (atm)
-  t_fuel: 25 + options.tempToK, // K (atm)
+  t_stack: 400 + options.tempToK, // K (flue gases out) //TODO: This isn't used
+  t_air: 21 + options.tempToK, // K (atm)
+  t_fuel: 21 + options.tempToK, // K (atm)
   t_amb: options.tAmb, // K
 }
 /*

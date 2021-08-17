@@ -20,31 +20,58 @@
  * Q_in = Q_out
  * Q_in = Q_rls + Q_air + Q_fuel
  * Q_out = Q_R + Q_shield + Q_losses + Q_flue_gases
- * Q_R = Q_rad + Q_conv = Q_fluid(out-in) = m_fluid*Cp_fluid(T_out - T_in)
+ * Q_R = Q_rad + Q_conv = Q_fluid(out-in) = m_fluid*Cp_fluid(t_out - t_in)
  *****************************************************************/
 const {newtonRaphson, options, log} = require('./utils');
 
-/** Calculates the required temperature of the rad section
+/** Calculates the required mass fluid and the necessary
+ * temperature of the rad section
  * Q_in = Q_rls + Q_air + Q_fuel
  * Q_out = Q_R + Q_shield + Q_losses + Q_flue
  * Q_in(Tg) - Q_out(Tg) ~= 0
+ * Q_rad + Q_conv = Q_fluid(out-in)
 */
 const radSection = (params) => {
+    let rad_result = {}, mass_difference = 0
+    const mass_radSection = (m_fuel) => {
+        [mass_difference, rad_result] = mass_radSection_full(m_fuel, params)
+        return mass_difference
+    }
+    const mass_fluid = newtonRaphson(mass_radSection, params.m_fuel_seed, options)
+    return [mass_fluid, rad_result]
+}
+const mass_radSection_full = (m_fuel_seed, params) => {
+    let Tg = 0; // Effective gas temperature in Kelvin degrees
     if (params === null || params === undefined) params = {}
-
-    const
-        // Temperatures
-        T_in = params.t_in_rad , // K
-        T_out = params.t_out, // K
-        T_stack = params.t_stack, // K
-        T_air = params.t_air, // K
-        T_fuel = params.t_fuel, // K
-        T_datum = params.t_amb // K
-
-        /** (kmol/h) */
-        m_fuel = params.m_fuel || 120,
+    const // Temperatures
+        t_in = params.t_in_rad, // K
+        t_out = params.t_out, // K
+        t_air = params.t_air, // K
+        t_fuel = params.t_fuel, // K
+        t_amb = params.t_amb, // K
+        /** Tw = Average tube wall temperature in Kelvin degrees */
+        Tw = (tIn = params.t_in_rad, tOut = params.t_out) => 100 + 0.5*(tIn + tOut);
+    const // Process parameters
+        /** (kJ/kmol) net calorific value */
         /** (kmol/h) */
         m_fluid = params.m_fluid || 225_700,
+        /** (kmol/h) */
+        m_fuel = m_fuel_seed || 120,
+        /** (kmol/h) */
+        m_air = params.m_air_ratio*m_fuel_seed || 1_589.014,
+        /** (kmol/h) */
+        m_flue = params.m_flue_ratio*m_fuel_seed || 1_720.9,
+        /** (kJ/kmol) */
+        NCV = params.ncv || 927_844.41,
+        /** (kJ/kmol.K) */
+        Cp_fluid = params.Cp_fluid,
+        /** (kJ/kmol-K) */
+        Cp_fuel = params.Cp_fuel((t_fuel + t_amb)*0.5) || 39.26,
+        /** (kJ/kmol-K) */
+        Cp_air = params.Cp_air((t_air + t_amb)*0.5) || 29.142,
+        /** (kJ/kmol-K) Molar heat of flue gases */
+        Cp_flue = (tG, tAmb = t_amb) => params.Cp_flue((tG + tAmb)*0.5);
+    const // Fired heater parameters
         /** - number of tubes in rad section */
         N = params.tubes_rad || 60,
         /** - number of shield tubes */
@@ -61,88 +88,103 @@ const radSection = (params) => {
         alpha = params.alpha_factor || 0.835,
         /** - alpha shield factor */
         alpha_shld = params.shld_alpha_factor || 1,
-
+        /** (kJ/h.m2.c) Film convective heat transfer coff */
+        h_conv = params.h_conv_rad || 30.66,
         // calculated params
-        /** (kmol/h) */
-        m_air = params.m_air || 1_589.014,
-        /** (kmol/h) */
-        m_flue = params.m_flue || 1_720.9,
-        /** (kJ/kmol) net calorific value */
-        NCV = params.ncv || 927_844.41,
-        /** (kJ/kmol-K) */
-        Cp_fuel = params.Cp_fuel((T_fuel + T_datum)*0.5) || 39.26,
-        /** (kJ/kmol-K) */
-        Cp_air = params.Cp_air((T_air + T_datum)*0.5) || 29.142,
-        //sigma = 5.67e-11, // (W.m-2.K-4)
+        /** (m2) Cold plane area of tube bank */
+        Acp = N*CtoC*L,
+        /** (m2) Cold plane area of shield tube bank */
+        Acp_shld = N_shld*CtoC*L,
         /** (kJ/h.m2.K4) */
         sigma = 2.041e-7,
-        pi = 3.14159;
+        //sigma = 5.67e-11, // (W.m-2.K-4)
+        pi = 3.14159,
+        /** (m2) Area of tubes in bank */
+        At = N*pi*Do*L;
 
     // ******* Heat input to the radiant section ********
-
-    /** (kJ/kg.K) */
-    const Cp_fluid = 2.5744
-    /** Q_fluid = m_fluid * Cp_fluid(T_fluid_avg) * DeltaT */
-    const Q_fluid = (tIn = T_in, tOut = T_out) =>
+    /** Sensible heat of fluid Q_fluid = m_fluid * Cp_fluid(T_fluid_avg) * DeltaT */
+    const Q_fluid = (tIn = t_in, tOut = t_out) =>
         m_fluid * Cp_fluid * ((tOut - tIn))
-        
-    // Sensible heat of air
-    const Q_air = (tAir = T_air, tAmb = T_datum) => 
+    /** Sensible heat of air Q_air = m_air * Cp_air * (tAir - tAmb) */
+    const Q_air = (tAir = t_air, tAmb = t_amb) => 
         m_air*Cp_air*(tAir - tAmb);
-
-    // Combustion heat of fuel
+    /** Combustion heat of fuel Q_rls = m_fuel * NCV */
     const Q_rls = m_fuel*NCV;
-
-    // Sensible heat of fuel
-    const Q_fuel = (tFuel = T_fuel, tAmb = T_datum) => 
+    /** Sensible heat of fuel Q_fuel = m_fuel * Cp_fuel * (tFuel - tAmb) */
+    const Q_fuel = (tFuel = t_fuel, tAmb = t_amb) => 
         m_fuel*Cp_fuel*(tFuel - tAmb);
-
-    const Q_in = (tAir = T_air, tFuel = T_fuel, tAmb = T_datum,  tIn = T_in) => 
+    /** Heat input Q_in = Q_rls + Q_air(tAir, tAmb) + Q_fuel(tFuel, tAmb) */
+    const Q_in = (tAir = t_air, tFuel = t_fuel, tAmb = t_amb,  tIn = t_in) => 
         Q_rls + Q_air(tAir, tAmb) + Q_fuel(tFuel, tAmb)
 
-    // **************************************************
-
     // ******* Heat taken out of radiant section ********
-
-    // Tg = Effective gas temperature in degrees Kelvin
-    // Tw = Average tube wall temperature in degrees Kelvin
-    const Tw = (tIn = T_in, tOut = T_out) => 100 + 0.5*(tIn + tOut);
-    const Acp = N*CtoC*L; // Cold plane area of tube bank
-    const Acp_shld = N_shld*CtoC*L; // m2
-    const At = N*pi*Do*L; // Area of tubes in bank
-    const h_conv = 30.66; // Film convective heat transfer coefficient (kJ/h.m2.c)
-    // Molar heat of flue gases
-    const Cp_flue = (tG, tAmb = T_datum) => 
-        29.98 + 3.1157e-3*(tG + tAmb)/2;
-
-    // Heat losses through setting
+    /** Heat losses through setting (5% of Q_release) */
     const Q_losses = 0.05*Q_rls;
-    // Radiant heat transfer
-    const Q_rad = (tG, tIn = T_in, tOut = T_out) => 
+    /** Radiant heat transfer = sigma*(alpha*Acp)*F*(tG**4 - Tw(tIn,tOut)**4)*/
+    const Q_rad = (tG, tIn = t_in, tOut = t_out) => 
         sigma*(alpha*Acp)*F*(tG**4 - Tw(tIn,tOut)**4)
-    // Convective heat transfer
-    const Q_conv = (tG, tIn = T_in, tOut = T_out) => 
+    /** Convective heat transfer = h_conv*At*(tG - Tw(tIn,tOut))*/
+    const Q_conv = (tG, tIn = t_in, tOut = t_out) => 
         h_conv*At*(tG - Tw(tIn,tOut))
-    // Heat absorbed by radiant tubes
-    const Q_R = (tG, tIn = T_in, tOut = T_out) => 
+    /** Heat absorbed by radiant tubes = Q_rad + Q_conv */
+    const Q_R = (tG, tIn = t_in, tOut = t_out) => 
         Q_rad(tG,tIn,tOut) + Q_conv(tG,tIn,tOut)
-    // Shield radiant heat transfer
-    const Q_shld = (tG, tIn = T_in, tOut = T_out) => 
+    /** Shield radiant heat transfer (a variation of Q_rad) */
+    const Q_shld = (tG, tIn = t_in, tOut = t_out) => 
         sigma*(alpha_shld*Acp_shld)*F*(tG**4 - Tw(tIn,tOut)**4)
-    // Sensible heat of flue gases
-    const Q_flue = (tG, tAmb = T_datum) => 
+    /** Sensible heat of flue gases = m_flue*Cp_flue(tG,tAmb)*(tG - tAmb) */
+    const Q_flue = (tG, tAmb = t_amb) => 
         m_flue*Cp_flue(tG,tAmb)*(tG - tAmb)
-    // Q_out = Q_R + Q_shld + Q_losses + Q_flue
-    const Q_out = (tG, tAmb = T_datum, tIn = T_in, tOut = T_out) => 
+    /** Q_out = Q_R + Q_shld + Q_losses + Q_flue */
+    const Q_out = (tG, tAmb = t_amb, tIn = t_in, tOut = t_out) => 
         Q_R(tG, tIn, tOut) + Q_shld(tG, tIn, tOut) + Q_losses + Q_flue(tG, tAmb)
 
-    // **************************************************
+    // **************************************************    
+    const y2 = (Tg) => Q_out(Tg) - Q_in()
+    flame = newtonRaphson(y2, 1000, options)
+    if (flame != false) Tg = flame
+    //log(`Flame temp: ${Tg.toExponential(2)}K with fuel ${m_fluid}`)
+    let rad_result = {
+        "Tw": Tw(),
+        "Tg": Tg,
 
+        "Q_in": Q_in(),
+        "Q_rls": Q_rls,
+        "Q_air": Q_air(),
+        "Q_fuel": Q_fuel(),
+        
+        "Q_out": Q_out(Tg),
+        "Q_losses": Q_losses,
+        "Q_rad": Q_rad(Tg),
+        "Q_conv": Q_conv(Tg),
+        "Q_shld": Q_shld(Tg),
+        "Q_flue": Q_flue(Tg),
+        
+        "Q_fluid": Q_fluid(),
+        "Cp_fluid": Cp_fluid,
+        "Cp_fuel": Cp_fuel,
+        "Cp_air": Cp_air,
+        "Cp_flue": Cp_flue(Tg),
+    }
+    //log("debug", JSON.stringify(rad_result, null, 2))
+
+    let t_out_recall = t_in - t_out + (Q_rad(Tg) + Q_conv(Tg)) / (m_fluid*Cp_fluid)
+    return [t_out_recall, rad_result]
+}
+
+module.exports = {
+    radSection
+  };
+
+/** Unused equations
+    const t_stack = params.t_stack, // K
     // Output:
     const A = Q_in() - Q_losses;
-    const B = A + sigma*F*(alpha*Acp + Acp_shld*alpha_shld)*Tw()**4 + h_conv*At*Tw() + m_flue*Cp_flue(T_stack)*T_datum;
+    const B = A + sigma*F*(alpha*Acp + Acp_shld*alpha_shld)*Tw()**4 + 
+        h_conv*At*Tw() + m_flue*Cp_flue(t_stack)*t_amb;
     const C = sigma*F*(alpha*Acp + Acp_shld*alpha_shld);
-    const D = h_conv*At + m_flue*Cp_flue(T_stack);
+    const D = h_conv*At + m_flue*Cp_flue(t_stack);
 
     // Equation of effective temperature.
     const y = (Tg) => C*(Tg**4) + D*Tg - B
@@ -152,30 +194,4 @@ const radSection = (params) => {
     //${C.toExponential(4)}*Tg**4 + ${D.toExponential(4)}*Tg - ${B.toExponential(4)}`)
     flame = newtonRaphson(y, 1270, options)
     log(`Effective gas temperature: ${flame}`)
-    
-    const y2 = (Tg) => Q_out(Tg) - Q_in()
-    flame2 = newtonRaphson(y2, 1270, options)
-    //log(`Second: ${flame2.toExponential(2)}`)
-    log("debug", `{"Effective Gas temperature": ${flame2}, "Tw": ${Tw(T_in,T_out)}` 
-    + `, "Q_in": ${Q_in()}`
-    + `, "Q_rls": ${Q_rls}`
-    + `, "Q_air": ${Q_air()}`
-    + `, "Cp_air": ${Cp_air}`
-    + `, "Q_fuel": ${Q_fuel()}`
-    + `, "Cp_fuel": ${Cp_fuel}`
-    + `, "Q_fluid": ${Q_fluid()}`
-
-    + `, "Q_out": ${Q_out(flame2)}`
-    + `, "Q_losses": ${Q_losses}`
-    + `, "Q_rad": ${Q_rad(flame2)}`
-    + `, "Q_conv": ${Q_conv(flame2)}`
-    + `, "Q_shld": ${Q_shld(flame2)}`
-    + `, "Q_flue": ${Q_flue(flame2)}`
-    +`}`)
-
-    return flame2
-}
-
-module.exports = {
-    radSection
-  };
+ */
