@@ -251,9 +251,9 @@ const molesOfCombustion = (fuels, options, params) => {
 
   params.NCV = -ncv(fuels, products, compounds, options.tAmb)
   log("info", "NCV (kJ/kmol): " + params.NCV)
-  log("info", "Adiabatic flame temp (K): " + 
-    newtonRaphson(adFlame(fuels, products, options.tAmb, o2excess), 1400, options)
-  )
+  params.adFlame = newtonRaphson(
+    adFlame(fuels, products, options.tAmb, o2excess), 1400, options)
+  log("info", "Adiabatic flame temp (K): " + params.adFlame)
 
   let totalPerMol = 0; totalPerM_Dry = 0
   for (const product in products) {

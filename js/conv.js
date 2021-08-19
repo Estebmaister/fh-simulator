@@ -57,122 +57,123 @@ const
     G = 30, //cst // Flue gas velocity through convection section, kg/m2.s
     L = 20.024, // Effective tube length, m
     Do = 0.219, // External diameter of tube, m
-    Di = , // Internal diameter of tube, m
-    n = , // Number of tubes in a layer
+    Di = 0.211, // Internal diameter of tube, m
+    n = 4, // Number of tubes in a layer
     Nshld = 8, // Number of shield tubes
     c = 0.219, // Center-to-center distance of tube spacing, m
-    N = , // Number of tube layers
+    N = 11, // Number of tube layers
     // ntube=input('Number of tubes at each row of tubes in convection section =');
-    Qs = , // Assumed heat absorption by the first layer of tubes, Kj/h
+    Qs = 6e8, // Assumed heat absorption by the first layer of tubes, Kj/h
 
     sigma = 2.041e-7, // Boltzman Constant, kJ/h.m2.K4
     alpha = 1, // Relative effectiveness factor of the shield tubes
     F = 0.97; // Exchange factor
 
-for I=1:N
-// Calculation of cold plane area of shield tubes
-Acpshld=Nshld*c*L;
-// Calculation of inside tube surface area
-Si=pi*Di*L;
-// Calculation of outside tube surface area
-So=pi*Do*L;
-// Calculation heat exchange surface area at each layer of tubes
-S=n*Si;
-// From the assumed heat absorption ,calculate the temperatures of...
-// the flue gas process fluid by means of appropriate balances ...
-// at each tube layer
-// Qs=Mgases*Cpav*(T1-T)
-Qc=0;
-while abs(Qc-Qs)>=0.001;
+for (let I=1; I>N; I++) {
+    // Calculation of cold plane area of shield tubes
+    Acpshld=Nshld*c*L;
+    // Calculation of inside tube surface area
+    Si=pi*Di*L;
+    // Calculation of outside tube surface area
+    So=pi*Do*L;
+    // Calculation heat exchange surface area at each layer of tubes
+    S=n*Si;
+    // From the assumed heat absorption ,calculate the temperatures of...
+    // the flue gas process fluid by means of appropriate balances ...
+    // at each tube layer
+    // Qs=Mgases*Cpav*(T1-T)
+    Qc=0;
+    while (Math.abs(Qc-Qs) >= 0.001) {
+        if (Qc == 0) {
+            Qs=Qc;
+        }// 1.end
 
-if Qc~=0
-Qs=Qc;
-end
-T=T1-Qs/(Mgases*Cpav);
-// Qs=Mfluid*Cpf*(t2-t)
-// x=0.01;
-// H=286.8;
-t=t2-Qs/(Mfluid*Cpf);
-// Calcualtion of the logarithm mean temperature difference (LMTD)
-Def1=T1-t2;
-Def2=T-t;
-LMTD=(Def1-Def2)/logarithm(Def1/Def2);
-// Calculation of Escaping radiation
-// Caculation tubewall temperature at tube layer
-Tw=100+0.5*(t+t2)+273;
-Qe_rad=sigma*alpha*Acpshld*F*((T+273)^4-Tw^4);
-// Calculation of overall heat exchange coefficient :
-// 1/U=(1/hi)+fy+(1/ho)*(Si/So)
-// Calculation of convection coefficient between the process fluid and ...
-// the inside wall of the tubes
-// hi=0.023*(k/Di)*pr^(1/3)*Re^0.8*(u/uw)^0.14
-// Let u/uw=1.0 for small variation in viscosity between ...
-// bulk and wall temperatures
-// k is thermal conductivity of oil(process fluid)
-k=0.49744-29.4604*10^(-5)*(t2+t)/2;
-// Calculation of Reynolds number ,Re=Di*w*ro/u
-// u is viscosity of process fluid at average temperatute of process fluid
-u=-0.1919*logarithm((t2+t)/2)*logarithm((t2+t)/2)+0.2295*logarithm((t2+t)/2)-2.9966;
-u=u/3600;
-u=exp(u);
-ri=Di/2;
-ro=Do/2;
-w=Mfluid/(pi*ri^2*ru);
-Re=Di*w*ru/u;
-// Calc of prandtl number at the average temperature of process fluid
-pr=Cpf*u/k;
-hi=0.023*(k/Di)*pr^(1/3)*Re^0.8;
-// Calculation of radiation and convection coefficient .....
-// between the flue gases and the outside surface of the tubes:
-// Estimating of a film coefficient based on pure convection...
-// for flue gas flowing normal to a bank of bare tubes
-// hc=0.018*Cpg*G^(2/3)*Tgai^0.3/Do
-// Tga is average flue gas temperature at each a tybe layer
-Tga=(T1+T)/2;
-Cpav=1.0775+1.1347*10^(-4)*(T1+T)/2;
-hc=0.018*Cpav*G^(2/3)*Tga^0.3/Do;
+        const T = T1-Qs/(Mgases*Cpav);
+        // Qs=Mfluid*Cpf*(t2-t)
+        // x=0.01;
+        // H=286.8;
+        const t = t2-Qs/(Mfluid*Cpf);
+        // Calcualtion of the logarithm mean temperature difference (LMTD)
+        const Def1=T1-t2;
+        const Def2=T-t;
+        const LMTD=(Def1-Def2)/logarithm(Def1/Def2);
+        // Calculation of Escaping radiation
+        // Caculation tubewall temperature at tube layer
+        const Tw = 100+0.5*(t+t2)+273;
+        const Qe_rad = sigma*alpha*Acpshld*F*((T+273)**4-Tw**4);
+        // Calculation of overall heat exchange coefficient :
+        // 1/U=(1/hi)+fy+(1/ho)*(Si/So)
+        // Calculation of convection coefficient between the process fluid and ...
+        // the inside wall of the tubes
+        // hi=0.023*(k/Di)*pr**(1/3)*Re**0.8*(u/uw)**0.14
+        // Let u/uw=1.0 for small variation in viscosity between ...
+        // bulk and wall temperatures
+        // k is thermal conductivity of oil(process fluid)
+        const k=0.49744-29.4604*10**(-5)*(t2+t)/2;
+        // Calculation of Reynolds number ,Re=Di*w*ro/u
+        // u is viscosity of process fluid at average temperatute of process fluid
+        const u=-0.1919*logarithm((t2+t)/2)*logarithm((t2+t)/2)+0.2295*logarithm((t2+t)/2)-2.9966;
+        const u=u/3600;
+        const u=exp(u);
+        const ri=Di/2;
+        const ro=Do/2;
+        const w=Mfluid/(pi*ri**2*ru);
+        const Re=Di*w*ru/u;
+        // Calc of prandtl number at the average temperature of process fluid
+        const pr=Cpf*u/k;
+        const hi=0.023*(k/Di)*pr**(1/3)*Re**0.8;
+        // Calculation of radiation and convection coefficient .....
+        // between the flue gases and the outside surface of the tubes:
+        // Estimating of a film coefficient based on pure convection...
+        // for flue gas flowing normal to a bank of bare tubes
+        // hc=0.018*Cpg*G**(2/3)*Tgai**0.3/Do
+        // Tga is average flue gas temperature at each a tybe layer
+        const Tga=(T1+T)/2;
+        const Cpav=1.0775+1.1347*10**(-4)*(T1+T)/2;
+        const hc=0.018*Cpav*G**(2/3)*Tga**0.3/Do;
 
-// Estimating of a radiation coefficient of the hot gases :
-hrg=9.2*10^(-2)*Tga-34;
-// Estimating of the total heat-transfer coefficient for the bare tube...
-// convection section :
-ho=1.1*(hc+hrg);
-// calculation of f(e,lampda)=fy:
-// fy=(ro/lampda)*logarithm(ro/ri)
-// Lampda is thermal coductivity of the tube wall:
-lampda=-0.157*10^(-4)*(Tw)^2+79.627*10^(-3)*(Tw)+28.803;
-// Assume uniform distribution of the the flux over ...
-// the whole periphery of the tube.
-fy=(ro/lampda)*logarithm(ro/ri);
-// Calculation of the overall heat exchange coefficient:
-// 1/U=(1/hi)+fy+(1/ho)*(Si/So)
-K=1/((1/hi)+fy+(1/ho)*(Si/So));
-// U=1/K;
-// Uc=U;
-Uc=K;
-// The heat transferred by convection and radiation ...
-// into the tubes:
-// Qc=Qe_rad+Uc*Atubes*LMTD
-// Atube is exchange surface are at each raw of tubes
-Atubes=S;
-Qc=Qe_rad+Uc*Atubes*LMTD;
-end
+        // Estimating of a radiation coefficient of the hot gases :
+        const hrg=9.2*10**(-2)*Tga-34;
+        // Estimating of the total heat-transfer coefficient for the bare tube...
+        // convection section :
+        const ho=1.1*(hc+hrg);
+        // calculation of f(e,lampda)=fy:
+        // fy=(ro/lampda)*logarithm(ro/ri)
+        // Lampda is thermal coductivity of the tube wall:
+        const lampda=-0.157*10**(-4)*(Tw)**2+79.627*10**(-3)*(Tw)+28.803;
+        // Assume uniform distribution of the the flux over ...
+        // the whole periphery of the tube.
+        const fy=(ro/lampda)*logarithm(ro/ri);
+        // Calculation of the overall heat exchange coefficient:
+        // 1/U=(1/hi)+fy+(1/ho)*(Si/So)
+        const K=1/((1/hi)+fy+(1/ho)*(Si/So));
+        // U=1/K;
+        // Uc=U;
+        const Uc=K;
+        // The heat transferred by convection and radiation ...
+        // into the tubes:
+        // Qc=Qe_rad+Uc*Atubes*LMTD
+        // Atube is exchange surface are at each raw of tubes
+        const Atubes=S;
+        const Qc=Qe_rad+Uc*Atubes*LMTD;
+    }// 2.end
+
 I
-Tg=T+273;
-log('The temperature of the flue gas is //5.1f Kelvin \n\n',Tg)
+const Tg=T+273;
+log(`The temperature of the flue gas is ${Tg} Kelvin \n\n`)
 t;
-Tf=t+273;
-log('The temperature of the process fluid is //5.1f Kelvin \n\n',Tf)
-Tw=Tw;
-log('The tube wall temperature is //5.1f Kelvin \n\n',Tw)
+const Tf=t+273;
+log(`The temperature of the process fluid is ${Tf} Kelvin \n\n`)
+const Tw=Tw;
+log(`The tube wall temperature is ${Tw} Kelvin \n\n`)
 Qc;
-log('Heat absorbed by heated fluid is //10.2e kJ/h\n',Qc)
-if t==t1
-T==T2
-break
-else
-t2=t;
-T1=T;
-Cpav=1.0775+1.1347*10^(-4)*(T2+T)/2;
-end
-end
+log(`Heat absorbed by heated fluid is //10.2e kJ/h\n`,Qc)
+    if (t==t1) {
+    T==T2
+    break
+    } else {
+    let t2=t;
+    let T1=T;
+    let Cpav=1.0775+1.1347*10**(-4)*(T2+T)/2;
+    } // 4.end
+}// 3.end
