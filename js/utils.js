@@ -56,11 +56,13 @@ const log = function(...arguments) {
   }
 }
 
-function newtonRaphson (f, fp, x0, options) {
+/** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
+function newtonRaphson (f, fp, x0, options, name) {
   let x1, y, yp, tol, maxIter, iter, yph, ymh, yp2h, ym2h, h, hr, verbose, eps;
 
   // Interpret variadic forms:
   if (typeof fp !== 'function') {
+    name = options;
     options = x0;
     x0 = fp;
     fp = null;
@@ -94,7 +96,7 @@ function newtonRaphson (f, fp, x0, options) {
       // Check for badly conditioned update (extremely small first deriv relative to function):
       if (Math.abs(yp) <= eps * Math.abs(y)) {
       if (verbose) {
-          log("info", 'Newton-Raphson: failed to converged due to nearly zero first derivative');
+          log("info", `Newton-Raphson (${name}): failed to converged due to nearly zero first derivative`);
       }
       return false;
       }
@@ -105,7 +107,7 @@ function newtonRaphson (f, fp, x0, options) {
       // Check for convergence:
       if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
       if (verbose) {
-          log("info", `Newton-Raphson: converged to x = ${x1} after ${iter} iterations`);
+          log("info", `Newton-Raphson (${name}): converged to x = ${x1} after ${iter} iterations`);
       }
       return x1;
       }
@@ -115,7 +117,7 @@ function newtonRaphson (f, fp, x0, options) {
   }
 
   if (verbose) {
-      log("info", `Newton-Raphson: Maximum iterations reached (${maxIter})`);
+      log("info", `Newton-Raphson (${name}): Maximum iterations reached (${maxIter})`);
   }
 
   return false;
@@ -136,8 +138,8 @@ const options = {
   pAtm: parseFloat(process.argv[7]) || 1e5,
 
   // Newton Raphson arguments
-  tolerance: 1e-2,
-  epsilon: 3e-6,
+  tolerance: 1e-4,
+  epsilon: 3e-8,
   maxIterations: 20,
   h: 1e-4,
 
