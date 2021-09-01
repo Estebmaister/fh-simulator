@@ -112,14 +112,17 @@ const normalize = (fuels) => {
 /** Check if the percentages of the fuels sums 100% 
  * opt. 2 Check if all the components in the fuels are in the data filtered
 */
-const checkFuelPercentage = (fuels, compounds) => {
+const checkFuelPercentage = (fuels, compounds, result = {}) => {
   // Check if the percentages of the fuels sums 100% 
-  const check1 = 1 === Object.values(fuels).reduce((acc, value)=> acc + value)
-  if (compounds == undefined) {
-    return check1
-  }
+  const fuelPercentage = Object.values(fuels).reduce((acc, value)=> acc + value)
+  const tolerance = 3e-12
+  const check1 = Math.abs(1 - fuelPercentage) <= tolerance
+  if (!check1) result.err += `fuel percentage not equal to 100, fp: ${fuelPercentage*100}.`
+  if (compounds == undefined) return check1
   // Check if all the components in the fuels are in the data filtered
-  const check2 = compounds.length === Object.keys(fuels).length
+  const badFuels = Math.abs(compounds.length - Object.keys(fuels).length)
+  const check2 = badFuels === 0
+  if (!check2) result.err += `some fuels aren't in the database, #badFuels: ${badFuels}`
   return check1 && check2
 }
 
@@ -211,14 +214,9 @@ const adFlame = (fuels, products, tIni, o2required) => {
 
 const molesOfCombustion = (fuels, options, params) => {
 
-  const compounds = data.filter( 
-    (element, i, arr) => element.Formula in fuels
-  )
-
-  if (!checkFuelPercentage(fuels, compounds)) return {}
-
-  log("info",`H2O moles per O2 in air ${options.humidity}% RH): ${moistAirMolesPerO2(options.tAmb, options.humidity)}`)
-
+  const result = {err: ""}
+  const compounds = data.filter((element, i, arr) => element.Formula in fuels)
+  if (!checkFuelPercentage(fuels, compounds, result)) return result
   const products = {
     O2: 0,
     H2O: 0,
@@ -226,6 +224,7 @@ const molesOfCombustion = (fuels, options, params) => {
     SO2: 0,
     N2: 0, // This is defined later, used here to avoid null
   }
+  log("info",`H2O moles per O2 in air ${options.humidity}% RH): ${moistAirMolesPerO2(options.tAmb, options.humidity)}`)
 
   for (const element of compounds) {
     // Calculating the products of combustion
@@ -252,7 +251,8 @@ const molesOfCombustion = (fuels, options, params) => {
   params.NCV = -ncv(fuels, products, compounds, options.tAmb)
   log("info", "NCV (kJ/kmol): " + params.NCV)
   params.adFlame = newtonRaphson(
-    adFlame(fuels, products, options.tAmb, o2excess), 1400, options)
+    adFlame(fuels, products, options.tAmb, o2excess),
+    1400, options, "fuel_adFlame")
   log("info", "Adiabatic flame temp (K): " + params.adFlame)
 
   let totalPerMol = 0; totalPerM_Dry = 0
@@ -280,21 +280,26 @@ const molesOfCombustion = (fuels, options, params) => {
 
   const rad_result = radSection(params)
 
-  log("Radiant section (K) Tg: " + rad_result[1].Tg)
-  log("Fuel mass (kmol) Tg: " + rad_result[0])
+  log("Radiant section (K) Tg: " + rad_result.Tg)
+  log("Fuel mass (kmol) Tg: " + rad_result.m_fuel)
 
-  return {flows, products, params, rad: rad_result[1]}
+  return {flows, products, params, rad_result}
 }
 
 var data = getData(options.processData)
 let fuels = {
-  CH4: 0.323,
-  O2: 0.003,
-  N2: 0.048,
-  H2: 0.519,
-  CO: 0.055,
-  CO2: 0.02,
-  C3H8: 0.032,
+  // O2: 0,
+  CH4: .5647,
+  C2H6: 0.1515,
+  C3H8: 0.0622,
+  C4H10: 0.0176,
+  iC4H10: 0.0075,
+  C2H4: 0.0158,
+  C3H6: 0.0277,
+  CO: 0.0066,
+  H2: 0.1142,
+  N2: 0.0068,
+  CO2: 0.0254,
 }
 // const fuels ={
 //   CH4: 1,
@@ -303,7 +308,6 @@ let fuels = {
 let params = {
   Cp_air: Cp0(data[33], true), /** Function of temp (kJ/kmol-K) */
   Cp_fuel: Cp_multicomp(fuels, true), /** Function of temp (kJ/kmol-K) */
-  m_fuel_seed: 120, /** (kmol/h) */
   Cp_fluid: 2.5744 * 105.183, /** (kJ/kmol-K) */
   m_fluid: 225_700 / 105.183, /** (kmol/h) */
   N: 60, /** - number of tubes in rad section */
@@ -314,15 +318,20 @@ let params = {
   F: 0.97, /** - emissive factor */
   alpha: 0.835, /** - alpha factor */
   alpha_shld: 1, /** - alpha shield factor */
+  pi: Math.PI,
 
   // Temperatures
   t_in_conv: 210 + options.tempToK, // K (process in rad sect)
-  t_in_rad: 250 + options.tempToK, // K (process in rad sect)
-  t_out: 355 + options.tempToK, // K (process global)
-  t_stack: 400 + options.tempToK, // K (flue gases out) //TODO: This isn't used
   t_air: 21 + options.tempToK, // K (atm)
   t_fuel: 21 + options.tempToK, // K (atm)
   t_amb: options.tAmb, // K
+  
+  // Variables
+  t_out: undefined, // 628.15 - 315 K (process global)
+  m_fuel: 100, /** (kmol/h) */
+  // t_out: 355 + options.tempToK, // K (process global)
+  // t_in_rad: 250 + options.tempToK, // K (process in rad sect)
+  // t_stack: 400 + options.tempToK, //TODO: (This isn't used) - K (flue gases out)
 }
 /*
 log(combustionH(data[7]).toString())
