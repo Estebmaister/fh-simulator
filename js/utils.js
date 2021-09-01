@@ -127,14 +127,14 @@ const tempToK = 273.15
 const tempAmbRef = tempToK + 25; // 298.15
 
 /** Example for a call of this file: 
- * node . true true 25 70 80 1e5  */ 
+ * node . true true 21 70 80 1e5  */ 
 const options = {
   // Entry arguments
   verbose: process.argv[2] == "true",
   processData: process.argv[3] == "true",
   tAmb: tempToK + parseFloat(process.argv[4]) || tempAmbRef - 4,
-  humidity: parseFloat(process.argv[5]) || 70,
-  airExcess: 0.01 * parseFloat(process.argv[6]) || 0.01 * 80,
+  humidity: 1e-10 + parseFloat(process.argv[5]) || 70,
+  airExcess: 1e-10 + 0.01 * parseFloat(process.argv[6]) || 0.01 * 80,
   pAtm: parseFloat(process.argv[7]) || 1e5,
 
   // Newton Raphson arguments
