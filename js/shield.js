@@ -21,6 +21,7 @@
  * Q_conv_shield = h_conv*At*(tG - Tw(tIn,tOut))
  * Q_conv_shield = m_flue*Cp_flue*(tG - Tg_sh)
  *****************************************************************/
+const {newtonRaphson, options, log} = require('./utils');
 
 const shieldSection = (params) => {
   let
@@ -36,7 +37,9 @@ const shieldSection = (params) => {
     /** Tw = Average tube wall temperature in Kelvin degrees */
     Tw = (tIn, tOut = t_out) => 100 + 0.5*(tIn + tOut),
     /** (kmol/h) */
-    m_flue = params.m_flue,
+    m_fuel = params.m_fuel,
+    /** (kmol/h) */
+    m_flue = (mFuel = m_fuel) => params.m_flue_ratio*mFuel,
     /** (kmol/h) */
     m_fluid = params.m_fluid,
     /** (kJ/kmol.K) */
@@ -57,19 +60,32 @@ const shieldSection = (params) => {
     pi = 3.14159,
     /** (m2) Area of tubes in bank */
     At = N_shld*pi*Do*L;
-
-  const Q_fluid_sh =  (tIn, tOut = t_out) => 
-    m_fluid*Cp_fluid*(tOut - tIn);
   
   const Q_conv_sh = (tG_sh, tG = Tg) => 
     h_conv*At*(tG_sh - Tw(tG_sh,tG));
 
   const Q_flue_sh = (tG_sh, tG = Tg) => 
-    m_flue*Cp_flue(tG_sh, tG)*(tG_sh - tG);
+    m_flue()*Cp_flue(tG_sh, tG)*(tG_sh - tG);
 
+  log("Q_conv_sh: " + Q_conv_sh(500) + ", Q_flue_sh: " + Q_flue_sh(500))
   const Tg_shBalance = (tG_sh, tG = Tg) => 
-    Q_flue_sh(Tg) - Q_conv_sh(Tg)
+    Q_flue_sh(tG_sh, tG) - Q_conv_sh(tG_sh, tG);
   
   flame = newtonRaphson(Tg_shBalance, Tg, options, "shield_Tg")
   if (flame != false) Tg_sh = flame
+  params.Tg_sh = Tg_sh
+
+  const Q_fluid_sh =  (tIn, tOut = t_out) => 
+    m_fluid*Cp_fluid*(tOut - tIn);
+
+  const T_in_shBalance = (tIn, tG_sh = Tg_sh, tG = Tg) => 
+    Q_fluid_sh(tIn) - Q_conv_sh(tG_sh, tG);
+
+  flame_t_in = newtonRaphson(T_in_shBalance, t_out, options, "shield_t_in")
+  if (flame_t_in != false) t_in = flame_t_in
+  params.t_in_sh = t_in
 }
+
+module.exports = {
+  shieldSection
+};

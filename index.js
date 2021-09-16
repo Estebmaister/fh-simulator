@@ -18,6 +18,7 @@ const fs = require('fs');
 const parse = require('csv-parse/lib/sync');
 const {newtonRaphson, options, log} = require('./js/utils');
 const {radSection} = require('./js/rad');
+const {shieldSection} = require('./js/shield');
 
 const dataPaths = {
   csv: __dirname + "/data.csv",
@@ -71,15 +72,16 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
 */
 const Cp_multicomp = (fuels, molResult) => {
   if (fuels.length === 0) return (t) => 0
+  let normalFuel = JSON.parse(JSON.stringify(fuels));
   if (!checkFuelPercentage(fuels)) {
-    fuels = normalize(fuels)
+    normalFuel = normalize(normalFuel)
   }
-  const fuelCompounds = data.filter( element => element.Formula in fuels )
+  const fuelCompounds = data.filter( element => element.Formula in normalFuel )
   let i = 0
   const cps = []
-  for (const fuel in fuels) {
+  for (const fuel in normalFuel) {
     const compound = fuelCompounds.filter(element => element.Formula == fuel)[0]
-    cps[i] = (t) => fuels[fuel] * Cp0(compound, molResult)(t)
+    cps[i] = (t) => normalFuel[fuel] * Cp0(compound, molResult)(t)
     i++
   }
   
@@ -102,11 +104,12 @@ const moistAirMolesPerO2 = (temperature, relativeHumidity) => {
 
 /** Normalize an object of fuels/products */
 const normalize = (fuels) => {
-  total = Object.values(fuels).reduce((acc, value)=> acc + value)
-  for (const fuel in fuels) {
-    fuels[fuel] = fuels[fuel]/total
+  normalFuel = {...fuels}
+  total = Object.values(normalFuel).reduce((acc, value)=> acc + value)
+  for (const fuel in normalFuel) {
+    normalFuel[fuel] = normalFuel[fuel]/total
   }
-  return fuels
+  return normalFuel
 }
 
 /** Check if the percentages of the fuels sums 100% 
@@ -279,6 +282,7 @@ const molesOfCombustion = (fuels, options, params) => {
   params.Cp_flue = Cp_multicomp(products, true);
 
   const rad_result = radSection(params)
+  shieldSection(params)
 
   log("Radiant section (K) Tg: " + rad_result.Tg)
   log("Fuel mass (kmol) Tg: " + rad_result.m_fuel)

@@ -22,7 +22,6 @@
  * Q_out = Q_R + Q_shield + Q_losses + Q_flue_gases
  * Q_R = Q_rad + Q_conv = Q_fluid(out-in) = m_fluid*Cp_fluid(t_out - t_in)
  *****************************************************************/
-const { isNullOrUndefined } = require('util');
 const {newtonRaphson, options, log} = require('./utils');
 
 /** Calculates the required mass fluid and the necessary
@@ -33,11 +32,11 @@ const {newtonRaphson, options, log} = require('./utils');
  * Q_rad + Q_conv = Q_fluid(out-in)
 */
 const radSection = (params) => {
-  let rad_result = {}, mass_difference = 0, radSection_nr = null
-  if (params.t_out !== null) {
-    rad_result = radSection_full(null, params.t_out, params)
-  } else if (params.m_fuel !== null) {
-    rad_result = radSection_full(params.m_fuel, null, params)
+  let rad_result = {}
+  if (params.t_out !== undefined) {
+    rad_result = radSection_full(undefined, params.t_out, params)
+  } else if (params.m_fuel !== undefined) {
+    rad_result = radSection_full(params.m_fuel, undefined, params)
   } else {
     params.err += "-wrong call for rad section, no seed for mass fuel or out temp."
   }
@@ -68,14 +67,13 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     Tw = (tOut, tIn = t_in) => 100 + 0.5*(tIn + tOut);
 
   const // Process parameters
-    /** (kJ/kmol) net calorific value */
     /** (kmol/h) */
     m_fluid = params.m_fluid || 225_700,
     /** (kmol/h) */
     m_air = (mFuel = m_fuel) => params.m_air_ratio*mFuel,
     /** (kmol/h) */
     m_flue = (mFuel = m_fuel) => params.m_flue_ratio*mFuel,
-    /** (kJ/kmol) */
+    /** (kJ/kmol) net calorific value */
     NCV = params.ncv || 927_844.41,
     /** (kJ/kmol.K) */
     Cp_fluid = params.Cp_fluid,
@@ -105,6 +103,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     alpha_shld = params.shld_alpha_factor || 1,
     /** (kJ/h.m2.c) Film convective heat transfer coff */
     h_conv = params.h_conv_rad || 30.66,
+    pi = params.pi || 3.14159,
     // calculated params
     /** (m2) Cold plane area of tube bank */
     Acp = N*CtoC*L,
@@ -113,7 +112,6 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     /** (kJ/h.m2.K4) */
     sigma = 2.041e-7,
     //sigma = 5.67e-11, // (W.m-2.K-4)
-    pi = 3.14159,
     /** (m2) Area of tubes in bank */
     At = N*pi*Do*L;
 
@@ -160,7 +158,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   // Calculating Tg from the given variable (mass_fuel or temp_out)
   let flame = 0
   let duty = 0
-  if (t_out_seed !== null) { // Given temp_out
+  if (t_out_seed !== undefined) { // Given temp_out
     duty = m_fluid*Cp_fluid*(t_out_seed - params.t_in_conv)
     // Approximating t_in_rad with assumption for 30% of duty
     t_in = params.t_in_conv + duty * 0.3 / (m_fluid*Cp_fluid)
@@ -175,7 +173,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     m_fuel = newtonRaphson(mFuelBalance, mass_fuel_seed, options, "rad_mFuel")
     if (m_fuel != false) params.m_fuel = m_fuel
 
-  } else if (m_fuel_seed !== null) { // Given mass_fuel
+  } else if (m_fuel_seed !== undefined) { // Given mass_fuel
     duty = Q_rls(m_fuel_seed) * 0.8
     // Approximating t_in_rad and t_out with efficiency
     t_in = params.t_in_conv + duty * 0.3 / (m_fluid*Cp_fluid)
@@ -201,6 +199,9 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   }
 
   // **************************************************
+  params.t_out = t_out
+  params.t_in_rad = t_in
+  params.Tg = Tg
 
   const rad_result = {
     "Tw": Tw(t_out),
