@@ -22,7 +22,7 @@
  * Q_out = Q_R + Q_shield + Q_losses + Q_flue_gases
  * Q_R = Q_rad + Q_conv = Q_fluid(out-in) = m_fluid*Cp_fluid(t_out - t_in)
  *****************************************************************/
-const {newtonRaphson, options, log} = require('./utils');
+const {newtonRaphson, log} = require('./utils');
 
 /** Calculates the required mass fluid and the necessary
  * temperature of the rad section
@@ -44,9 +44,10 @@ const radSection = (params) => {
   //     [t_difference, rad_result] = radSection_full(null, t_out, params)
   //     return t_difference
   // }
-  // const mass_fluid = newtonRaphson(radSection_nr, params.m_fuel_seed, options)
+  // const mass_fluid = newtonRaphson(radSection_nr, params.m_fuel_seed, params.NROptions)
   return rad_result
 }
+
 const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   let 
     /** Effective gas temperature in Kelvin degrees */
@@ -165,12 +166,12 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     log(`${t_in} vs ${params.t_in_rad}`)
     // Calculating Tg
     const TgBalance_OutTemp = (tG) => m_fluid*Cp_fluid*(t_out - t_in) - (Q_rad(tG) + Q_conv(tG))
-    flame = newtonRaphson(TgBalance_OutTemp, 1000, options, "rad_Tg_Tout")
+    flame = newtonRaphson(TgBalance_OutTemp, 1000, params.NROptions, "rad_Tg_Tout")
     if (flame != false) Tg = flame
     // Calculating fuel mass
     const mFuelBalance = (mFuel) => Q_out(Tg, t_out, mFuel) - Q_in(mFuel)
     const mass_fuel_seed = m_fluid*Cp_fluid*(t_out_seed - params.t_in_conv)/(NCV*0.75)
-    m_fuel = newtonRaphson(mFuelBalance, mass_fuel_seed, options, "rad_mFuel")
+    m_fuel = newtonRaphson(mFuelBalance, mass_fuel_seed, params.NROptions, "rad_mFuel")
     if (m_fuel != false) params.m_fuel = m_fuel
 
   } else if (m_fuel_seed !== undefined) { // Given mass_fuel
@@ -182,11 +183,11 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     // Calculating Tg
     //TODO: t_out isn't set needs recalculate
     const TgBalance_MassFuel = (tG) => Q_out(tG, t_out_seed, m_fuel) - Q_in(m_fuel)
-    flame = newtonRaphson(TgBalance_MassFuel, 1000, options, "rad_Tg_mFuel")
+    flame = newtonRaphson(TgBalance_MassFuel, 1000, params.NROptions, "rad_Tg_mFuel")
     if (flame != false) Tg = flame
     // Calculating t_out
     const tOutBalance = (tOut) => m_fluid*Cp_fluid*(tOut - t_in) - (Q_rad(Tg) + Q_conv(Tg))
-    t_out = newtonRaphson(tOutBalance, t_out_seed, options, "rad_Tout")
+    t_out = newtonRaphson(tOutBalance, t_out_seed, params.NROptions, "rad_Tout")
     if (t_out != false) params.t_out = t_out
 
     // Discrepancies
