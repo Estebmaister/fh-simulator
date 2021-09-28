@@ -148,10 +148,13 @@ const options = {
   tempAmbRef
 }
 
+const round = (number) => Math.round(number*1e3)/1e3
+
 if (options.verbose) log("debug",JSON.stringify(options, null, 2))
 
 module.exports = {
   newtonRaphson,
   options,
-  log
+  log,
+  round
 };
