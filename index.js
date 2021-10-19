@@ -14,7 +14,7 @@
  * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
-const {newtonRaphson, options, log, round, roundDict} = require('./js/utils');
+const {newtonRaphson, options, log, round, roundDict, units} = require('./js/utils');
 const {radSection} = require('./js/rad');
 const {shieldSection} = require('./js/shield');
 
@@ -109,16 +109,24 @@ const MW_multicomp = (fuels) => {
 
 /** Temperature should be in K, humidity %[0,100] */
 const moistAirMolesPerO2 = (temperature, relativeHumidity) => {
-  // Equation from Reference: Tetens, O., 1930
-  temperature = temperature - options.tempToK
-  // ps is the saturation vapour pressure, in pascals,
-  // where t is the temperature in degrees Celsius.
-  const ps = 610.78*Math.exp(temperature/(temperature+238.3)*17.2694)
-  // pw is the actual water vapour pressure.
-  const pw = ps * relativeHumidity * 0.01
-  // w is the weight ratio of water vapour and dry air.
-  const w = 0.018 * pw / ( 0.029 * (options.pAtm - pw ) ) 
+  const pw = pressureH2OinAir(temperature, relativeHumidity)
+  // w is the weight ratio of water vapour and dry air. (kg-w_vap/kg-dry_a)
+  // simplification 0.62 * 1e-5 * pw
+  const w = 0.018 * pw / ( 0.029 * (options.pAtm - pw ) )
+  // weight ratio converted to water per oxygen in air
   return w * 7.655
+}
+
+/** Temperature should be in K, humidity %[0,100] */
+const pressureH2OinAir = (temperature, relativeHumidity) => {
+  // Equation from Reference: Tetens, O., 1930
+
+  // This eq uses temp in °C
+  const temp = temperature - options.tempToK
+  // ps is the saturation vapour pressure, in pascals,
+  const ps = 610.78*Math.exp(temp/(temp+238.3)*17.2694)
+  // result pw is the actual water vapour pressure.
+  return ps * relativeHumidity * 0.01
 }
 
 /** Normalize an object of fuels/products */
@@ -234,6 +242,9 @@ const adFlame = (fuels, products, tIni, o2required) => {
   return (t) => pEnthalpy(t) - enthalpy.reduce((acc, value)=> acc + value)
 }
 
+/** In this process the params object will be updated
+ *  in every function call with the combustion data
+ */
 const molesOfCombustion = (airExcess, fuels, params) => {
   log("airExcess in call: " + airExcess)
   const result = {err: ""}
@@ -270,11 +281,14 @@ const molesOfCombustion = (airExcess, fuels, params) => {
     products['N2'] = 0
     products['O2'] = -products['O2']
   } else {
+    const waterPressure = pressureH2OinAir(params.t_amb, params.humidity)
+    const dryAirPressure = params.p_atm - waterPressure
+    const airN2Percentage = .7905 * dryAirPressure / params.p_atm
+    const airO2Percentage = .2005 * dryAirPressure / params.p_atm
     products['O2'] = o2excess - products['O2'] // Subtracting the O2 used in combustion
-    products['N2'] += products['O2'] * (0.7905/0.2005)
-    // TODO: calculate water in the used air as well
-    products['H2O'] += products['N2']*(1/(0.7905/0.2005)) * 
-    moistAirMolesPerO2(params.t_amb, params.humidity)
+    products['N2'] += products['O2'] * (airN2Percentage/airO2Percentage)
+    products['H2O'] += products['N2']* (waterPressure / (airN2Percentage*params.p_atm))
+    //moistAirMolesPerO2(params.t_amb, params.humidity)
   }
 
 
@@ -292,9 +306,7 @@ const molesOfCombustion = (airExcess, fuels, params) => {
   }
   const flows = {
     TOTAL: round(totalPerMol),
-    DRY_TOTAL: round(totalPerM_Dry),
-    AC: round(o2excess * (1 + (0.7905/0.2005))),
-    AC_MASS: round(o2excess * 100/21 * data[33].MW / MW_multicomp(fuels)), 
+    DRY_TOTAL: round(totalPerM_Dry), 
     // 'O2%_DRY': round(100*products['O2']/totalPerM_Dry),
     // 'CO2%_DRY': round(100*products['CO2']/totalPerM_Dry),
     // 'N2%_DRY': round(100*products['N2']/totalPerM_Dry),
@@ -302,25 +314,26 @@ const molesOfCombustion = (airExcess, fuels, params) => {
     'H2O_%': round(100*products['H2O']/totalPerMol),
     'CO2_%': round(100*products['CO2']/totalPerMol),
     'O2_%': round(100*products['O2']/totalPerMol),
+
+    AC: round(o2excess * (1 + (0.7905/0.2005))),
+    AC_MASS: round(o2excess * 100/21 * data[33].MW / MW_multicomp(fuels)),
     'AirExcess_%': round(100*params.airExcess),
+
+    Fuel_MW: units["mass/mol"](MW_multicomp(fuels)),
+    Flue_MW: units["mass/mol"](MW_multicomp(products)),
+    NCV: units["energy/mol"](params.NCV)
   }
+  
 
   params.m_fuel_seed = 120; /** (kmol/h) */
   params.m_flue_ratio = flows.TOTAL;
   params.m_air_ratio = flows.AC;
   /** Function of temp (kJ/kmol-K) */
   params.Cp_flue = Cp_multicomp(products, true);
-  
-  flows.Fuel_MW = round(MW_multicomp(fuels)) + " kg/kmol"
-  flows.Flue_MW = round(MW_multicomp(products)) + " kg/kmol"
-  flows.NCV = round(params.NCV) + " kj/kmol"
   roundDict(products)
   return {flows, products}
 }
 
-/** In this process the params object will be updated
- *  in every function call
- */
 const combustion = (fuels, options, params) => {
 
   log("info", `Cp_${data[33].Substance} Cp0(kJ/kmol-K): `+
@@ -349,9 +362,10 @@ const combustion = (fuels, options, params) => {
 
   const rad_result = radSection(params)
   log("info", "Radiant section (K) Tg: " + rad_result.Tg)
+  //log("Fuel mass (kmol) " + rad_result.m_fuel)
   /*
   shieldSection(params)
-  log("Fuel mass (kmol) Tg: " + rad_result.m_fuel)
+  convectionSection(params)
   // */
   //return {flows, products, params, rad_result}
 
@@ -384,6 +398,8 @@ let params = {
   Cp_fuel: Cp_multicomp(fuels, true), /** Function of temp (kJ/kmol-K) */
   Cp_fluid: 2.5744 * 105.183, /** (kJ/kmol-K) */
   m_fluid: 225_700 / 105.183, /** (kmol/h) */
+
+  // Mechanic variables for heater
   N: 60, /** - number of tubes in rad section */
   N_shld: 8, /** - number of shield tubes */
   L: 20.024, /** (m) effective tube length*/
@@ -393,6 +409,8 @@ let params = {
   alpha: 0.835, /** - alpha factor */
   alpha_shld: 1, /** - alpha shield factor */
   pi: Math.PI,
+
+  p_atm: options.pAtm, /** Pa */
 
   // Temperatures
   t_in_conv: 210 + options.tempToK, // K (process in rad sect)
@@ -407,9 +425,10 @@ let params = {
   humidity: options.humidity, // %
   airExcess: options.airExcess, // % * 0.01
   o2Excess: options.o2Excess, // % * 0.01
+  // t_out: 355 + options.tempToK, // K (process global)
   t_out: undefined, // 628.15 - 315 K (process global)
   m_fuel: 100, /** (kmol/h) */
-  // t_out: 355 + options.tempToK, // K (process global)
+  //TODO: let duty be a variable
   // t_in_rad: 250 + options.tempToK, // K (process in rad sect)
   // t_stack: 400 + options.tempToK, //TODO: (This isn't used) - K (flue gases out)
 }
