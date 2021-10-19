@@ -127,7 +127,7 @@ const tempToK = 273.15
 const tempAmbRef = tempToK + 25; // 298.15
 
 /** Example for a call of this file: 
- * node . true false 21 70 0 80 1e5  */ 
+ * node . true false 21 70 0 80 1e5 SI */ 
 const options = {
   // Entry arguments
   verbose: process.argv[2] == "true",
@@ -137,6 +137,7 @@ const options = {
   o2Excess: 0.01 * parseFloat(process.argv[6]) || 0.01 * 0,
   airExcess: 1e-10 + 0.01 * parseFloat(process.argv[7]) || 0.01 * 80,
   pAtm: parseFloat(process.argv[8]) || 1e5,
+  unitSystem: process.argv[9],
 
   // Newton Raphson arguments
   NROptions: {
@@ -163,10 +164,72 @@ const round = (number) => Math.round(number*1e3)/1e3
 
 if (options.verbose) log("debug",JSON.stringify(options, null, 2))
 
+const englishSystem = { //(US Customary)
+  "energy/mol": (number) => round(number * 0.9478171203) + " Btu/mol",
+  "mass/mol": (number) => round(number * 2.2046244202) + " lb/kmol",
+  heat_flow : (number) => round(number * 3.4121416331) + " MMBtu/h",
+  heat_flux: (number) => round(number * 3.4121416331/10.763910417) + " Btu/h-ft2",
+  //TODO: change default
+  fouling_factor: (number) => round(number * 1) + " h-ft2-°F/Btu",
+
+  //TODO: change default
+  "energy/mass": (number) => round(number * 1) + " kJ/kg",
+  "energy/vol": (number) => round(number * 1) + " kJ/m3",
+  area: (number) => round(number * 10.763910417) + " ft2",
+  length: (number) => round(number * 3.280839895) + " ft",
+  temp: (number) => round(number * 1.8) + " °R",
+  pressure: (number) => round(number * 0.0001450377) + " psi",
+  mass_flow: (number) => round(number * 2.2046244202) + " lb/s",
+  vol_flow: (number) => round(number * 35.314666721) + " f3/h",
+  //TODO: change default
+  cp: (number) => round(number * 1) + " kJ/kmol-K",
+  power: (number) => round(number * 3.4121416331) + " Btu/h",
+}
+
+const siSystem = {
+  "energy/mol": (number) => round(number * 1) + " kJ/mol",
+  "mass/mol": (number) => round(number * 1) + " kg/kmol",
+  heat_flow: (number) => round(number * 1) + " MW/h",
+  heat_flux: (number) => round(number * 1) + " W/m2",
+  fouling_factor: (number) => round(number * 1) + " m2-K/W",
+
+  "energy/mass": (number) => round(number * 1) + " kJ/kg",
+  "energy/vol": (number) => round(number * 1) + " kJ/m3",
+  area: (number) => round(number * 1) + " m2",
+  length: (number) => round(number * 1) + " m",
+  temp: (number) => round(number * 1) + " K",
+  pressure: (number) => round(number * 1) + " Pa",
+  mass_flow: (number) => round(number * 1) + " kg/s",
+  vol_flow: (number) => round(number * 1) + " m3/h",
+  cp: (number) => round(number * 1) + " kJ/kmol-K",
+  power: (number) => round(number * 1) + " W",
+}
+
+const initSystem = (options) => {
+  if (typeof options.unitSystem !== "string") {
+    log("warn", 
+    `invalid type (${options.unitSystem}) for unit system, using default SI`)
+    return siSystem
+  }
+  switch (options.unitSystem.toLowerCase()) {
+    case "si":
+      return siSystem;
+    case "english":
+      return englishSystem;
+    default:
+      log("warn", 
+      options.unitSystem.toLowerCase() + 
+      ' - invalid unit system, using default SI')
+      return siSystem;
+  }
+}
+const units = initSystem(options)
+
 module.exports = {
   newtonRaphson,
   options,
   log,
   round,
-  roundDict
+  roundDict,
+  units
 };
