@@ -17,11 +17,13 @@
 const {newtonRaphson, options, log, round, roundDict, units} = require('./js/utils');
 const {radSection} = require('./js/rad');
 const {shieldSection} = require('./js/shield');
+const dryAirN2Percentage = 79.5
+const dryAirO2Percentage = 20.5
 
 const getData = (fromCSV) => {
   const dataPaths = {
     csv: __dirname + "/data.csv",
-    json: __dirname + "/data.json"
+    json: __dirname + "/js/data.json"
   }
 
   let CompoundsArray = []
@@ -61,8 +63,8 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
       log("warn", `wrong use of Cp0, called for compound ${Substance}`)
       return 0
     }
-    if (molResult) return (c0 + c1*(teta*0.001) + c2*(teta*0.001)**2 + c3*(teta*0.001)**3)*MW
-    return (c0 + c1*(teta*0.001) + c2*(teta*0.001)**2 + c3*(teta*0.001)**3)
+    if (molResult) return (c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)*MW
+    return (c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)
   }
 }
 
@@ -218,11 +220,11 @@ const adFlame = (fuels, products, tIni, o2required) => {
   const fuelCompounds = data.filter( 
     (element) => element.Formula in fuels
   )
-  const o2_H = deltaH(data[2])
-  const n2_H = deltaH(data[3])
-  const co2_H = deltaH(data[6])
-  const h2o_H = deltaH(data[31])
-  const so2_H = deltaH(data[34])
+  const o2_H = deltaH(data.filter(element => element.Formula == "O2")[0])
+  const n2_H = deltaH(data.filter(element => element.Formula == "N2")[0])
+  const co2_H = deltaH(data.filter(element => element.Formula == "CO2")[0])
+  const h2o_H = deltaH(data.filter(element => element.Formula == "H2O")[0])
+  const so2_H = deltaH(data.filter(element => element.Formula == "SO2")[0])
   if (tIni === undefined) tIni = options.tAmb
   if (o2required === undefined) o2required = 0
 
@@ -283,8 +285,9 @@ const molesOfCombustion = (airExcess, fuels, params) => {
   } else {
     const waterPressure = pressureH2OinAir(params.t_amb, params.humidity)
     const dryAirPressure = params.p_atm - waterPressure
-    const airN2Percentage = .7905 * dryAirPressure / params.p_atm
-    const airO2Percentage = .2005 * dryAirPressure / params.p_atm
+    const airN2Percentage = .01 * dryAirN2Percentage * dryAirPressure / params.p_atm
+    const airO2Percentage = .01 * dryAirO2Percentage * dryAirPressure / params.p_atm
+
     products['O2'] = o2excess - products['O2'] // Subtracting the O2 used in combustion
     products['N2'] += products['O2'] * (airN2Percentage/airO2Percentage)
     products['H2O'] += products['N2']* (waterPressure / (airN2Percentage*params.p_atm))
