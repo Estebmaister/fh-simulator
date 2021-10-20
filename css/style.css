@@ -17,7 +17,7 @@
 /* ------- 6. Icon Pack      ------*/
 /* ------- 7. Animation      ------*/
 
-/* ------- Page structure ------*/
+/* -------  Page structure   ------*/
 
 html {
   scroll-behavior: smooth;
@@ -44,8 +44,9 @@ header {
 
 main {
   padding: 1%;
-  margin-top: 40px;
-  margin-bottom: 50px;
+  min-height: 88vh;
+  padding-top: 40px;
+  padding-bottom: 40px;
   background-color: var(--light-color, lightgray);
 }
 
@@ -53,10 +54,20 @@ footer {
   position: fixed;
   z-index: 1;
   bottom: 0px;
-  height: 50px;
+  height: 40px;
   width: 100%;
-  display: flex;
   background-color: var(--nav-color, lightgray);
+  display: flex;
+  justify-content: space-around;
+}
+
+.credits {
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: "Trebuchet MS", sans-serif;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 .logo {
@@ -120,6 +131,27 @@ footer {
   background-color: transparent;
 }
 
+/* -------  Form structure   ------*/
+
+input, select {
+  height: 1.5em;
+  border: none;
+  border-radius: 3px;
+}
+
+input[type="number"] {
+  width: 3em;
+}
+
+input:invalid+span:after {
+  content: '✖';
+  padding-left: 5px;
+}
+
+input:valid+span:after {
+  content: '✓';
+  padding-left: 5px;
+}
 /* Stylish one column Form */
 
 .form-input {
