@@ -117,39 +117,51 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     At = N*pi*Do*L;
 
   // ******* Heat input to the radiant section ********
+  //
   /** Sensible heat of fluid Q_fluid = m_fluid * Cp_fluid(T_fluid_avg) * DeltaT */
   const Q_fluid = (tOut = t_out, tIn = t_in) =>
     m_fluid * Cp_fluid * (tOut - tIn)
+
   /** Sensible heat of air Q_air = m_air * Cp_air * (tAir - tAmb) */
   const Q_air = (mFuel, tAir = t_air, tAmb = t_amb) => 
     m_air(mFuel)*Cp_air*(tAir - tAmb);
+
   /** Combustion heat of fuel Q_rls = m_fuel * NCV */
   const Q_rls = (mFuel) => mFuel*NCV;
+
   /** Sensible heat of fuel Q_fuel = m_fuel * Cp_fuel * (tFuel - tAmb) */
   const Q_fuel = (mFuel, tFuel = t_fuel, tAmb = t_amb) => 
     mFuel*Cp_fuel*(tFuel - tAmb);
+
   /** Heat input Q_in = Q_rls + Q_air(tAir, tAmb) + Q_fuel(tFuel, tAmb) */
   const Q_in = (mFuel, tAir = t_air, tFuel = t_fuel, tAmb = t_amb) => 
     Q_rls(mFuel) + Q_air(mFuel, tAir, tAmb) + Q_fuel(mFuel, tFuel, tAmb)
 
   // ******* Heat taken out of radiant section ********
+  //
   /** Heat losses through setting (5% of Q_release) */
   const Q_losses = (mFuel = m_fuel) => 0.05*Q_rls(mFuel);
+
   /** Radiant heat transfer = sigma*(alpha*Acp)*F*(tG**4 - Tw(tIn,tOut)**4)*/
   const Q_rad = (tG, tOut = t_out, tIn = t_in) => 
     sigma*(alpha*Acp)*F*(tG**4 - Tw(tOut,tIn)**4)
+
   /** Convective heat transfer = h_conv*At*(tG - Tw(tOut,tIn))*/
   const Q_conv = (tG, tOut = t_out, tIn = t_in) => 
     h_conv*At*(tG - Tw(tOut,tIn))
+
   /** Heat absorbed by radiant tubes = Q_rad + Q_conv */
   const Q_R = (tG, tOut = t_out, tIn = t_in) => 
     Q_rad(tG,tOut,tIn) + Q_conv(tG,tOut,tIn)
+
   /** Shield radiant heat transfer (a variation of Q_rad) */
   const Q_shld = (tG, tOut = t_out, tIn = t_in) => 
     sigma*(alpha_shld*Acp_shld)*F*(tG**4 - Tw(tOut,tIn)**4)
+
   /** Sensible heat of flue gases = m_flue*Cp_flue(tG,tAmb)*(tG - tAmb) */
   const Q_flue = (tG, mFuel = m_fuel, tAmb = t_amb) => 
     m_flue(mFuel)*Cp_flue(tG,tAmb)*(tG - tAmb)
+
   /** Q_out = Q_R + Q_shld + Q_losses + Q_flue */
   const Q_out = (tG, tOut = t_out, mFuel = m_fuel, tIn = t_in, tAmb = t_amb) => 
     Q_R(tG, tOut, tIn) + Q_shld(tG, tOut, tIn) + Q_losses(mFuel) + Q_flue(tG, mFuel, tAmb)
@@ -160,14 +172,20 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   let flame = 0
   let duty = 0
   if (t_out_seed !== undefined) { // Given temp_out
+    // Duty effective from t_out
+    //TODO: calculate efficiency here
     duty = m_fluid*Cp_fluid*(t_out_seed - params.t_in_conv)
+
     // Approximating t_in_rad with assumption for 30% of duty
+    //TODO: make this assumption a variable
     t_in = params.t_in_conv + duty * 0.3 / (m_fluid*Cp_fluid)
     log(`${t_in} vs ${params.t_in_rad}`)
-    // Calculating Tg
+
+    // Calculating Tg (effective gas temp)
     const TgBalance_OutTemp = (tG) => m_fluid*Cp_fluid*(t_out - t_in) - (Q_rad(tG) + Q_conv(tG))
     flame = newtonRaphson(TgBalance_OutTemp, 1000, params.NROptions, "rad_Tg_Tout")
     if (flame != false) Tg = flame
+
     // Calculating fuel mass
     const mFuelBalance = (mFuel) => Q_out(Tg, t_out, mFuel) - Q_in(mFuel)
     const mass_fuel_seed = m_fluid*Cp_fluid*(t_out_seed - params.t_in_conv)/(NCV*0.75)
@@ -175,16 +193,22 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     if (m_fuel != false) params.m_fuel = m_fuel
 
   } else if (m_fuel_seed !== undefined) { // Given mass_fuel
+    // Duty effective from from q release by fuel
+    //TODO: make efficiency a variable
     duty = Q_rls(m_fuel_seed) * 0.8
+
     // Approximating t_in_rad and t_out with efficiency
+    //TODO: make this assumption a variable
     t_in = params.t_in_conv + duty * 0.3 / (m_fluid*Cp_fluid)
     t_out_seed = params.t_in_conv + duty / (m_fluid*Cp_fluid)
     log(`t_in_rad, seed: ${t_in} vs problem: ${params.t_in_rad}`)
-    // Calculating Tg
+
+    // Calculating Tg (effective gas temp)
     //TODO: t_out isn't set needs recalculate
     const TgBalance_MassFuel = (tG) => Q_out(tG, t_out_seed, m_fuel) - Q_in(m_fuel)
     flame = newtonRaphson(TgBalance_MassFuel, 1000, params.NROptions, "rad_Tg_mFuel")
     if (flame != false) Tg = flame
+
     // Calculating t_out
     const tOutBalance = (tOut) => m_fluid*Cp_fluid*(tOut - t_in) - (Q_rad(Tg) + Q_conv(Tg))
     t_out = newtonRaphson(tOutBalance, t_out_seed, params.NROptions, "rad_Tout")
