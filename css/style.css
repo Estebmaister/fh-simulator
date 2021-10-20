@@ -1,10 +1,12 @@
 :root {
   --primary-color: black;
   --secondary-color: #595f6e;
+  --light-color: #b7bac0;
+  --nav-color: rgb(228, 228, 25);
   --contrast-color: white;
   --shadow: grey;
   --alert-color: red;
-  --passing-color: #2dc874;
+  --passing-color: #bec82d;
 }
 
 /* ------- 1. Page structure ------*/
@@ -15,7 +17,7 @@
 /* ------- 6. Icon Pack      ------*/
 /* ------- 7. Animation      ------*/
 
-/* ------- Page structure ------*/
+/* -------  Page structure   ------*/
 
 html {
   scroll-behavior: smooth;
@@ -36,19 +38,49 @@ header {
   border: none;
   height: 50px;
   width: 100%;
-  background-color: var(--secondary-color, lightgray);
+  background-color: var(--nav-color, lightgray);
   box-shadow: 0 1px 4px var(--shadow, grey);
 }
 
+main {
+  padding: 1%;
+  min-height: 88vh;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: var(--light-color, lightgray);
+}
+
+footer {
+  position: fixed;
+  z-index: 1;
+  bottom: 0px;
+  height: 40px;
+  width: 100%;
+  background-color: var(--nav-color, lightgray);
+  display: flex;
+  justify-content: space-around;
+}
+
+.credits {
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: "Trebuchet MS", sans-serif;
+  font-weight: bold;
+  font-size: 15px;
+}
+
 .logo {
-  height: 50px;
+  height: 42px;
+  margin: 2px;
   width: auto;
   background-color: transparent;
   opacity: 0.9;
   transition: 0.3s;
 }
 .logo:hover {
-  height: 60px;
+  height: 47px;
+  margin: 1px;
   width: auto;
   opacity: 1;
 }
@@ -99,6 +131,27 @@ header {
   background-color: transparent;
 }
 
+/* -------  Form structure   ------*/
+
+input, select {
+  height: 1.5em;
+  border: none;
+  border-radius: 3px;
+}
+
+input[type="number"] {
+  width: 3em;
+}
+
+input:invalid+span:after {
+  content: '✖';
+  padding-left: 5px;
+}
+
+input:valid+span:after {
+  content: '✓';
+  padding-left: 5px;
+}
 /* Stylish one column Form */
 
 .form-input {
@@ -152,7 +205,7 @@ header {
 .form-input input:focus + .label-input .content-label,
 .form-input input:not([value=""]) + .label-input .content-label {
   transform: translateY(-110%);
-  color: #2dc874;
+  color: var(--passing-color);
   font-size: 14px;
 }
 

@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" href="./img/fav.ico" />
+	<link rel="icon" href="./img/fav.png" />
 
 	<title>Fire Heater Sim</title>
 	<meta name="description" content="Fire Heater Simulator" />
@@ -15,13 +15,13 @@
 	<!-- WhatsApp Description -->
 	<meta property="og:title" content="Fire Heater Simulator" />
 	<meta property="og:description" content="Esteban's public website, curriculum and projects." />
-	<meta property="og:image" content="./img/fav.ico" />
+	<meta property="og:image" content="./img/fav.png" />
 	<meta property="og:url" content="#" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Fire Heater Sim" />
 
 	<meta name="twitter:title" content="Esteban Camargo (Remoter)" />
-	<meta name="twitter:image" content="./img/fav.ico" />
+	<meta name="twitter:image" content="./img/fav.png" />
 	<meta name="twitter:url" content="#" />
 	<meta name="twitter:domain" content="estebmaister.com.ve" />
 	<meta name="twitter:card" content="summary_large_image" />
@@ -52,13 +52,101 @@
       <h1>Fire heater simulator</h1>
       <p>Testing page, a simple view for the input and output.</p>
     </section>
-    <section id="capturer-sect">
-      <form
-        id="fuel-form"
-        method="GET"
-        action=""
-      >
+    <form id="fuel-form" method="GET" action="">
+    <table>
+      <tbody>
+        <tr class="section_title">
+          <td colspan="9"><h2>Project data</h2></td>
+        </tr>
+        <tr> 
+          <td colspan="2">Project N°: <input type="number" min="0" placeholder="1.0" required><span class="validity"></span></td> 
+          <td colspan="3">Project Title: <input value="Fire_heater_sim"></td> 
+          <td colspan="2">Revision No: <input type="number" min="0" max="5" value="1"></td>
+          <td colspan="2">Date : <input type="date"></td> 
+        </tr> 
+          
+        <tr class="section_title"> <td colspan="9"><h2>Inputs</h2></td> </tr>
+        <tr> 
+          <td colspan="5">Ambient Temperature T<sub>a</sub> <input type="number" ></span> °C</span></td> 
+          <td colspan="4">Relative Humidity RH <input type="number"> %</td>
+        </tr>
+
+        <tr> 
+          <td colspan="2">Flue Gas</td> 
+          <td colspan="7"><i><sub>For healthy combustion with gas fuels, 3% Oxygen in flue gas on dry basis is targeted.</sub></i></td> 
+        </tr> 
+        <tr> 
+          <td colspan="5">Flue gas O<sub>2</sub> Excess <input type="number"> °C</td>
+          <td colspan="4">Oxygen sampling basis <select><option value="wet">wet basis</option> <option value="dry">dry basis</option></select></td> 
+        </tr> 
+        <tr> <td colspan="9">Fuel Gas</td> </tr>
+
+        <tr> 
+          <td colspan="9">Fuel gas Specified as <select >
+          <option value="mole_percent">mole percent</option> 
+          <!-- <option value="mass_percent">mass percent</option> -->
+          </select></td>
+        </tr> 
+
+        <tr> 
+          <td colspan="3">Fuel gas Composition</td>
+          <td colspan="4">Fuel gas temperature T<sub>f</sub> <input type="number"> °C
+          <td colspan="2">Total <span style="font-weight: bold;"> 100 </span> 
+        <tr> 
+          <td>Component   </td><td>Formula                      </td><td>Mole %</td>
+          <td>Component   </td><td>Formula                      </td><td>Mole %</td>
+          <td>Component   </td><td>Formula                      </td><td>Mole %</td>
+        </tr>
+          <td>Carbon      </td><td>C                            </td><td><input type="number" class="inp"></td> </td> 
+          <td>Hydrogen    </td><td>H<sub>2</sub>                </td><td><input type="number" class="inp"></td> </td> 
+          <td>Oxygen      </td><td>O<sub>2</sub>                </td><td><input type="number" class="inp"></td> </td>
+        </tr> 
+        <tr> 
+          <td>Nitrogen    </td><td>N<sub>2</sub>                </td><td><input type="number" class="inp"></td> </td> 
+          <td>Carbon Monox</td><td>CO                           </td><td><input type="number" class="inp"></td> </td> 
+          <td>Carbon Diox.</td><td>CO<sub>2</sub>               </td><td><input type="number" class="inp"></td> </td> 
+        </tr> 
+        <tr>
+          <td>Methane     </td><td>CH<sub>4</sub>               </td><td><input type="number" class="inp"></td> </td> 
+          <td>Ethane      </td><td>C<sub>2</sub>H<sub>6</sub>   </td><td><input type="number" class="inp"></td> </td> 
+          <td>Ethylene    </td><td>C<sub>2</sub>H<sub>4</sub>   </td><td><input type="number" class="inp"></td> </td>
+        </tr> 
+        <tr>
+          <td>Acetylene   </td><td>C<sub>2</sub>H<sub>2</sub>   </td><td><input type="number" class="inp"></td> </td> 
+          <td>Propane     </td><td>C<sub>3</sub>H<sub>8</sub>   </td><td><input type="number" class="inp"></td> </td> 
+          <td>Propylene   </td><td>C<sub>3</sub>H<sub>6</sub>   </td><td><input type="number" class="inp"></td> </td>
+        </tr>
+        <tr>
+          <td>Butane      </td><td>C<sub>4</sub>H<sub>10</sub> </td><td><input type="number" class="inp"></td> </td> 
+          <td>Butylene    </td><td>C<sub>4</sub>H<sub>8</sub>  </td><td><input type="number" class="inp"></td> </td> 
+          <td>Pentane     </td><td>C<sub>5</sub>H<sub>12</sub> </td><td><input type="number" class="inp"></td> </td>
+        </tr>
+        <tr>
+          <td>Hexane      </td><td>C<sub>6</sub>H<sub>14</sub></td><td><input type="number" class="inp"></td> </td> 
+          <td>Benzene     </td><td>C<sub>6</sub>H<sub>6</sub> </td><td><input type="number" class="inp"></td> </td> 
+          <td>Methanol    </td><td>CH<sub>3</sub>OH           </td><td><input type="number" class="inp"></td> </td>
+        </tr>
+        <tr>
+          <td>Ammonia     </td><td>NH<sub>3</sub>             </td><td><input type="number" class="inp"></td> </td> 
+          <td>Sulfur      </td><td>S                          </td><td><input type="number" class="inp"></td> </td> 
+          <td>Hydrogen    </td><td>Sulphide H<sub>2</sub>S    </td><td><input type="number" class="inp"></td> </td>
+        </tr>
+        <tr>
+          <td>Water Vapor </td><td>H2O                        </td><td><input type="number" class="inp"></td> </td> 
+        </tr>
+
+        <tr><td colspan="9"><button>Calculate</button></td></tr>
+      </tbody> 
+      <!----> 
+      <tbody>
+        <tr class="section_title"><td colspan="9"><h2 >Results</h2></td> </tr>
+      </tbody>
+    </table>
+
+    <!-- Form first version -->
+    <!-- <section id="capturer-sect">
         <div class="form-input">
+
           <input type="number" name="t-amb" id="t-amb" required autocomplete value=""
             onkeyup="this.setAttribute('value', this.value);" onchange="this.setAttribute('value', this.value);"/>
           <label class="label-input" id="t-amb-label" for="t-amb">
@@ -80,14 +168,16 @@
             />
           </div>
         </div>
-      </form>
-    </section>
+      </section> -->
+    </form>
+
   </main>
 	<footer>
 		<p>
-			<a class="credits" id="profile-link" href="https://github.com/estebmaister/" target="_blank">
-				© USB 2021
+      <a class="credits" id="profile-link" href="https://github.com/estebmaister/" target="_blank">
+        © USB 2021
 			</a>
+      <i>Calculations performed at web browser engine, logs can be seen at the console</i>
 		</p>
 	</footer>
 </body>
