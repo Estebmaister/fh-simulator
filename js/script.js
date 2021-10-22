@@ -1,7 +1,6 @@
 /******************************************************************
- * Exported functions from this file
+ * File with functions to receive data from web app
  ******************************************************************
- * @molesOfCombustion fuels, options, humidity, airExcess
  * @version  1.00
  * @param   {fuels object} valid i.e. {'CH4': 1}.
  * @return  {result object} flows, products
@@ -9,42 +8,12 @@
  * @author  Esteban Camargo
  * @date    17 Jul 2021
  * @call    node . true true 25 70 80 1e5
- * @callParams verbose, check for changes in csv, t_amb, humidity, air_excess, p_amb
- * 
- * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
 const {newtonRaphson, options, log, round, roundDict, units} = require('./js/utils');
 const {radSection} = require('./js/rad');
 const {shieldSection} = require('./js/shield');
-const dryAirN2Percentage = 79.5
-const dryAirO2Percentage = 20.5
-
-const getData = (fromCSV) => {
-  const dataPaths = {
-    csv: __dirname + "/data.csv",
-    json: __dirname + "/js/data.json"
-  }
-
-  let CompoundsArray = []
-  
-  if (fromCSV) {
-    const fs = require('fs');
-    const parse = require('csv-parse/lib/sync');
-    log("info","Starting data extraction for Simulator")
-    CompoundsArray = parse(fs.readFileSync(dataPaths.csv), {
-      columns: true,
-      skip_empty_lines: true,
-      cast: true
-    })
-
-    fs.writeFileSync(dataPaths.json, JSON.stringify(CompoundsArray, null, 2))
-    log("info",'JSON file successfully updated');
-  } else {
-    CompoundsArray = require(dataPaths.json)
-  }
-  return CompoundsArray
-};
+const data = require(__dirname + "/data.json");
 
 /** (kJ/kg K) to call returning function use Kelvin units 
  * if you want a result in (kJ/kmol K) units, multiply the
@@ -63,8 +32,8 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
       log("warn", `wrong use of Cp0, called for compound ${Substance}`)
       return 0
     }
-    if (molResult) return (c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)*MW
-    return (c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)
+    if (molResult) return (c0 + c1*(teta*0.001) + c2*(teta*0.001)**2 + c3*(teta*0.001)**3)*MW
+    return (c0 + c1*(teta*0.001) + c2*(teta*0.001)**2 + c3*(teta*0.001)**3)
   }
 }
 
@@ -220,11 +189,11 @@ const adFlame = (fuels, products, tIni, o2required) => {
   const fuelCompounds = data.filter( 
     (element) => element.Formula in fuels
   )
-  const o2_H = deltaH(data.filter(element => element.Formula == "O2")[0])
-  const n2_H = deltaH(data.filter(element => element.Formula == "N2")[0])
-  const co2_H = deltaH(data.filter(element => element.Formula == "CO2")[0])
-  const h2o_H = deltaH(data.filter(element => element.Formula == "H2O")[0])
-  const so2_H = deltaH(data.filter(element => element.Formula == "SO2")[0])
+  const o2_H = deltaH(data[2])
+  const n2_H = deltaH(data[3])
+  const co2_H = deltaH(data[6])
+  const h2o_H = deltaH(data[31])
+  const so2_H = deltaH(data[34])
   if (tIni === undefined) tIni = options.tAmb
   if (o2required === undefined) o2required = 0
 
@@ -285,9 +254,8 @@ const molesOfCombustion = (airExcess, fuels, params) => {
   } else {
     const waterPressure = pressureH2OinAir(params.t_amb, params.humidity)
     const dryAirPressure = params.p_atm - waterPressure
-    const airN2Percentage = .01 * dryAirN2Percentage * dryAirPressure / params.p_atm
-    const airO2Percentage = .01 * dryAirO2Percentage * dryAirPressure / params.p_atm
-
+    const airN2Percentage = .7905 * dryAirPressure / params.p_atm
+    const airO2Percentage = .2005 * dryAirPressure / params.p_atm
     products['O2'] = o2excess - products['O2'] // Subtracting the O2 used in combustion
     products['N2'] += products['O2'] * (airN2Percentage/airO2Percentage)
     products['H2O'] += products['N2']* (waterPressure / (airN2Percentage*params.p_atm))
@@ -375,8 +343,6 @@ const combustion = (fuels, options, params) => {
   return comb_result
 }
 
-
-var data = getData(options.processData)
 let fuels = {
   // O2: 0,
   CH4: .5647,

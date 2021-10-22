@@ -140,7 +140,7 @@ input, select {
 }
 
 input[type="number"] {
-  width: 3em;
+  width: 4em;
 }
 
 input:invalid+span:after {

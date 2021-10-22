@@ -28,6 +28,7 @@
 
 	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 	<link rel="stylesheet" href="./css/style.css" />
+  <script src="js/script.js" defer></script>
 </head>
 <body>
   <header id="header">
@@ -36,39 +37,46 @@
     <nav id="navbar">
       <ul id="nav-list">
         <li class="nav-sec">
-          <a class="nav-link" href="#welcome-section">About</a>
+          <a class="nav-link" href="#data-sect">Data</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="#projects">Projects</a>
+          <a class="nav-link" href="/result">Result</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="#social-section">Social</a>
+          <a class="nav-link" href="https://github.com/estebmaister/" target="_blank">Projects</a>
         </li>
       </ul>
     </nav>
   </header>
   <main>
-    <section id="welcome-sect">
+    <section id="data-sect">
       <h1>Fire heater simulator</h1>
       <p>Testing page, a simple view for the input and output.</p>
     </section>
-    <form id="fuel-form" method="GET" action="">
+    <form id="data-form" method="GET" action="/result.html">
     <table>
       <tbody>
         <tr class="section_title">
           <td colspan="9"><h2>Project data</h2></td>
         </tr>
         <tr> 
-          <td colspan="2">Project N°: <input type="number" min="0" placeholder="1.0" required><span class="validity"></span></td> 
-          <td colspan="3">Project Title: <input value="Fire_heater_sim"></td> 
-          <td colspan="2">Revision No: <input type="number" min="0" max="5" value="1"></td>
-          <td colspan="2">Date : <input type="date"></td> 
+          <td colspan="2">
+            Project N°: <input name="project_n" type="number" min="0" value="1">
+          </td> 
+          <td colspan="3">Project Title: <input name="project_title" value="Fire_heater_sim" required>
+            <span class="validity"></span>
+          </td> 
+          <td colspan="2">Revision No: <input name="revision_n" type="number" min="0" max="5" value="0"></td>
+          <td colspan="2">Date : <input id="date" name="date" type="date"></td>
+          <script>
+            document.getElementById("date").value = new Date().toISOString().substring(0, 10);
+          </script>
         </tr> 
           
         <tr class="section_title"> <td colspan="9"><h2>Inputs</h2></td> </tr>
         <tr> 
-          <td colspan="5">Ambient Temperature T<sub>a</sub> <input type="number" ></span> °C</span></td> 
-          <td colspan="4">Relative Humidity RH <input type="number"> %</td>
+          <td colspan="5">Ambient Temperature T<sub>a</sub> <input name="t_amb" type="number" placeholder="25.0"></span> °C</span></td> 
+          <td colspan="4">Relative Humidity RH <input name="humidity" type="number" placeholder="0.0"> %</td>
         </tr>
 
         <tr> 
@@ -76,13 +84,13 @@
           <td colspan="7"><i><sub>For healthy combustion with gas fuels, 3% Oxygen in flue gas on dry basis is targeted.</sub></i></td> 
         </tr> 
         <tr> 
-          <td colspan="5">Flue gas O<sub>2</sub> Excess <input type="number"> °C</td>
-          <td colspan="4">Oxygen sampling basis <select><option value="wet">wet basis</option> <option value="dry">dry basis</option></select></td> 
+          <td colspan="5">Flue gas O<sub>2</sub> Excess <input name="o2_excess" type="number" min="0" max="30" placeholder="0.0"> %</td>
+          <td colspan="4">Oxygen sampling basis <select name="o2_basis"><option value="wet">wet basis</option> <option value="dry">dry basis</option></select></td> 
         </tr> 
         <tr> <td colspan="9">Fuel Gas</td> </tr>
 
         <tr> 
-          <td colspan="9">Fuel gas Specified as <select >
+          <td colspan="9">Fuel gas Specified as <select name="fuel_percent">
           <option value="mole_percent">mole percent</option> 
           <!-- <option value="mass_percent">mass percent</option> -->
           </select></td>
@@ -90,49 +98,64 @@
 
         <tr> 
           <td colspan="3">Fuel gas Composition</td>
-          <td colspan="4">Fuel gas temperature T<sub>f</sub> <input type="number"> °C
+          <td colspan="4">Fuel gas temperature T<sub>f</sub> <input name="t_fuel" placeholder="25.0" type="number"> °C
           <td colspan="2">Total <span style="font-weight: bold;"> 100 </span> 
         <tr> 
-          <td>Component   </td><td>Formula                      </td><td>Mole %</td>
-          <td>Component   </td><td>Formula                      </td><td>Mole %</td>
-          <td>Component   </td><td>Formula                      </td><td>Mole %</td>
+          <td>Component   </td><td>Formula                    </td><td>Mole %</td>
+          <td>Component   </td><td>Formula                    </td><td>Mole %</td>
+          <td>Component   </td><td>Formula                    </td><td>Mole %</td>
         </tr>
-          <td>Carbon      </td><td>C                            </td><td><input type="number" class="inp"></td> </td> 
-          <td>Hydrogen    </td><td>H<sub>2</sub>                </td><td><input type="number" class="inp"></td> </td> 
-          <td>Oxygen      </td><td>O<sub>2</sub>                </td><td><input type="number" class="inp"></td> </td>
+          <td>Carbon      </td><td>C                          </td><td><input name="C"      id="C"      placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Hydrogen    </td><td>H<sub>2</sub>              </td><td><input name="H2"     id="H2"     placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Oxygen      </td><td>O<sub>2</sub>              </td><td><input name="O2"     id="O2"     placeholder="0.00" type="number" class="inp"></td> </td>
         </tr> 
         <tr> 
-          <td>Nitrogen    </td><td>N<sub>2</sub>                </td><td><input type="number" class="inp"></td> </td> 
-          <td>Carbon Monox</td><td>CO                           </td><td><input type="number" class="inp"></td> </td> 
-          <td>Carbon Diox.</td><td>CO<sub>2</sub>               </td><td><input type="number" class="inp"></td> </td> 
+          <td>Nitrogen    </td><td>N<sub>2</sub>              </td><td><input name="N2"     id="N2"     placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Carbon Monoxide</td><td>CO                      </td><td><input name="CO"     id="CO"     placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Carbon Dioxide</td><td>CO<sub>2</sub>           </td><td><input name="CO2"    id="CO2"    placeholder="0.00" type="number" class="inp"></td> </td> 
         </tr> 
         <tr>
-          <td>Methane     </td><td>CH<sub>4</sub>               </td><td><input type="number" class="inp"></td> </td> 
-          <td>Ethane      </td><td>C<sub>2</sub>H<sub>6</sub>   </td><td><input type="number" class="inp"></td> </td> 
-          <td>Ethylene    </td><td>C<sub>2</sub>H<sub>4</sub>   </td><td><input type="number" class="inp"></td> </td>
+          <td>Methane     </td><td>CH<sub>4</sub>             </td><td><input name="CH4"    id="CH4"    placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Ethane      </td><td>C<sub>2</sub>H<sub>6</sub> </td><td><input name="C2H6"   id="C2H6"   placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Propane     </td><td>C<sub>3</sub>H<sub>8</sub> </td><td><input name="C3H8"   id="C3H8"   placeholder="0.00" type="number" class="inp"></td> </td> 
         </tr> 
         <tr>
-          <td>Acetylene   </td><td>C<sub>2</sub>H<sub>2</sub>   </td><td><input type="number" class="inp"></td> </td> 
-          <td>Propane     </td><td>C<sub>3</sub>H<sub>8</sub>   </td><td><input type="number" class="inp"></td> </td> 
-          <td>Propylene   </td><td>C<sub>3</sub>H<sub>6</sub>   </td><td><input type="number" class="inp"></td> </td>
+          <td>n-Butane    </td><td>C<sub>4</sub>H<sub>10</sub></td><td><input name="C4H10"  id="C4H10"  placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>i-Butane    </td><td>C<sub>4</sub>H<sub>10</sub></td><td><input name="iC4H10" id="iC4H10" placeholder="0.00" type="number" class="inp"></td> </td>
+          <td>n-Pentane   </td><td>C<sub>5</sub>H<sub>12</sub></td><td><input name="C5H12"  id="C5H12"  placeholder="0.00" type="number" class="inp"></td> </td> 
         </tr>
         <tr>
-          <td>Butane      </td><td>C<sub>4</sub>H<sub>10</sub> </td><td><input type="number" class="inp"></td> </td> 
-          <td>Butylene    </td><td>C<sub>4</sub>H<sub>8</sub>  </td><td><input type="number" class="inp"></td> </td> 
-          <td>Pentane     </td><td>C<sub>5</sub>H<sub>12</sub> </td><td><input type="number" class="inp"></td> </td>
+          <td>i-Pentane   </td><td>C<sub>5</sub>H<sub>12</sub></td><td><input name="iC5H12" id="iC5H12" placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>neo-Pentane </td><td>C<sub>5</sub>H<sub>12</sub></td><td><input name="nC5H12" id="nC5H12" placeholder="0.00" type="number" class="inp"></td> </td>
+          <td>n-Hexane    </td><td>C<sub>6</sub>H<sub>14</sub></td><td><input name="C6H14"  id="C6H14"  placeholder="0.00" type="number" class="inp"></td> </td>
         </tr>
         <tr>
-          <td>Hexane      </td><td>C<sub>6</sub>H<sub>14</sub></td><td><input type="number" class="inp"></td> </td> 
-          <td>Benzene     </td><td>C<sub>6</sub>H<sub>6</sub> </td><td><input type="number" class="inp"></td> </td> 
-          <td>Methanol    </td><td>CH<sub>3</sub>OH           </td><td><input type="number" class="inp"></td> </td>
+          <td>Ethylene    </td><td>C<sub>2</sub>H<sub>4</sub> </td><td><input name="C2H4"   id="C2H4"   placeholder="0.00" type="number" class="inp"></td> </td>
+          <td>Propylene   </td><td>C<sub>3</sub>H<sub>6</sub> </td><td><input name="C3H6"   id="C3H6"   placeholder="0.00" type="number" class="inp"></td> </td>
+          <td>Butylene    </td><td>C<sub>4</sub>H<sub>8</sub> </td><td><input name="C4H8"   id="C4H8"   placeholder="0.00" type="number" class="inp"></td> </td> 
         </tr>
         <tr>
-          <td>Ammonia     </td><td>NH<sub>3</sub>             </td><td><input type="number" class="inp"></td> </td> 
-          <td>Sulfur      </td><td>S                          </td><td><input type="number" class="inp"></td> </td> 
-          <td>Hydrogen    </td><td>Sulphide H<sub>2</sub>S    </td><td><input type="number" class="inp"></td> </td>
+          <td>i-Butene    </td><td>C<sub>4</sub>H<sub>8</sub> </td><td><input name="iC4H8"  id="iC4H8"  placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>n-Pentene   </td><td>C<sub>5</sub>H<sub>10</sub></td><td><input name="C5H10"  id="C5H10"  placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Benzene     </td><td>C<sub>6</sub>H<sub>6</sub> </td><td><input name="C6H6"   id="C6H6"   placeholder="0.00" type="number" class="inp"></td> </td> 
         </tr>
         <tr>
-          <td>Water Vapor </td><td>H2O                        </td><td><input type="number" class="inp"></td> </td> 
+          <td>Toluene     </td><td>C<sub>7</sub>H<sub>8</sub> </td><td><input name="C7H8"   id="C7H8"   placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Xylene      </td><td>C<sub>8</sub>H<sub>10</sub></td><td><input name="C8H10"  id="C8H10"  placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Acetylene   </td><td>C<sub>2</sub>H<sub>2</sub> </td><td><input name="C2H2"   id="C2H2"   placeholder="0.00" type="number" class="inp"></td> </td> 
+        </tr>
+        <tr>
+          <td>Naphthalene </td><td>C<sub>10</sub>H<sub>8</sub></td><td><input name="C10H8"  id="C10H8"  placeholder="0.00" type="number" class="inp"></td> </td>
+          <td>Methanol    </td><td>CH<sub>3</sub>OH           </td><td><input name="CH3OH"  id="CH3OH"  placeholder="0.00" type="number" class="inp"></td> </td>
+          <td>Ethanol    </td><td>C<sub>2</sub>H<sub>5</sub>OH</td><td><input name="C2H5OH" id="C2H5OH" placeholder="0.00" type="number" class="inp"></td> </td>
+        </tr>
+        <tr>
+          <td>Ammonia     </td><td>NH<sub>3</sub>             </td><td><input name="NH3"    id="NH3"    placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Sulfur      </td><td>S                          </td><td><input name="S"      id="S"      placeholder="0.00" type="number" class="inp"></td> </td> 
+          <td>Hydrogen Sulphide</td><td>H<sub>2</sub>S        </td><td><input name="H2S"    id="H2S"    placeholder="0.00" type="number" class="inp"></td> </td>
+        </tr>
+        <tr>
+          <td>Water       </td><td>H<sub>2</sub>O             </td><td><input name="H2Ol"   id="H2Ol"   placeholder="0.00" type="number" class="inp"></td> </td> 
         </tr>
 
         <tr><td colspan="9"><button>Calculate</button></td></tr>
@@ -174,12 +197,11 @@
   </main>
 	<footer>
 		<p>
-      <a class="credits" id="profile-link" href="https://github.com/estebmaister/" target="_blank">
+      <a class="credits" id="profile-link" href="http://www.usb.ve" target="_blank">
         © USB 2021
 			</a>
-      <i>Calculations performed at web browser engine, logs can be seen at the console</i>
+      <i> - Calculations performed at web browser engine, logs can be seen at the console</i>
 		</p>
 	</footer>
 </body>
-<script src="js/index.js"></script>
 </html>

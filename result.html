@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="./img/fav.png" />
+
+	<title>Fire Heater Sim</title>
+	<meta name="description" content="Fire Heater Simulator" />
+	<meta name="author" content="Esteban Camargo" />
+	<meta name="keywords" content="simulator" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<!-- WhatsApp Description -->
+	<meta property="og:title" content="Fire Heater Simulator" />
+	<meta property="og:description" content="Esteban's public website, curriculum and projects." />
+	<meta property="og:image" content="./img/fav.png" />
+	<meta property="og:url" content="#" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Fire Heater Sim" />
+
+	<meta name="twitter:title" content="Esteban Camargo (Remoter)" />
+	<meta name="twitter:image" content="./img/fav.png" />
+	<meta name="twitter:url" content="#" />
+	<meta name="twitter:domain" content="estebmaister.com.ve" />
+	<meta name="twitter:card" content="summary_large_image" />
+
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="./css/style.css" />
+  <script src="js/script.js" defer></script>
+</head>
+<body>
+  <header id="header">
+    <a class="logo" href="#"><img class="logo" id="header-img" src="./img/logo.png" alt="Logo" /></a>
+
+    <nav id="navbar">
+      <ul id="nav-list">
+        <li class="nav-sec">
+          <a class="nav-link" href="/">Data</a>
+        </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="">Result</a>
+        </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="https://github.com/estebmaister/" target="_blank">Projects</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section id="data-sect">
+      <h1>Fire heater simulator</h1>
+      <p>Testing page, a simple view for the output.</p>
+    </section>
+    <section id="output-sect">
+      <pre><code id="output-data">
+        <script>
+          let qs = (function(a) {
+            if (a == "") return {};
+            let b = {};
+            for (let i = 0; i < a.length; ++i)
+            {
+              var p=a[i].split('=', 2);
+              if (p.length == 1) {
+                b[p[0]] = "";
+              }
+              else {
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+              }
+            }
+            return b;
+          })(window.location.search.substr(1).split('&'));
+          document.getElementById("output-data").textContent = JSON.stringify(qs, null, 2);
+        </script>
+      </code></pre>
+    </section>
+  </main>
+	<footer>
+		<p>
+      <a class="credits" id="profile-link" href="http://www.usb.ve" target="_blank">
+        © USB 2021
+			</a>
+      <i> - Calculations performed at web browser engine, logs can be seen at the console</i>
+		</p>
+	</footer>
+</body>
+</html>

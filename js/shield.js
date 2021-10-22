@@ -62,14 +62,14 @@ const shieldSection = (params) => {
     At = N_shld*pi*Do*L;
   
   const Q_conv_sh = (tG_sh, tG = Tg) => 
-    h_conv*At*(tG_sh - Tw(tG_sh,tG));
+    h_conv*At*(tG_sh - Tw(tG_sh,tG)); //Tw(tin, tout)
 
   const Q_flue_sh = (tG_sh, tG = Tg) => 
     m_flue()*Cp_flue(tG_sh, tG)*(tG_sh - tG);
 
   log("Q_conv_sh: " + Q_conv_sh(500) + ", Q_flue_sh: " + Q_flue_sh(500))
   const Tg_shBalance = (tG_sh, tG = Tg) => 
-    Q_flue_sh(tG_sh, tG) - Q_conv_sh(tG_sh, tG);
+    Q_flue_sh(tG_sh, tG) - Q_conv_sh(tG_sh, tG); //TODO: q_rad(tG)
   
   flame = newtonRaphson(Tg_shBalance, Tg, options, "shield_Tg")
   if (flame != false) Tg_sh = flame
