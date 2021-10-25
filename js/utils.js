@@ -55,6 +55,18 @@ const log = function(...arguments) {
       break;
   }
 }
+const logByLevel = (...arguments) => {
+  for (var i = 1; i < arguments.length; i++) {
+    console.log(`{"${arguments[0]}": "${arguments[i]}"}`);
+  }
+}
+const logger = {
+  info: (arguments) => logByLevel("INFO", arguments),
+  warn: (arguments) => logByLevel("WARN", arguments),
+  error: (arguments) => logByLevel("ERROR", arguments),
+  debug: (arguments) => logByLevel("DEBUG", arguments),
+  default: (arguments) => logByLevel("DEFAULT", arguments),
+}
 
 /** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
 function newtonRaphson (f, fp, x0, options, name) {
@@ -184,6 +196,7 @@ const englishSystem = { //(US Customary)
   //TODO: change default
   cp: (number) => round(number * 1) + " kJ/kmol-K",
   power: (number) => round(number * 3.4121416331) + " Btu/h",
+  system: "ENGLISH"
 }
 
 const siSystem = {
@@ -197,12 +210,14 @@ const siSystem = {
   "energy/vol": (number) => round(number * 1) + " kJ/m3",
   area: (number) => round(number * 1) + " m2",
   length: (number) => round(number * 1) + " m",
+  tempC: (number) => round(number * 1 - tempToK) + " °C",
   temp: (number) => round(number * 1) + " K",
-  pressure: (number) => round(number * 1) + " Pa",
+  pressure: (number) => round(number * 1e-3) + " kPa",
   mass_flow: (number) => round(number * 1) + " kg/s",
   vol_flow: (number) => round(number * 1) + " m3/h",
   cp: (number) => round(number * 1) + " kJ/kmol-K",
   power: (number) => round(number * 1) + " W",
+  system: "SI"
 }
 
 const initSystem = (options) => {
@@ -229,6 +244,7 @@ module.exports = {
   newtonRaphson,
   options,
   log,
+  logger,
   round,
   roundDict,
   units
