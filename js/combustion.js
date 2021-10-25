@@ -226,10 +226,17 @@ const adFlame = (fuels, products, tIni, o2required) => {
 *  in every function call with the combustion data
 */
 const combSection = (airExcess, fuels, params) => {
-  logger.debug("airExcess in call: " + airExcess)
-  const result = {err: ""}
+  //logger.debug("airExcess in call: " + airExcess)
+  const debug_data = {
+    atmPressure: units.pressure(params.p_atm),
+    ambTemperature: units.tempC(params.t_amb),
+    "humidity_%":  round(params.humidity),
+    "dryAirN2_%": round(dryAirN2Percentage),
+    "dryAirO2_%": round(dryAirO2Percentage),
+    err: ""
+  };
   const compounds = data.filter((element, i, arr) => element.Formula in fuels)
-  if (!checkFuelPercentage(fuels, compounds, result)) return result
+  if (!checkFuelPercentage(fuels, compounds, debug_data)) return {debug_data}
   const products = {
     O2: 0,
     H2O: 0,
@@ -242,14 +249,6 @@ const combSection = (airExcess, fuels, params) => {
     O2: .01 * dryAirO2Percentage,
     N2: .01 * dryAirN2Percentage,
     H2O: 0
-  };
-
-  const debug_data = {
-    ambTemperature: units.tempC(params.t_amb),
-    "humidity_%":  round(params.humidity),
-    "dryAirN2_%": round(dryAirN2Percentage),
-    "dryAirO2_%": round(dryAirO2Percentage),
-    atmPressure: units.pressure(params.p_atm),
   };
 
   // for every element in the fuel compounds
@@ -296,7 +295,6 @@ const combSection = (airExcess, fuels, params) => {
 
 
   params.NCV = -ncv(fuels, products, compounds, params.t_amb)
-  // logger.info( "NCV (kJ/kmol): " + params.NCV)
   params.adFlame = newtonRaphson(
     adFlame(fuels, products, params.t_amb, o2excess),
     1400, params.NROptions, "fuel_adFlame")
@@ -333,11 +331,9 @@ const combSection = (airExcess, fuels, params) => {
   params.m_fuel_seed = 120; /** (kmol/h) */
   params.m_flue_ratio = flows.total_flow;
   params.m_air_ratio = flows.AC;
-  /** Function of temp (kJ/kmol-K) */
+  /** Functions of temp (kJ/kmol-K) */
   params.Cp_flue = Cp_multicomp(products, true);
-  /** Function of temp (kJ/kmol-K) */
   params.Cp_air = Cp_multicomp(air, true);
-  /** Function of temp (kJ/kmol-K) */
   params.Cp_fuel = Cp_multicomp(fuels, true);
 
   roundDict(products)

@@ -190,6 +190,7 @@ const englishSystem = { //(US Customary)
   area: (number) => round(number * 10.763910417) + " ft2",
   length: (number) => round(number * 3.280839895) + " ft",
   temp: (number) => round(number * 1.8) + " °R",
+  tempC: (number) => round((number-tempToK)*9/5 + 32) + " °F",
   pressure: (number) => round(number * 0.0001450377) + " psi",
   mass_flow: (number) => round(number * 2.2046244202) + " lb/s",
   vol_flow: (number) => round(number * 35.314666721) + " f3/h",
