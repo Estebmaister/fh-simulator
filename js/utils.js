@@ -140,29 +140,46 @@ const tempAmbRef = tempToK + 25; // 298.15
 
 /** Example for a call of this file: 
  * node . false 26.6667 50 0 20 1.01325e5 SI */ 
-const options = {
-  // Entry arguments
-  verbose: process.argv[2] == "true",
-  tAmb: tempToK + parseFloat(process.argv[3]) || tempAmbRef - 4,
-  humidity: 1e-10 + parseFloat(process.argv[4]) || 70,
-  o2Excess: 0.01 * parseFloat(process.argv[5]) || 0.01 * 0,
-  airExcess: 1e-10 + 0.01 * parseFloat(process.argv[6]) || 0.01 * 80,
-  pAtm: parseFloat(process.argv[7]) || 1e5,
-  unitSystem: process.argv[8],
+const getOptions = () => {
+  const optObject = {
+    // Entry arguments
+    verbose: true,
+    tAmb: tempToK + 26.6667,
+    humidity: 50,
+    o2Excess: 0.01 * 0,
+    airExcess: 0.01 * 80,
+    pAtm: 101_325,
+    unitSystem: "SI",
+  
+    // Newton Raphson arguments
+    NROptions: {
+      tolerance: 1e-4,
+      epsilon: 3e-8,
+      maxIterations: 20,
+      h: 1e-4,
+      verbose: true
+    },
+  
+    // constants
+    tempToK,
+    tempAmbRef
+  }
+  
+  if (typeof process == 'undefined') return optObject;
 
+  optObject.verbose = process.argv[2] == "true";
+  optObject.tAmb = tempToK + parseFloat(process.argv[3]) || tempAmbRef - 4;
+  optObject.humidity = 1e-10 + parseFloat(process.argv[4]) || 70;
+  optObject.o2Excess = 0.01 * parseFloat(process.argv[5]) || 0.01 * 0;
+  optObject.airExcess = 1e-10 + 0.01 * parseFloat(process.argv[6]) || 0.01 * 80;
+  optObject.pAtm = parseFloat(process.argv[7]) || 1e5;
+  optObject.unitSystem = process.argv[8];
   // Newton Raphson arguments
-  NROptions: {
-    tolerance: 1e-4,
-    epsilon: 3e-8,
-    maxIterations: 20,
-    h: 1e-4,
-    verbose: process.argv[2] == "true"
-  },
+  optObject.NROptions.verbose = process.argv[2] == "true";
 
-  // constants
-  tempToK,
-  tempAmbRef
-}
+  return optObject
+};
+const options = getOptions();
 
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
