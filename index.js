@@ -14,42 +14,33 @@
  * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
-const {newtonRaphson, options, log, logger, round, roundDict, units} = require('./js/utils');
-const {combSection} = require('./js/combustion');
-const {radSection} = require('./js/rad');
-const {shieldSection} = require('./js/shield');
-const dryAirN2Percentage = 79.05
-const dryAirO2Percentage = 20.95
-
-const getData = (fromCSV) => {
+const updateData = (fromCSV) => {
+  if (!fromCSV) return
+  const fs = require('fs');
   const dataPaths = {
     csv: __dirname + "/data.csv",
     json: __dirname + "/js/data.json"
-  }
+  }  
+  const parse = require('csv-parse/lib/sync');
+  logger.info("Starting data extraction for Simulator")
+  const CompoundsArray = parse(fs.readFileSync(dataPaths.csv), {
+    columns: true,
+    skip_empty_lines: true,
+    cast: true
+  })
 
-  let CompoundsArray = []
-  
-  if (fromCSV) {
-    const fs = require('fs');
-    const parse = require('csv-parse/lib/sync');
-    logger.info("Starting data extraction for Simulator")
-    CompoundsArray = parse(fs.readFileSync(dataPaths.csv), {
-      columns: true,
-      skip_empty_lines: true,
-      cast: true
-    })
-
-    fs.writeFileSync(dataPaths.json, JSON.stringify(CompoundsArray, null, 2))
-    logger.info('JSON file successfully updated');
-  } else {
-    CompoundsArray = require(dataPaths.json)
-  }
-  return CompoundsArray
+  fs.writeFileSync(dataPaths.json, JSON.stringify(CompoundsArray, null, 2))
+  logger.info('JSON file successfully updated');
 };
-
+const {newtonRaphson, options, logger, round, units} = require('./js/utils');
+updateData(options.processData)
+const {combSection} = require('./js/combustion');
+const {radSection} = require('./js/rad');
+const {shieldSection} = require('./js/shield');
 
 const combustion = (fuels, options, params) => {
-
+  //TODO: create a function for this process
+  // if params.o2Excess is set, start airExcess iteration
   if (params.o2Excess != 0) {
     const comb_o2 = (airExcess) => {
       combO2 = combSection(airExcess, fuels, params)
@@ -67,21 +58,17 @@ const combustion = (fuels, options, params) => {
   }
 
   const comb_result = combSection(params.airExcess, fuels, params)
-
   const rad_result = radSection(params)
   logger.info( "Radiant section (K) Tg: " + rad_result.Tg)
-  //logger.default("Fuel mass (kmol) " + rad_result.m_fuel)
+  logger.info("Fuel mass (kmol) " + rad_result.m_fuel)
   /*
   shieldSection(params)
-  convectionSection(params)
+  convSection(params)
   // */
-  //return {flows, products, params, rad_result}
 
   return comb_result
 }
 
-
-var data = getData(options.processData)
 let fuels = {
   // O2: 0,
   CH4: .5647,
