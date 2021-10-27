@@ -228,12 +228,12 @@ const adFlame = (fuels, products, tIni, o2required) => {
 const combSection = (airExcess, fuels, params) => {
   //logger.debug("airExcess in call: " + airExcess)
   const debug_data = {
+    err: "",
     atmPressure: units.pressure(params.p_atm),
     ambTemperature: units.tempC(params.t_amb),
     "humidity_%":  round(params.humidity),
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
-    err: ""
   };
   const compounds = data.filter((element, i, arr) => element.Formula in fuels)
   if (!checkFuelPercentage(fuels, compounds, debug_data)) return {debug_data}
@@ -282,9 +282,9 @@ const combSection = (airExcess, fuels, params) => {
     
     debug_data.dryAirPressure = units.pressure(dryAirPressure)
     debug_data.waterPressure = units.pressure(waterPressure)
-    debug_data["H2OPressure_%"] = 100 * air.H2O
-    debug_data["N2Pressure_%"] = 100 * air.N2
-    debug_data["O2Pressure_%"] = 100 *air.O2
+    debug_data["H2OPressure_%"] = round(100 * air.H2O)
+    debug_data["N2Pressure_%"] = round(100 * air.N2)
+    debug_data["O2Pressure_%"] = round(100 *air.O2)
     debug_data.unitSystem = units.system
 
     products['O2'] = o2excess - products['O2'] // Subtracting the O2 used in combustion
@@ -316,10 +316,15 @@ const combSection = (airExcess, fuels, params) => {
     'CO2_%': round(100*products['CO2']/totalPerMol),
     'O2_%': round(100*products['O2']/totalPerMol),
 
+    O2_mol_req_theor: round(o2required),
+    O2_mass_req_theor: units.mass(o2required * data[2].MW),
     'air_excess_%': round(100 * params.airExcess),
     AC: round(o2excess / air.O2),
-    AC_mass: round( o2excess / air.O2 * MW_multicomp(air) / MW_multicomp(fuels) ),
-    AC_mass_theor: round( o2required / air.O2 * MW_multicomp(air) / MW_multicomp(fuels) ),
+    AC_theor_dryAir: round(o2required / (.01 * dryAirO2Percentage)),
+    AC_mass: round( o2excess / air.O2 * 
+      MW_multicomp(air) / MW_multicomp(fuels) ),
+    AC_mass_theor_moistAir: round( o2required / air.O2 * 
+      MW_multicomp(air) / MW_multicomp(fuels) ),
 
     fuel_MW: units["mass/mol"](MW_multicomp(fuels)),
     fuel_Cp: units.cp(Cp_multicomp(fuels, true)(params.t_fuel)),
@@ -337,6 +342,7 @@ const combSection = (airExcess, fuels, params) => {
   params.Cp_fuel = Cp_multicomp(fuels, true);
 
   roundDict(products)
+  if (debug_data.err == "") delete debug_data.err;
   return {flows, products, debug_data}
 }
 
