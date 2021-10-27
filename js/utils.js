@@ -192,6 +192,7 @@ const englishSystem = { //(US Customary)
   temp: (number) => round(number * 1.8) + " °R",
   tempC: (number) => round((number-tempToK)*9/5 + 32) + " °F",
   pressure: (number) => round(number * 0.0001450377) + " psi",
+  mass: (number) => round(number * 2.2046244202e-3) + " lb",
   mass_flow: (number) => round(number * 2.2046244202) + " lb/s",
   vol_flow: (number) => round(number * 35.314666721) + " f3/h",
   //TODO: change default
@@ -214,6 +215,7 @@ const siSystem = {
   tempC: (number) => round(number * 1 - tempToK) + " °C",
   temp: (number) => round(number * 1) + " K",
   pressure: (number) => round(number * 1e-3) + " kPa",
+  mass: (number) => round(number * 1e-3) + " kg",
   mass_flow: (number) => round(number * 1) + " kg/s",
   vol_flow: (number) => round(number * 1) + " m3/h",
   cp: (number) => round(number * 1) + " kJ/kmol-K",
