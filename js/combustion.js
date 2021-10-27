@@ -15,7 +15,7 @@
  *
  *****************************************************************/
 const {newtonRaphson, options, logger, round, roundDict, units} = require('./utils');
-const data = require('./data.json')
+const data = require('../data/data.json')
 const dryAirN2Percentage = 79.05
 const dryAirO2Percentage = 20.95
 

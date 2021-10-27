@@ -14,26 +14,7 @@
  * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
-const updateData = (fromCSV) => {
-  if (!fromCSV) return
-  const fs = require('fs');
-  const dataPaths = {
-    csv: __dirname + "/data.csv",
-    json: __dirname + "/js/data.json"
-  }  
-  const parse = require('csv-parse/lib/sync');
-  logger.info("Starting data extraction for Simulator")
-  const CompoundsArray = parse(fs.readFileSync(dataPaths.csv), {
-    columns: true,
-    skip_empty_lines: true,
-    cast: true
-  })
-
-  fs.writeFileSync(dataPaths.json, JSON.stringify(CompoundsArray, null, 2))
-  logger.info('JSON file successfully updated');
-};
 const {newtonRaphson, options, logger, round, units} = require('./js/utils');
-updateData(options.processData)
 const {combSection} = require('./js/combustion');
 const {radSection} = require('./js/rad');
 const {shieldSection} = require('./js/shield');
