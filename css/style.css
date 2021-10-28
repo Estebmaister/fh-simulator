@@ -50,6 +50,62 @@ main {
   background-color: var(--light-color, lightgray);
 }
 
+#data-sect p {
+  text-align: center;
+}
+
+.form-div {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+.comp-div {
+  justify-content: space-between;
+}
+.comp {
+  justify-content: space-between;
+  padding: 2em;
+}
+
+h1, h2, h3 {
+  text-align: center;
+}
+
+h3 span {
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.project-info {
+  margin: 0;
+  display: inline-block;
+  padding-right: 1em;
+  padding-bottom: 1em;
+}
+
+.fuel-compound {
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 2em;
+  width: 16em;
+}
+.fuel-name, .fuel-formula, .fuel-input {
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 2em;
+  width: 4em;
+}
+.fuel-formula {
+  justify-content: center;
+}
+.fuel-name {
+  width: 7.5em;
+}
+
 footer {
   position: fixed;
   z-index: 1;
@@ -60,6 +116,10 @@ footer {
   display: flex;
   justify-content: space-around;
 }
+
+/* @media screen {
+  660px
+} */
 
 .credits {
   color: var(--secondary-color);
@@ -132,6 +192,23 @@ footer {
 }
 
 /* -------  Form structure   ------*/
+
+form div button {
+  padding: 0 1em;
+  margin: 2em 0 0.5em;
+  height: 2em;
+  border: none;
+  background-color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--shadow, gray);
+  font-weight: 600;
+}
+
+form div button:hover {
+  background-color: #000;
+  color: #fff;
+}
 
 input, select {
   height: 1.5em;
