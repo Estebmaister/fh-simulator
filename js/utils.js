@@ -55,6 +55,18 @@ const log = function(...arguments) {
       break;
   }
 }
+const logByLevel = (...arguments) => {
+  for (var i = 1; i < arguments.length; i++) {
+    console.log(`{"${arguments[0]}": "${arguments[i]}"}`);
+  }
+}
+const logger = {
+  info: (arguments) => logByLevel("INFO", arguments),
+  warn: (arguments) => logByLevel("WARN", arguments),
+  error: (arguments) => logByLevel("ERROR", arguments),
+  debug: (arguments) => logByLevel("DEBUG", arguments),
+  default: (arguments) => logByLevel("DEFAULT", arguments),
+}
 
 /** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
 function newtonRaphson (f, fp, x0, options, name) {
@@ -127,31 +139,47 @@ const tempToK = 273.15
 const tempAmbRef = tempToK + 25; // 298.15
 
 /** Example for a call of this file: 
- * node . true false 21 70 0 80 1e5 SI */ 
-const options = {
-  // Entry arguments
-  verbose: process.argv[2] == "true",
-  processData: process.argv[3] == "true",
-  tAmb: tempToK + parseFloat(process.argv[4]) || tempAmbRef - 4,
-  humidity: 1e-10 + parseFloat(process.argv[5]) || 70,
-  o2Excess: 0.01 * parseFloat(process.argv[6]) || 0.01 * 0,
-  airExcess: 1e-10 + 0.01 * parseFloat(process.argv[7]) || 0.01 * 80,
-  pAtm: parseFloat(process.argv[8]) || 1e5,
-  unitSystem: process.argv[9],
+ * node . false 26.6667 50 0 20 1.01325e5 SI */ 
+const getOptions = () => {
+  const optObject = {
+    // Entry arguments
+    verbose: true,
+    tAmb: tempToK + 26.6667,
+    humidity: 50,
+    o2Excess: 0.01 * 0,
+    airExcess: 0.01 * 80,
+    pAtm: 101_325,
+    unitSystem: "SI",
+  
+    // Newton Raphson arguments
+    NROptions: {
+      tolerance: 1e-4,
+      epsilon: 3e-8,
+      maxIterations: 20,
+      h: 1e-4,
+      verbose: true
+    },
+  
+    // constants
+    tempToK,
+    tempAmbRef
+  }
+  
+  if (typeof process == 'undefined') return optObject;
 
+  optObject.verbose = process.argv[2] == "true";
+  optObject.tAmb = tempToK + parseFloat(process.argv[3]) || tempAmbRef - 4;
+  optObject.humidity = 1e-10 + parseFloat(process.argv[4]) || 70;
+  optObject.o2Excess = 0.01 * parseFloat(process.argv[5]) || 0.01 * 0;
+  optObject.airExcess = 1e-10 + 0.01 * parseFloat(process.argv[6]) || 0.01 * 80;
+  optObject.pAtm = parseFloat(process.argv[7]) || 1e5;
+  optObject.unitSystem = process.argv[8];
   // Newton Raphson arguments
-  NROptions: {
-    tolerance: 1e-4,
-    epsilon: 3e-8,
-    maxIterations: 20,
-    h: 1e-4,
-    verbose: process.argv[2] == "true"
-  },
+  optObject.NROptions.verbose = process.argv[2] == "true";
 
-  // constants
-  tempToK,
-  tempAmbRef
-}
+  return optObject
+};
+const options = getOptions();
 
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
@@ -178,12 +206,15 @@ const englishSystem = { //(US Customary)
   area: (number) => round(number * 10.763910417) + " ft2",
   length: (number) => round(number * 3.280839895) + " ft",
   temp: (number) => round(number * 1.8) + " °R",
+  tempC: (number) => round((number-tempToK)*9/5 + 32) + " °F",
   pressure: (number) => round(number * 0.0001450377) + " psi",
+  mass: (number) => round(number * 2.2046244202e-3) + " lb",
   mass_flow: (number) => round(number * 2.2046244202) + " lb/s",
   vol_flow: (number) => round(number * 35.314666721) + " f3/h",
   //TODO: change default
   cp: (number) => round(number * 1) + " kJ/kmol-K",
   power: (number) => round(number * 3.4121416331) + " Btu/h",
+  system: "ENGLISH"
 }
 
 const siSystem = {
@@ -197,12 +228,15 @@ const siSystem = {
   "energy/vol": (number) => round(number * 1) + " kJ/m3",
   area: (number) => round(number * 1) + " m2",
   length: (number) => round(number * 1) + " m",
+  tempC: (number) => round(number * 1 - tempToK) + " °C",
   temp: (number) => round(number * 1) + " K",
-  pressure: (number) => round(number * 1) + " Pa",
+  pressure: (number) => round(number * 1e-3) + " kPa",
+  mass: (number) => round(number * 1e-3) + " kg",
   mass_flow: (number) => round(number * 1) + " kg/s",
   vol_flow: (number) => round(number * 1) + " m3/h",
   cp: (number) => round(number * 1) + " kJ/kmol-K",
   power: (number) => round(number * 1) + " W",
+  system: "SI"
 }
 
 const initSystem = (options) => {
@@ -229,6 +263,7 @@ module.exports = {
   newtonRaphson,
   options,
   log,
+  logger,
   round,
   roundDict,
   units

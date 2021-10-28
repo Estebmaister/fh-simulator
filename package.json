@@ -1,0 +1,35 @@
+{
+  "name": "fh-simulator",
+  "version": "1.0.0",
+  "description": "Run this simulator with the following command:",
+  "main": "app.js",
+  "dependencies": {
+    "csv-parse": "^4.15.4",
+    "csv-parser": "^3.0.0",
+    "fs": "0.0.1-security",
+    "stream": "0.0.2",
+    "webpack": "^5.60.0",
+    "webpack-cli": "^4.9.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "webpack --mode production -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Estebmaister/fh-simulator.git"
+  },
+  "keywords": [
+    "simulator",
+    "fire heater",
+    "thermodynamic",
+    "chemical engineering"
+  ],
+  "author": "Esteban Camargo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Estebmaister/fh-simulator/issues"
+  },
+  "homepage": "https://github.com/Estebmaister/fh-simulator#readme"
+}

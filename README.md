@@ -3,7 +3,7 @@
 Run this simulator with the following command:
 
 ```sh
-node . true false 21 70 5 20 1e5 SI
+node . false 26.6667 50 0 20 1.01325e5 SI
 ```
 
 Arguments:

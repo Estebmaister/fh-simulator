@@ -1,6 +1,7 @@
 /******************************************************************
- * File with functions to receive data from web app
+ * Exported functions from this file
  ******************************************************************
+ * @combustion fuels, options, humidity, airExcess
  * @version  1.00
  * @param   {fuels object} valid i.e. {'CH4': 1}.
  * @return  {result object} flows, products
@@ -8,12 +9,15 @@
  * @author  Esteban Camargo
  * @date    17 Jul 2021
  * @call    node . true true 25 70 80 1e5
+ * @callParams verbose, check for changes in csv, t_amb, humidity, air_excess, p_amb
+ * 
+ * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
-const {newtonRaphson, options, logger, round} = require('./utils');
-const {combSection} = require('./combustion');
-const {radSection} = require('./rad');
-const {shieldSection} = require('./shield');
+const {newtonRaphson, options, logger, round, units} = require('./js/utils');
+const {combSection} = require('./js/combustion');
+const {radSection} = require('./js/rad');
+const {shieldSection} = require('./js/shield');
 
 const combustion = (fuels, options, params) => {
   //TODO: create a function for this process
@@ -105,3 +109,7 @@ let params = {
 
 const result = combustion(fuels, options, params)
 logger.debug(JSON.stringify(result, null, 2))
+
+module.exports = {
+  combustion
+};
