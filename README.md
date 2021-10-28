@@ -44,3 +44,43 @@ Arguments:
   }
 }}
 ```
+
+### Reference after processing the data
+
+20% exceso de aire 50% humedad
+Moles de gas total y porcentajes por cada mol de combustible:
+    "total_flow": 14.919,
+    "dry_total_flow": 12.496,
+    "N2_%": 71.86,
+    "H2O_%": 16.245,
+    "CO2_%": 8.723,
+    "O2_%": 3.172,
+    "O2_mol_req_theor": 2.366,
+    "O2_mass_req_theor": "0.076 kg",
+    "air_excess_%": 20,
+    "AC": 13.79,
+    "AC_mass": 18.689,
+    "AC_mass_theor": 15.574,
+    "fuel_MW": "21.149 kg/kmol",
+    "fuel_Cp": "42.409 kJ/kmol-K",
+    "flue_MW": "27.911 kg/kmol",
+    "flue_Cp_Tamb": "30.613 kJ/kmol-K",
+    "NCV": "966864.235 kJ/mol"
+Moles de gases de combustion por cada mol de combustible
+    "O2": 0.473,
+    "H2O": 2.424,
+    "CO2": 1.301,
+    "SO2": 0,
+    "N2": 10.721
+Datos de entrada
+    "atmPressure": "101.325 kPa",
+    "ambTemperature": "26.667 °C",
+    "humidity_%": 50,
+    "dryAirN2_%": 79.05,
+    "dryAirO2_%": 20.95,
+    "dryAirPressure": "99.589 kPa",
+    "waterPressure": "1.736 kPa",
+    "H2OPressure_%": 1.714,
+    "N2Pressure_%": 77.695,
+    "O2Pressure_%": 20.591,
+    "unitSystem": "SI"
