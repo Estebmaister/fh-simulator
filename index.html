@@ -54,48 +54,49 @@
       <p>Testing page, a simple view for the input and output.</p>
     </section>
     <form id="data-form" method="GET" action="./result.html">
-    <table>
-      <tbody>
-        <tr class="section_title">
-          <td colspan="9"><h2>Project data</h2></td>
-        </tr>
-        <tr> 
-          <td colspan="2">
-            Project N°: <input name="project_n" type="number" min="0" value="1">
-          </td> 
-          <td colspan="3">Project Title: <input name="project_title" value="Fire_heater_sim" required>
-            <span class="validity"></span>
-          </td> 
-          <td colspan="2">Revision No: <input name="revision_n" type="number" min="0" max="5" value="0"></td>
-          <td colspan="2">Date : <input id="date" name="date" type="date"></td>
-          <script>
-            document.getElementById("date").value = new Date().toISOString().substring(0, 10);
-          </script>
-        </tr> 
-          
-        <tr class="section_title"> <td colspan="9"><h2>Inputs</h2></td> </tr>
-        <tr> 
-          <td colspan="5">Ambient Temperature T<sub>a</sub> <input name="t_amb" type="number" placeholder="25.0"></span> °C</span></td> 
-          <td colspan="4">Relative Humidity RH <input name="humidity" type="number" placeholder="0.0"> %</td>
-        </tr>
+      <h2>Project data</h2>
+        <p class="project-info">
+          Project Title: 
+          <input name="project_title" value="Fire_heater_sim" required>
+          <span class="validity"></span>
+        </p>
+        <p class="project-info">
+          Project N°: 
+          <input name="project_n" type="number" min="0" value="1">
+        </p>
+        <p class="project-info">
+          Revision No: 
+          <input name="revision_n" type="number" min="0" max="5" value="0"></p>
+        <p class="project-info">
+          Date : 
+          <input id="date" name="date" type="date">
+          <script>document.getElementById("date").value = new Date().toISOString().substring(0, 10);</script>
+        </p>
 
-        <tr> 
-          <td colspan="2">Flue Gas</td> 
-          <td colspan="7"><i><sub>For healthy combustion with gas fuels, 3% Oxygen in flue gas on dry basis is targeted.</sub></i></td> 
-        </tr> 
-        <tr> 
-          <td colspan="5">Flue gas O<sub>2</sub> Excess <input name="o2_excess" type="number" min="0" max="30" placeholder="0.0"> %</td>
-          <td colspan="4">Oxygen sampling basis <select name="o2_basis"><option value="wet">wet basis</option> <option value="dry">dry basis</option></select></td> 
-        </tr> 
-        <tr> <td colspan="9">Fuel Gas</td> </tr>
-
-        <tr> 
-          <td colspan="9">Fuel gas Specified as <select name="fuel_percent">
+        <h2>Inputs</h2>
+        <div> 
+          <p class="project-info">Ambient Temperature T<sub>a</sub> <input name="t_amb" type="number" placeholder="25.0"></span> °C</span></p> 
+          <p class="project-info">Relative Humidity RH <input name="humidity" type="number" placeholder="0.0"> %</p>
+        </div>
+  
+        <div> 
+          <p class="project-info">Flue Gas</p> 
+          <p class="project-info"><i><sub>(For healthy combustion with gas fuels, 3% Oxygen in flue gas on dry basis is targeted.)</sub></i></p> 
+        </div> 
+        <div> 
+          <p class="project-info">Flue gas O<sub>2</sub> Excess <input name="o2_excess" type="number" min="0" max="30" placeholder="0.0"> %</p>
+          <p class="project-info">Oxygen sampling basis <select name="o2_basis"><option value="wet">wet basis</option> <option value="dry">dry basis</option></select></p> 
+        </div> 
+        <div> <p class="project-info">Fuel Gas</p> </div>
+  
+        <div> 
+          <p class="project-info">Fuel gas Specified as <select name="fuel_percent">
           <option value="mole_percent">mole percent</option> 
           <!-- <option value="mass_percent">mass percent</option> -->
-          </select></td>
-        </tr> 
-
+          </select></p>
+        </div> 
+    <table>
+      <tbody>
         <tr> 
           <td colspan="3">Fuel gas Composition</td>
           <td colspan="4">Fuel gas temperature T<sub>f</sub> <input name="t_fuel" placeholder="25.0" type="number"> °C
