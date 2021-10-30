@@ -20,30 +20,34 @@ const dryAirN2Percentage = 79.05
 const dryAirO2Percentage = 20.95
 
 //TODO: expanse the use of the error in result dictionary
-/** Check if the percentages of the fuels sums 100% 
-* opt. 2 Check if all the components in the fuels are in the data filtered
-*/
-const checkFuelPercentage = (fuels, compounds, result = {}) => {
+/** Check if the percentages of the fuels sums 100% */
+const checkObjectFraction = (fuels, result = {}) => {
   // Check if the percentages of the fuels sums 100% 
-  const fuelPercentage = Object.values(fuels).reduce((acc, value)=> acc + value)
+  const total = Object.values(fuels).reduce((acc, value)=> acc + value)
   const tolerance = 3e-12
-  const check1 = Math.abs(1 - fuelPercentage) <= tolerance
-  if (!check1) result.err += `fuel percentage not equal to 100, fp: ${fuelPercentage*100}.`
-  if (compounds == undefined) return check1
+  const check1 = Math.abs(1 - total) <= tolerance
+  if (!check1) result.err += `[fuel fraction not equal to 1,` + 
+    ` total: ${total}. fuels: ${Object.keys(fuels)}],`;
+  return check1;
+};
+
+/** Check if all the components in the fuels are in the data filtered */
+const checkFuelData = (fuels, compounds, result = {}) => {
   // Check if all the components in the fuels are in the data filtered
   const badFuels = Math.abs(compounds.length - Object.keys(fuels).length)
-  const check2 = badFuels === 0
-  if (!check2) result.err += `some fuels aren't in the database, #badFuels: ${badFuels}`
-  return check1 && check2
+  const check1 = badFuels === 0
+  if (!check1) result.err += `[some fuels aren't in the database, #badFuels: ${badFuels}],`
+  return check1
 }
 
 /** Normalize an object of fuels/products */
-const normalize = (fuels) => {
+const normalize = (fuels, name) => {
   normalFuel = {...fuels}
   total = Object.values(normalFuel).reduce((acc, value)=> acc + value)
   for (const fuel in normalFuel) {
     normalFuel[fuel] = normalFuel[fuel]/total
   }
+  logger.debug(`Normalizing ${name}, total: ${total}`)
   return normalFuel
 }
 
@@ -79,8 +83,8 @@ const Cp_multicomp = (fuels, molResult) => {
   if (fuels.length === 0) return (t) => 0
   // making a deep copy and normalize if needed
   let normalFuel = JSON.parse(JSON.stringify(fuels));
-  if (!checkFuelPercentage(fuels)) {
-    normalFuel = normalize(normalFuel)
+  if (!checkObjectFraction(fuels)) {
+    normalFuel = normalize(normalFuel, "Cp_multicomp")
   }
   const fuelCompounds = data.filter( element => element.Formula in normalFuel )
   let i = 0
@@ -101,8 +105,8 @@ const MW_multicomp = (fuels) => {
   if (fuels.length === 0) return (t) => 0
   // making a deep copy and normalize if needed
   let normalFuel = JSON.parse(JSON.stringify(fuels));
-  if (!checkFuelPercentage(fuels)) {
-    normalFuel = normalize(normalFuel)
+  if (!checkObjectFraction(fuels)) {
+    normalFuel = normalize(normalFuel, "MW_multicomp")
   }
   const fuelCompounds = data.filter( element => element.Formula in normalFuel )
   let MWs = 0
@@ -236,7 +240,9 @@ const combSection = (airExcess, fuels, params) => {
     "dryAirO2_%": round(dryAirO2Percentage),
   };
   const compounds = data.filter((element, i, arr) => element.Formula in fuels)
-  if (!checkFuelPercentage(fuels, compounds, debug_data)) return {debug_data}
+  let normalFuel = {...fuels}
+  if (!checkObjectFraction(fuels, debug_data)) normalFuel = normalize(fuels, "combSection");
+  if (!checkFuelData(normalFuel, compounds, debug_data)) return debug_data;
   const products = {
     O2: 0,
     H2O: 0,
@@ -256,8 +262,8 @@ const combSection = (airExcess, fuels, params) => {
     // calculating every product of combustion per fuel element
     for (const product in products) {
       //logger.default(`${element['Formula']} req = ${product} ` +
-      //  `${element[product]*fuels[element['Formula']]}` )
-      products[product] += element[product]*fuels[element['Formula']]
+      //  `${element[product]*normalFuel[element['Formula']]}` )
+      products[product] += element[product]*normalFuel[element['Formula']]
     }
   }
 
@@ -294,9 +300,9 @@ const combSection = (airExcess, fuels, params) => {
   }
 
 
-  params.NCV = -ncv(fuels, products, compounds, params.t_amb)
+  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb)
   params.adFlame = newtonRaphson(
-    adFlame(fuels, products, params.t_amb, o2excess),
+    adFlame(normalFuel, products, params.t_amb, o2excess),
     1400, params.NROptions, "fuel_adFlame")
   // logger.info( "Adiabatic flame temp (K): " + params.adFlame)
 
@@ -322,12 +328,12 @@ const combSection = (airExcess, fuels, params) => {
     AC: round(o2excess / air.O2),
     AC_theor_dryAir: round(o2required / (.01 * dryAirO2Percentage)),
     AC_mass: round( o2excess / air.O2 * 
-      MW_multicomp(air) / MW_multicomp(fuels) ),
+      MW_multicomp(air) / MW_multicomp(normalFuel) ),
     AC_mass_theor_moistAir: round( o2required / air.O2 * 
-      MW_multicomp(air) / MW_multicomp(fuels) ),
+      MW_multicomp(air) / MW_multicomp(normalFuel) ),
 
-    fuel_MW: units["mass/mol"](MW_multicomp(fuels)),
-    fuel_Cp: units.cp(Cp_multicomp(fuels, true)(params.t_fuel)),
+    fuel_MW: units["mass/mol"](MW_multicomp(normalFuel)),
+    fuel_Cp: units.cp(Cp_multicomp(normalFuel, true)(params.t_fuel)),
     flue_MW: units["mass/mol"](MW_multicomp(products)),
     flue_Cp_Tamb: units.cp(Cp_multicomp(products, true)(params.t_amb)),
     NCV: units["energy/mol"](params.NCV)
@@ -339,7 +345,7 @@ const combSection = (airExcess, fuels, params) => {
   /** Functions of temp (kJ/kmol-K) */
   params.Cp_flue = Cp_multicomp(products, true);
   params.Cp_air = Cp_multicomp(air, true);
-  params.Cp_fuel = Cp_multicomp(fuels, true);
+  params.Cp_fuel = Cp_multicomp(normalFuel, true);
 
   roundDict(products)
   if (debug_data.err == "") delete debug_data.err;

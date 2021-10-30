@@ -1,53 +1,4 @@
-/******************************************************************
- * File with functions to receive data from web app
- ******************************************************************
- * @version  1.00
- * @param   {fuels object} valid i.e. {'CH4': 1}.
- * @return  {result object} flows, products
- * 
- * @author  Esteban Camargo
- * @date    17 Jul 2021
- * @call    node . true true 25 70 80 1e5
- *
- *****************************************************************/
-const {newtonRaphson, options, logger, round} = require('./utils');
-const {combSection} = require('./combustion');
-const {radSection} = require('./rad');
-const {shieldSection} = require('./shield');
-
-const combustion = (fuels, options, params) => {
-  //TODO: create a function for this process
-  // if params.o2Excess is set, start airExcess iteration
-  if (params.o2Excess != 0) {
-    const comb_o2 = (airExcess) => {
-      combO2 = combSection(airExcess, fuels, params)
-      logger.info( "O2%: " + combO2.flows['O2_%'] +
-        " vs O2excess: " + params.o2Excess * 100)
-      return combO2.flows['O2_%'] / 100 - params.o2Excess
-    }
-    const airExcess = newtonRaphson(comb_o2, .5, 
-      params.NROptions, "o2_excess_to_air")
-    if (airExcess != false) {
-      params.airExcess = airExcess
-    }
-  } else {
-    params.airExcess = options.airExcess
-  }
-
-  const comb_result = combSection(params.airExcess, fuels, params)
-  const rad_result = radSection(params)
-  logger.info( "Radiant section (K) Tg: " + rad_result.Tg)
-  logger.info("Fuel mass (kmol) " + rad_result.m_fuel)
-  /*
-  shieldSection(params)
-  convSection(params)
-  // */
-
-  return comb_result
-}
-
-let fuels = {
-  // O2: 0,
+let defaultFuels = {
   CH4: .5647,
   C2H6: .1515,
   C3H8: .0622,
@@ -60,48 +11,29 @@ let fuels = {
   N2: .0068,
   CO2: .0254,
 }
-// fuels ={
-//   H2: .8,
-//   O2: .2
-// }
 
-let params = {
-  Cp_fluid: 2.5744 * 105.183, /** (kJ/kmol-K) */
-  m_fluid: 225_700 / 105.183, /** (kmol/h) */
+const dataFormulas = ["C","H2","O2","N2","N2a","CO","CO2","CH4","C2H6","C3H8","C4H10","iC4H10","C5H12","iC5H12","nC5H12","C6H14",
+"C2H4","C3H6","C4H8","iC4H8","C5H10","C6H6","C7H8","C8H10","C2H2","C10H8","CH3OH","C2H5OH","NH3","S","H2S","H2O","H2Ol","N2+O2","SO2"]
 
-  // Mechanic variables for heater
-  N: 60, /** - number of tubes in rad section */
-  N_shld: 8, /** - number of shield tubes */
-  L: 20.024, /** (m) effective tube length*/
-  Do: 0.219, /** (m) external diameter rad section */
-  CtoC: 0.394, /** (m) center to center distance of tube */
-  F: 0.97, /** - emissive factor */
-  alpha: 0.835, /** - alpha factor */
-  alpha_shld: 1, /** - alpha shield factor */
-  pi: Math.PI,
-
-  p_atm: options.pAtm, /** Pa */
-
-  // Temperatures
-  t_in_conv: 210 + options.tempToK, // K (process in rad sect)
-  t_air: options.tAmb, // K (atm)
-  t_fuel: options.tAmb, // K (atm)
-  t_amb: options.tAmb, // K
-  
-  // NewtonRaphson
-  NROptions: options.NROptions,
-
-  // Variables
-  humidity: round(options.humidity), // %
-  airExcess: options.airExcess, // % * 0.01
-  o2Excess: options.o2Excess, // % * 0.01
-  // t_out: 355 + options.tempToK, // K (process global)
-  t_out: undefined, // 628.15 - 315 K (process global)
-  m_fuel: 100, /** (kmol/h) */
-  //TODO: let duty be a variable
-  // t_in_rad: 250 + options.tempToK, // K (process in rad sect)
-  // t_stack: 400 + options.tempToK, //TODO: (This isn't used) - K (flue gases out)
+for (const key in defaultFuels) {
+  document.getElementById(key).value = parseFloat(defaultFuels[key]) *100;
 }
 
-const result = combustion(fuels, options, params)
-logger.debug(JSON.stringify(result, null, 2))
+const totalRecalculate = () => {
+  let total = 0;
+  dataFormulas.forEach(element => {
+    inputElement = document.getElementById(element)
+    if (inputElement !== null) {
+      if (inputElement.value !== "") total += parseFloat(inputElement.value);
+    }
+  });
+  document.getElementById("total").innerHTML = total
+}
+totalRecalculate()
+
+dataFormulas.forEach(element => {
+  inputElement = document.getElementById(element)
+  if (inputElement !== null) {
+    inputElement.addEventListener('input', totalRecalculate)
+  }
+});
