@@ -56,16 +56,18 @@ const log = function(...arguments) {
   }
 }
 const logByLevel = (...arguments) => {
+  let argumentsText = ""
   for (var i = 1; i < arguments.length; i++) {
-    console.log(`{"${arguments[0]}": "${arguments[i]}"}`);
+    argumentsText += arguments[i]
   }
+  console.log(`{'${arguments[0]}': '${argumentsText}'}`);
 }
 const logger = {
-  info: (arguments) => logByLevel("INFO", arguments),
-  warn: (arguments) => logByLevel("WARN", arguments),
-  error: (arguments) => logByLevel("ERROR", arguments),
-  debug: (arguments) => logByLevel("DEBUG", arguments),
-  default: (arguments) => logByLevel("DEFAULT", arguments),
+  info: (...arguments) => logByLevel("INFO", arguments),
+  warn: (...arguments) => logByLevel("WARN", arguments),
+  error: (...arguments) => logByLevel("ERROR", arguments),
+  debug: (...arguments) => logByLevel("DEBUG", arguments),
+  default: (...arguments) => logByLevel("DEFAULT", arguments),
 }
 
 /** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
@@ -82,7 +84,7 @@ function newtonRaphson (f, fp, x0, options, name) {
 
   options = options || {};
   tol = options.tolerance === undefined ? 1e-7 : options.tolerance;
-  eps = options.epsilon === undefined ? 2.220446049250313e-16 : options.epsilon;
+  eps = options.epsilon === undefined ? 2.22e-15 : options.epsilon;
   maxIter = options.maxIterations === undefined ? 20 : options.maxIterations;
   h = options.h === undefined ? 1e-4 : options.h;
   verbose = options.verbose === undefined ? false : options.verbose;
@@ -142,14 +144,14 @@ const tempAmbRef = tempToK + 25; // 298.15
  * node . false 26.6667 50 0 20 1.01325e5 SI */ 
 const getOptions = () => {
   const optObject = {
-    // Entry arguments
-    verbose: true,
-    tAmb: tempToK + 26.6667,
-    humidity: 50,
-    o2Excess: 0.01 * 0,
-    airExcess: 0.01 * 80,
-    pAtm: 101_325,
-    unitSystem: "SI",
+    // Entry default arguments
+    verbose: true,          // boolean
+    tAmb: tempToK + 26.6667,// K
+    humidity: 50,           // %
+    o2Excess: .01 * 0,      // fr
+    airExcess: .01 * 80,    // fr
+    pAtm: 101_325,          // Pa
+    unitSystem: "SI",       // string
   
     // Newton Raphson arguments
     NROptions: {
@@ -170,8 +172,8 @@ const getOptions = () => {
   optObject.verbose = process.argv[2] == "true";
   optObject.tAmb = tempToK + parseFloat(process.argv[3]) || tempAmbRef - 4;
   optObject.humidity = 1e-10 + parseFloat(process.argv[4]) || 70;
-  optObject.o2Excess = 0.01 * parseFloat(process.argv[5]) || 0.01 * 0;
-  optObject.airExcess = 1e-10 + 0.01 * parseFloat(process.argv[6]) || 0.01 * 80;
+  optObject.o2Excess = .01 * parseFloat(process.argv[5]) || .01 * 0;
+  optObject.airExcess = 1e-10 + .01 * parseFloat(process.argv[6]) || .01 * 80;
   optObject.pAtm = parseFloat(process.argv[7]) || 1e5;
   optObject.unitSystem = process.argv[8];
   // Newton Raphson arguments

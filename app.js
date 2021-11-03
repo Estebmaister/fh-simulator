@@ -212,6 +212,12 @@ if (typeof window !== 'undefined') {
   logger.debug(JSON.stringify(result, null, 2))
   logger.debug(JSON.stringify(browserData, null, 2))
 
+  
+  let i = 0;
+  do { i += 1 }
+  while(i < 2e5)
+  const loader = document.getElementById("loader-wrapper").remove();
+  // loader.parentNode.removeChild(loader);
   document.getElementById("output-data").textContent = JSON.stringify({...result}, null, 2);
 } else {
   const result = combustion(fuels, options)

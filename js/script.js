@@ -27,7 +27,7 @@ const totalRecalculate = () => {
       if (inputElement.value !== "") total += parseFloat(inputElement.value);
     }
   });
-  document.getElementById("total").innerHTML = total
+  document.getElementById("total").innerHTML = parseInt(total * 1e4)/1e4
 }
 totalRecalculate()
 

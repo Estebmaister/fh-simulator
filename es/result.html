@@ -4,9 +4,9 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" href="./img/fav.png" />
+	<link rel="icon" href="../img/fav.png" />
 
-	<title>Fire Heater Simulator</title>
+	<title>Fire Heater Sim</title>
 	<meta name="description" content="Fire Heater Simulator" />
 	<meta name="author" content="Esteban Camargo" />
 	<meta name="keywords" content="simulator" />
@@ -15,32 +15,32 @@
 	<!-- WhatsApp Description -->
 	<meta property="og:title" content="Fire Heater Simulator" />
 	<meta property="og:description" content="Esteban's public website, curriculum and projects." />
-	<meta property="og:image" content="./img/fav.png" />
+	<meta property="og:image" content="../img/fav.png" />
 	<meta property="og:url" content="#" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Fire Heater Sim" />
 
 	<meta name="twitter:title" content="Esteban Camargo (Remoter)" />
-	<meta name="twitter:image" content="./img/fav.png" />
+	<meta name="twitter:image" content="../img/fav.png" />
 	<meta name="twitter:url" content="#" />
 	<meta name="twitter:domain" content="estebmaister.com.ve" />
 	<meta name="twitter:card" content="summary_large_image" />
 
-  <meta http-equiv="refresh" content="0;url=./en" />      
-  <link rel="canonical" href="./en" />
-	<link rel="stylesheet" href="./css/style.css" />
+	<link rel="stylesheet" href="../css/style.css" />
+	<link rel="stylesheet" href="../css/loader.css" />
+  <script src="../js/resultCall.js" defer></script>
 </head>
 <body>
   <header id="header">
-    <a class="logo" href="#"><img class="logo" id="header-img" src="./img/logo.png" alt="Logo" /></a>
+    <a class="logo" href="#"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" /></a>
 
     <nav id="navbar">
       <ul id="nav-list">
         <li class="nav-sec">
-          <a class="nav-link" href="#data-sect">Data</a>
+          <a class="nav-link" href="./">Data</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="./result.html">Result</a>
+          <a class="nav-link" href="">Result</a>
         </li>
         <li class="nav-sec">
           <a class="nav-link" href="https://github.com/estebmaister/" target="_blank">Projects</a>
@@ -50,9 +50,37 @@
   </header>
   <main>
     <section id="data-sect">
-      <h1>The page you are looking for is at <a href="./es">/en</a></h1>
+      <h1>Fire heater simulator</h1>
+      <p>Testing page, a simple view for the output.</p>
     </section>
-
+    <section id="output-sect">
+      <div id="loader-wrapper">
+        <!-- Floating Loader -->
+        <div class="loader"></div>
+        <div class="shadow"></div>
+        <!-- <div class="loader">
+            <svg viewBox="0 0 80 80">
+                <circle id="test" cx="40" cy="40" r="32"></circle>
+            </svg>
+        </div>
+        
+        <div class="loader triangle">
+            <svg viewBox="0 0 86 80">
+                <polygon points="43 8 79 72 7 72"></polygon>
+            </svg>
+        </div>
+        
+        <div class="loader">
+            <svg viewBox="0 0 80 80">
+                <rect x="8" y="8" width="64" height="64"></rect>
+            </svg>
+        </div> -->
+        <!-- <div class="loader loader1"></div>
+        <div class="loader loader2"></div> -->
+      </div>
+      <pre><code id="output-data">
+      </code></pre>
+    </section>
   </main>
 	<footer>
 		<p>

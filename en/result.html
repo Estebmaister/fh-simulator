@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" href="./img/fav.png" />
+	<link rel="icon" href="../img/fav.png" />
 
 	<title>Fire Heater Sim</title>
 	<meta name="description" content="Fire Heater Simulator" />
@@ -15,23 +15,24 @@
 	<!-- WhatsApp Description -->
 	<meta property="og:title" content="Fire Heater Simulator" />
 	<meta property="og:description" content="Esteban's public website, curriculum and projects." />
-	<meta property="og:image" content="./img/fav.png" />
+	<meta property="og:image" content="../img/fav.png" />
 	<meta property="og:url" content="#" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="Fire Heater Sim" />
 
 	<meta name="twitter:title" content="Esteban Camargo (Remoter)" />
-	<meta name="twitter:image" content="./img/fav.png" />
+	<meta name="twitter:image" content="../img/fav.png" />
 	<meta name="twitter:url" content="#" />
 	<meta name="twitter:domain" content="estebmaister.com.ve" />
 	<meta name="twitter:card" content="summary_large_image" />
 
-	<link rel="stylesheet" href="./css/style.css" />
-  <script src="./js/bundle.js" defer></script>
+	<link rel="stylesheet" href="../css/style.css" />
+	<link rel="stylesheet" href="../css/loader.css" />
+  <script src="../js/resultCall.js" defer></script>
 </head>
 <body>
   <header id="header">
-    <a class="logo" href="#"><img class="logo" id="header-img" src="./img/logo.png" alt="Logo" /></a>
+    <a class="logo" href="#"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" /></a>
 
     <nav id="navbar">
       <ul id="nav-list">
@@ -53,25 +54,31 @@
       <p>Testing page, a simple view for the output.</p>
     </section>
     <section id="output-sect">
+      <div id="loader-wrapper">
+        <!-- Floating Loader -->
+        <div class="loader"></div>
+        <div class="shadow"></div>
+        <!-- <div class="loader">
+            <svg viewBox="0 0 80 80">
+                <circle id="test" cx="40" cy="40" r="32"></circle>
+            </svg>
+        </div>
+        
+        <div class="loader triangle">
+            <svg viewBox="0 0 86 80">
+                <polygon points="43 8 79 72 7 72"></polygon>
+            </svg>
+        </div>
+        
+        <div class="loader">
+            <svg viewBox="0 0 80 80">
+                <rect x="8" y="8" width="64" height="64"></rect>
+            </svg>
+        </div> -->
+        <!-- <div class="loader loader1"></div>
+        <div class="loader loader2"></div> -->
+      </div>
       <pre><code id="output-data">
-        <!-- <script>
-          let qs = (function(a) {
-            if (a == "") return {};
-            let b = {};
-            for (let i = 0; i < a.length; ++i)
-            {
-              var p=a[i].split('=', 2);
-              if (p.length == 1) {
-                b[p[0]] = "";
-              }
-              else {
-                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-              }
-            }
-            return b;
-          })(window.location.search.substr(1).split('&'));
-          document.getElementById("output-data").textContent = JSON.stringify(qs, null, 2);
-        </script> -->
       </code></pre>
     </section>
   </main>
