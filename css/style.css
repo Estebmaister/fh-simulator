@@ -43,6 +43,29 @@ header {
   box-shadow: 0 1px 4px var(--shadow, grey);
 }
 
+#lang {
+  position: fixed;
+  right: 1%;
+  top: 42px;
+  padding: 2px;
+  width: 5em;
+  height: 12px;
+
+  font-size: 10px;
+  font-family: sans-serif;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+
+  border-radius: 6px;
+  border: 1px solid var(--shadow, #595f6e);
+  background-color: var(--contrast-color, lightgray);
+}
+#lang span {
+  font-weight: 800;
+}
+
 main {
   padding: 1%;
   min-height: 88vh;
