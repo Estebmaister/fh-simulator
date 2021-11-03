@@ -46,6 +46,7 @@
         </li>
       </ul>
     </nav>
+    <a id="lang" href="../en">EN | <span>ES</span></a>
   </header>
   <main>
     <section id="data-sect">
@@ -81,54 +82,54 @@
   
           <div class="form-div"> 
             <p class="project-info">
-              Ambient Temperature T<sub>a</sub> <input name="t_amb" type="number" placeholder="25.0">
+              Temperatura Ambiente T<sub>a</sub> <input name="t_amb" type="number" placeholder="25.0">
             </span> °C</span>
             </p> 
             <p class="project-info">
-              Relative Humidity RH <input name="humidity" type="number" placeholder="0.0"> %
+              Humedad Relativa RH <input name="humidity" type="number" placeholder="0.0"> %
             </p>
             <p class="project-info">
-              Atmospheric Pressure <input name="p_atm" type="number" placeholder="0.0">
+              Presión Atmosférica <input name="p_atm" type="number" placeholder="0.0">
             </span> kPa</span>
             </p>
             <p class="project-info">
-              Air Excess <input name="air_excess" type="number" placeholder="0.0"> %
+              Exceso de Aire <input name="air_excess" type="number" placeholder="0.0"> %
             </p>
           </div>
         </div>
   
         <div class="form-block">
           <hr>
-          <h3>Flue Gas <br> <span><i><sub>(For healthy combustion with gas fuels, 3% Oxygen in flue gas on dry basis is targeted.)</sub> </i></span> </h3>
+          <h3>Gas de Combustión (GC)<br> <span><i><sub>(Para una combustión adecuada de combustible gaseoso, se recomienda alcanzar 3% de O2 en GC a base seca.)</sub> </i></span> </h3>
   
           <div class="form-div"> 
-            <p class="project-info">Flue gas O<sub>2</sub> Excess <input name="o2_excess" type="number" min="0" max="30" placeholder="0.0"> %</p>
-            <p class="project-info">Oxygen sampling basis <select name="o2_basis"><option value="wet">wet basis</option> <option value="dry">dry basis</option></select></p> 
+            <p class="project-info">Exceso de O<sub>2</sub> en GC <input name="o2_excess" type="number" min="0" max="30" placeholder="0.0"> %</p>
+            <p class="project-info">Base de muestreo de O2 <select name="o2_basis"><option value="wet">base húmeda</option> <option value="dry">base seca</option></select></p> 
           </div>
         </div>
       </div>
 
       <hr>
-      <h3>Fuel Gas</h3>
+      <h3>Combustible</h3>
 
       <div class="form-div"> 
-        <p class="project-info">Fuel gas temperature T<sub>f</sub> <input name="t_fuel" placeholder="25.0" type="number"> °C </p>
-        <p class="project-info">Fuel gas Specified as <select name="fuel_percent">
-        <option value="mole_percent">mole percent</option> 
+        <p class="project-info">Temperatura del combustible T<sub>f</sub> <input name="t_fuel" placeholder="25.0" type="number"> °C </p>
+        <p class="project-info">Combustible especificado como <select name="fuel_percent">
+        <option value="mole_percent">porcentaje molar</option> 
         <!-- <option value="mass_percent">mass percent</option> -->
         </select></p>
       </div> 
 
       <div class="form-div comp"> 
-        <p class="project-info">Fuel gas Composition</p>
+        <p class="project-info">Composición del combustible</p>
         <p class="project-info">Total <span id="total" style="font-weight: bold;"> 0 </span></p>
       </div> 
 
       <div class="form-div comp-div">
 
-      <div class="fuel-compound">
+      <!-- <div class="fuel-compound">
         <p class="fuel-name">Carbon      </p><p class="fuel-formula">C                          </p> <p class="fuel-input"><input max="100" min="0.00" name="C"      id="C"      placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
-      </div>
+      </div> -->
       <div class="fuel-compound">
         <p class="fuel-name">Hydrogen    </p><p class="fuel-formula">H<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="H2"     id="H2"     placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
       </div>
@@ -159,7 +160,7 @@
       <div class="fuel-compound">
         <p class="fuel-name">i-Butane    </p><p class="fuel-formula">C<sub>4</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="iC4H10" id="iC4H10" placeholder="0.00" type="number" class="inp" step="0.0001"></p>
       </div>
-      <div class="fuel-compound">
+      <!-- <div class="fuel-compound">
         <p class="fuel-name">n-Pentane   </p><p class="fuel-formula">C<sub>5</sub>H<sub>12</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C5H12"  id="C5H12"  placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
       </div>
       <div class="fuel-compound">
@@ -170,7 +171,7 @@
       </div>
       <div class="fuel-compound">
         <p class="fuel-name">n-Hexane    </p><p class="fuel-formula">C<sub>6</sub>H<sub>14</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C6H14"  id="C6H14"  placeholder="0.00" type="number" class="inp" step="0.0001"></p>
-      </div>
+      </div> -->
       <div class="fuel-compound">
         <p class="fuel-name">Ethylene    </p><p class="fuel-formula">C<sub>2</sub>H<sub>4</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H4"   id="C2H4"   placeholder="0.00" type="number" class="inp" step="0.0001"></p>
       </div>
@@ -222,7 +223,7 @@
 
       </div>
           
-      <div class="form-div"> <button>Calculate</button> </div>
+      <div class="form-div"> <button>Calcular</button> </div>
       <!----> 
       <!-- Form first version -->
       <!-- <section id="capturer-sect">
@@ -261,7 +262,7 @@
 			</a>
 		</p>
     <p>
-      <i> - Calculations performed at web browser engine, logs can be seen at the console</i>
+      <i> - Calculos realizados en el motor del navegador, registros disponibles en consola</i>
     </p>
 	</footer>
 </body>

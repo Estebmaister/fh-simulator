@@ -14,6 +14,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "webpack --mode production -w",
+    "data": "node ./data/update.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
