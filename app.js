@@ -18,6 +18,7 @@ const {newtonRaphson, options, logger, round, units} = require('./js/utils');
 const {combSection} = require('./js/combustion');
 const {radSection} = require('./js/rad');
 const {shieldSection} = require('./js/shield');
+const {browserProcess} = require('./js/browser');
 const data = require('./data/data.json');
 
 
@@ -94,18 +95,10 @@ const combustion = (fuels, options) => {
   return comb_result
 }
 
-let fuels = {
-  H2: .1142,
-  N2: .0068,
-  CO: .0066,
-  CO2: .0254,
-  CH4: .5647,
-  C2H6: .1515,
-  C3H8: .0622,
-  C4H10: .0176,
-  iC4H10: .0075,
-  C2H4: .0158,
-  C3H6: .0277,
+let fuels = { 
+  H2: .1142, N2: .0068, CO: .0066, CO2: .0254, 
+  CH4: .5647, C2H6: .1515, C3H8: .0622, C4H10: .0176, 
+  iC4H10: .0075, C2H4: .0158, C3H6: .0277,
 }
 // fuels ={
 //   H2: .8,
@@ -113,112 +106,8 @@ let fuels = {
 // }
 
 if (typeof window !== 'undefined') {
-
-  const extractURIdata = (argumentsArray) => {
-    if (argumentsArray == "") return {};
-    let resultObject = {};
-    for (let i = 0; i < argumentsArray.length; ++i)
-    {
-      const argumentPair = argumentsArray[i].split('=', 2);
-      if (argumentPair.length == 1) {
-        resultObject[argumentPair[0]] = "";
-      }
-      else {
-        resultObject[argumentPair[0]] = decodeURIComponent(
-          argumentPair[1].replace(/\+/g, " ")
-          );
-      }
-    }
-    return resultObject;
-  }
-  const insertBrowserData = (browserData, fuels, data, options) => {
-    const browserFuels = {}
-    const fuelCompounds = data.filter( element => element.Formula in browserData )
-    for (const key in browserData) {
-      const compoundArray = fuelCompounds.filter(element => element.Formula == key)
-      if (compoundArray.length === 1 && browserData[key] !== "") {
-        const fuelFrac = parseFloat(browserData[key])
-        if (fuelFrac > 0 && fuelFrac <= 100) {
-          browserFuels[key] = fuelFrac/100
-        } else {
-          logger.error(`fuel fraction invalid (${fuelFrac}) for ${key}`)
-        }
-      } else if (browserData[key] !== "") {
-        let optValue
-        switch (key) {
-          case "project_title":
-            
-            break;
-          case "project_n":
-            
-            break;
-          case "revision_n":
-            
-            break;
-          case "date":
-            
-            break;
-          case "t_amb":
-            logger.debug(key, browserData[key])
-            optValue = parseFloat(browserData[key])
-            if (optValue > -options.tempToK && optValue < 100) 
-              options.tAmb = optValue +options.tempToK;
-            break;
-          case "humidity":
-            logger.debug(key, browserData[key])
-            optValue = parseFloat(browserData[key])
-            if (optValue >= 0 && optValue <= 100) 
-              options.humidity = optValue;
-            break;
-          case "p_atm":
-            logger.debug(key, browserData[key])
-            optValue = parseFloat(browserData[key])
-            if (optValue > 1e-3 && optValue < 1e3) 
-              options.pAtm = optValue *1e3;
-            break;
-          case "air_excess":
-            logger.debug(key, browserData[key])
-            optValue = parseFloat(browserData[key])
-            if (optValue >= 0 && optValue <= 300) 
-              options.airExcess = optValue * .01;
-            break;
-          case "o2_excess":
-            logger.debug(key, browserData[key])
-            optValue = parseFloat(browserData[key])
-            if (optValue >= 0 && optValue <= 30) 
-              options.o2Excess = optValue * .01;
-            break;
-          case "o2_basis":
-            
-            break;
-          case "t_fuel":
-            
-            break;
-          case "fuel_percent":
-            
-            break;
-          default:
-            break;
-        }
-      }
-    }
-
-    if (Object.keys(browserFuels).length !== 0) fuels = browserFuels
-  }
-  const browserData = extractURIdata(window.location.search.substr(1).split('&'));
-  if (browserData !== {}) insertBrowserData(browserData, fuels, data, options)
-
-  const result = combustion(fuels, options)
-  logger.debug(JSON.stringify(result, null, 2))
-  logger.debug(JSON.stringify(browserData, null, 2))
-
-  document.getElementById("loader-wrapper").remove();
-  document.getElementById("output-data").textContent = JSON.stringify({...result}, null, 2);
+  browserProcess(fuels, data, options, combustion)
 } else {
   const result = combustion(fuels, options)
   logger.debug(JSON.stringify(result, null, 2))
 }
-
-module.exports = {
-  combustion
-};

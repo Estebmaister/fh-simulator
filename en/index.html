@@ -58,18 +58,18 @@
 
       <div class="form-div">
         <p class="project-info">
-          Project Title:      <input name="project_title" value="Fire_heater_sim" required> <span class="validity"></span>
+          Project Title: <input name="project_title" value="fire_heater_sim" required> <span class="validity"></span>
         </p>
         <p class="project-info">
-          Project N°:         <input name="project_n" type="number" min="0" value="1">
+          Project N°:    <input name="project_n" type="number" min="0" value="1">
         </p>
         <p class="project-info">
-          Revision No:        <input name="revision_n" type="number" min="0" max="5" value="0"></p>
+          Revision No:   <input name="revision_n" type="number" min="0" max="5" value="0"></p>
           <p class="project-info">
-            Date :              <input id="date" name="date" type="date">
+            Date :       <input name="date" id="date" type="date">
             <script>
-            document.getElementById("date").value = new Date().toISOString().substring(0, 10);
-            // TODO: use the GMT
+              const date = new Date(new Date().toLocaleDateString()).toISOString().substring(0, 10)
+              document.getElementById("date").value = date;
             </script>
           </p>
       </div>
@@ -103,7 +103,10 @@
   
           <div class="form-div"> 
             <p class="project-info">Flue gas O<sub>2</sub> Excess <input name="o2_excess" type="number" min="0" max="30" placeholder="0.0"> %</p>
-            <p class="project-info">Oxygen sampling basis <select name="o2_basis"><option value="wet">wet basis</option> <option value="dry">dry basis</option></select></p> 
+            <p class="project-info">Oxygen sampling basis <select name="o2_basis">
+              <option value="wet">wet basis</option>
+              <!-- <option value="dry">dry basis</option> -->
+            </select></p> 
           </div>
         </div>
       </div>
@@ -126,9 +129,9 @@
 
       <div class="form-div comp-div">
 
-      <div class="fuel-compound">
+      <!-- <div class="fuel-compound">
         <p class="fuel-name">Carbon      </p><p class="fuel-formula">C                          </p> <p class="fuel-input"><input max="100" min="0.00" name="C"      id="C"      placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
-      </div>
+      </div> -->
       <div class="fuel-compound">
         <p class="fuel-name">Hydrogen    </p><p class="fuel-formula">H<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="H2"     id="H2"     placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
       </div>
@@ -159,7 +162,7 @@
       <div class="fuel-compound">
         <p class="fuel-name">i-Butane    </p><p class="fuel-formula">C<sub>4</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="iC4H10" id="iC4H10" placeholder="0.00" type="number" class="inp" step="0.0001"></p>
       </div>
-      <div class="fuel-compound">
+      <!-- <div class="fuel-compound">
         <p class="fuel-name">n-Pentane   </p><p class="fuel-formula">C<sub>5</sub>H<sub>12</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C5H12"  id="C5H12"  placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
       </div>
       <div class="fuel-compound">
@@ -170,7 +173,7 @@
       </div>
       <div class="fuel-compound">
         <p class="fuel-name">n-Hexane    </p><p class="fuel-formula">C<sub>6</sub>H<sub>14</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C6H14"  id="C6H14"  placeholder="0.00" type="number" class="inp" step="0.0001"></p>
-      </div>
+      </div> -->
       <div class="fuel-compound">
         <p class="fuel-name">Ethylene    </p><p class="fuel-formula">C<sub>2</sub>H<sub>4</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H4"   id="C2H4"   placeholder="0.00" type="number" class="inp" step="0.0001"></p>
       </div>
