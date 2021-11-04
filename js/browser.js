@@ -101,7 +101,6 @@ const outputData = (result, browserData, lang) => {
 	logger.info(JSON.stringify(result, null, 2))
   logger.debug(JSON.stringify(browserData, null, 2))
 
-  document.getElementById("loader-wrapper").remove();
   let outputString = ''
   if (lang == 'es') {
     outputString = `
@@ -123,21 +122,29 @@ Moles de gas total y porcentajes por cada mol de combustible
     O2:  ${result.flows["O2_%"]}
 
   Exceso de aire usado (%): ${result.flows["air_excess_%"]},
-  Moles O2 requeridos/mol de combustible (teórico): ${result.flows["O2_mol_req_theor"]},
+  Moles O2 requeridos/mol de combustible 
+    (teórico): ${result.flows["O2_mol_req_theor"]},
 
-  Relación A/C molar:                         ${result.flows["AC"]},
-  Relación A/C molar (aire seco, teórica):    ${result.flows["AC_theor_dryAir"]},
-  Relación A/C másica:                        ${result.flows["AC_mass"]},
-  Relación A/C másica (aire húmedo, teórica): ${result.flows["AC_mass_theor_moistAir"]},
+  Relación A/C molar:       ${result.flows["AC"]},
+  Relación A/C másica:      ${result.flows["AC_mass"]},
+  Relación A/C molar 
+    (aire seco, teórica):   ${result.flows["AC_theor_dryAir"]},
+  Relación A/C másica 
+    (aire húmedo, teórica): ${result.flows["AC_mass_theor_moistAir"]},
 
-  Peso molecular del combustible: ${result.flows["fuel_MW"]},
-  Cp(t_entrada) del combustible:  ${result.flows["fuel_Cp"]},
+  Peso molecular del combustible: 
+    ${result.flows["fuel_MW"]},
+  Cp(t_entrada) del combustible:  
+    ${result.flows["fuel_Cp"]},
   NCV: ${result.flows["NCV"]},
 
-  Peso molecular de los gases de combustión: ${result.flows["flue_MW"]},
-  Cp(t_entrada) de los gases de combustión:  ${result.flows["flue_Cp_Tamb"]}
+  Peso molecular de los gases de combustión: 
+    ${result.flows["flue_MW"]},
+  Cp(t_amb) de los gases de combustión:  
+    ${result.flows["flue_Cp_Tamb"]}
 
-Datos de entrada (en caso de no haber sido introducidos, tomará el predeterminado)
+Datos de entrada 
+  (en caso de no haber sido introducidos, tomará el predeterminado)
 
   Presión atmosférica:   ${result.debug_data["atmPressure"]},
   Temperatura ambiente:  ${result.debug_data["ambTemperature"]},
@@ -152,9 +159,60 @@ Datos de entrada (en caso de no haber sido introducidos, tomará el predetermina
   Presión parcial de O2:    ${result.debug_data["O2Pressure_%"]},
   Sistema de unidades:      ${result.debug_data["unitSystem"]}`;
   } else {
-    outputString = JSON.stringify({...result}, null, 2);
+    outputString = `
+Total flue gas moles and percentage (per fuel mol)
+
+  Flow total: ${result.flows["total_flow"]},
+  Dry total:  ${result.flows["dry_total_flow"]},
+
+  N2:  ${result.products["N2"]},
+  O2:  ${result.products["O2"]},
+  H2O: ${result.products["H2O"]},
+  CO2: ${result.products["CO2"]},
+  SO2: ${result.products["SO2"]}
+
+  Moist basis percentage
+    N2:  ${result.flows["N2_%"]},
+    H2O: ${result.flows["H2O_%"]},
+    CO2: ${result.flows["CO2_%"]},
+    O2:  ${result.flows["O2_%"]}
+
+  Air excess used (%): ${result.flows["air_excess_%"]},
+  Moles O2 required/fuel-mol
+    (theoretical): ${result.flows["O2_mol_req_theor"]},
+
+  A/C molar relation:         ${result.flows["AC"]},
+  A/C mass relation:          ${result.flows["AC_mass"]},
+  A/C molar relation 
+    (dry air, theoretical):   ${result.flows["AC_theor_dryAir"]},
+  A/C mass  relation
+    (moist air, theoretical): ${result.flows["AC_mass_theor_moistAir"]},
+
+  Fuel mol weight:     ${result.flows["fuel_MW"]},
+  Fuel Cp(t_fuel_in):	 ${result.flows["fuel_Cp"]},
+  NCV:  ${result.flows["NCV"]},
+
+  Flue gas mol weight: ${result.flows["flue_MW"]},
+  Flue gas Cp(t_amb):  ${result.flows["flue_Cp_Tamb"]}
+
+Input Data 
+  (in case of no input, default values will be taken)
+
+  Atmospheric Pressure: ${result.debug_data["atmPressure"]},
+  Ambient Temperature:  ${result.debug_data["ambTemperature"]},
+  Humidity percentage:  ${result.debug_data["humidity_%"]},
+  %N2 en aire seco:     ${result.debug_data["dryAirN2_%"]},
+  %O2 en aire seco:     ${result.debug_data["dryAirO2_%"]},
+
+  Dry Air Pressure:     ${result.debug_data["dryAirPressure"]},
+  Water Vapor Pressure: ${result.debug_data["waterPressure"]},
+  Partial Pressure H2O: ${result.debug_data["H2OPressure_%"]},
+  Partial Pressure N2:  ${result.debug_data["N2Pressure_%"]},
+  Partial Pressure O2:  ${result.debug_data["O2Pressure_%"]},
+  Unit System:          ${result.debug_data["unitSystem"]}`;
   }
   
+  document.getElementById("loader-wrapper").remove();
   document.getElementById("output-data").textContent = outputString;
 };
 
