@@ -1,7 +1,7 @@
 :root {
   --primary-color: black;
   --secondary-color: #595f6e;
-  --light-color: #dee8fa;
+  --light-color: #cfdce4;
   --nav-color: rgb(228, 228, 25);
   --contrast-color: white;
   --shadow: #95a5a6;
@@ -10,11 +10,11 @@
 }
 
 /* ------- 1. Page structure ------*/
-/* ------- 2. Main           ------*/
-/* ------- 3. Projects       ------*/
+/* ------- 2. Lang switch    ------*/
+/* ------- 3. Navbar (header)------*/
 /* ------- 4. Social         ------*/
 /* ------- 5. Footer         ------*/
-/* ------- 6. Icon Pack      ------*/
+/* ------- 6. Form Structure ------*/
 /* ------- 7. Animation      ------*/
 
 /* -------  Page structure   ------*/
@@ -43,6 +43,34 @@ header {
   box-shadow: 0 1px 4px var(--shadow, grey);
 }
 
+main {
+  padding: 1%;
+  min-height: 88vh;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: var(--light-color, lightgray);
+}
+
+footer {
+  position: fixed;
+  z-index: 1;
+  bottom: 0px;
+  height: 40px;
+  width: 100%;
+  background-color: var(--nav-color, lightgray);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8em;
+}
+@media screen and (max-width: 570px) {
+  footer {
+    font-size: 0.5em;
+  }
+}
+
+/* -------    Lang switch    ------*/
+
 #lang {
   position: fixed;
   right: 1%;
@@ -66,13 +94,83 @@ header {
   font-weight: 800;
 }
 
-main {
-  padding: 1%;
-  min-height: 88vh;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: var(--light-color, lightgray);
+/* -------    Navbar (header)------*/
+
+.logo {
+  height: 42px;
+  margin: 2px;
+  width: auto;
+  background-color: transparent;
+  opacity: 0.9;
+  transition: 0.3s;
 }
+.logo:hover {
+  height: 47px;
+  margin: 1px;
+  width: auto;
+  opacity: 1;
+}
+#navbar {
+  display: flex;
+  margin: 0 0 0 auto;
+  height: 100%;
+  width: 75%;
+}
+#nav-list {
+  list-style: none;
+  flex-flow: row nowrap;
+  width: 100%;
+  display: flex;
+  margin: 0px;
+  padding: 0px;
+}
+.nav-link {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: var(--primary-color, black);
+  font-weight: bold;
+  font-size: 15px;
+  text-transform: uppercase;
+}
+.nav-link:after {
+  text-decoration: none;
+  color: var(--primary-color, black);
+}
+.nav-sec {
+  display: flex;
+  flex: 1 1 auto;
+  text-align: center;
+  margin: 0px;
+  padding: 0px;
+  opacity: 0.9;
+  transition: 0.3s;
+}
+.nav-sec:hover {
+  background-color: var(--shadow, gray);
+}
+.nav-sec:active {
+  background-color: transparent;
+}
+
+/* -------    Footer         ------*/
+
+.credits {
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: "Trebuchet MS", sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  display: block;
+  width: 6em;
+}
+
+/* -------   Form Structure  ------*/
 
 #data-sect p {
   text-align: center;
@@ -145,96 +243,6 @@ h3 span {
   width: 7.5em;
 }
 
-footer {
-  position: fixed;
-  z-index: 1;
-  bottom: 0px;
-  height: 40px;
-  width: 100%;
-  background-color: var(--nav-color, lightgray);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.8em;
-}
-@media screen and (max-width: 570px) {
-  footer {
-    font-size: 0.5em;
-  }
-}
-
-.credits {
-  color: var(--secondary-color);
-  text-transform: uppercase;
-  text-decoration: none;
-  font-family: "Trebuchet MS", sans-serif;
-  font-weight: bold;
-  font-size: 14px;
-  display: block;
-  width: 6em;
-}
-
-.logo {
-  height: 42px;
-  margin: 2px;
-  width: auto;
-  background-color: transparent;
-  opacity: 0.9;
-  transition: 0.3s;
-}
-.logo:hover {
-  height: 47px;
-  margin: 1px;
-  width: auto;
-  opacity: 1;
-}
-#navbar {
-  display: flex;
-  margin: 0 0 0 auto;
-  height: 100%;
-  width: 75%;
-}
-#nav-list {
-  list-style: none;
-  flex-flow: row nowrap;
-  width: 100%;
-  display: flex;
-  margin: 0px;
-  padding: 0px;
-}
-.nav-link {
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  text-decoration: none;
-  color: var(--primary-color, black);
-  font-weight: bold;
-  font-size: 15px;
-  text-transform: uppercase;
-}
-.nav-link:after {
-  text-decoration: none;
-  color: var(--primary-color, black);
-}
-.nav-sec {
-  display: flex;
-  flex: 1 1 auto;
-  text-align: center;
-  margin: 0px;
-  padding: 0px;
-  opacity: 0.9;
-  transition: 0.3s;
-}
-.nav-sec:hover {
-  background-color: var(--shadow, gray);
-}
-.nav-sec:active {
-  background-color: transparent;
-}
-
 /* -------  Form structure   ------*/
 
 form div button {
@@ -245,7 +253,7 @@ form div button {
   background-color: var(--contrast-color, #fff);
   border-radius: 4px;
   cursor: pointer;
-  color: var(--shadow, gray);
+  color: var(--primary-color, #000);
   font-weight: 600;
 }
 
@@ -259,9 +267,9 @@ input, select {
   border: none;
   border-radius: 3px;
 }
-
+/* Just enough to 4 decimals */
 input[type="number"] {
-  width: 4em;
+  width: 4.1em;
 }
 
 input:invalid+span:after {
@@ -273,14 +281,26 @@ input:valid+span:after {
   content: '✓';
   padding-left: 5px;
 }
-/* Stylish one column Form */
 
+#total {
+  display: inline-block;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  height: 1em;
+  text-align: center;
+  align-content: center;
+  margin-left: 0.5em;
+  border-radius: 4px;
+  background-color: var(--contrast-color, #fff);
+}
+
+/* Stylish one column Form */
+/* 
 .form-input {
   position: relative;
   width: 20%;
   height: 40px;
   overflow: hidden;
-  /* margin: auto; */
 }
 
 .form-input input {
@@ -333,16 +353,4 @@ input:valid+span:after {
 .form-input input:focus + .label-input::after,
 .form-input input:not([value=""]) + .label-input::after {
   transform: translateX(0%);
-}
-
-#total {
-  display: inline-block;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  height: 1em;
-  text-align: center;
-  align-content: center;
-  margin-left: 0.5em;
-  border-radius: 4px;
-  background-color: var(--contrast-color, #fff);
-}
+} */
