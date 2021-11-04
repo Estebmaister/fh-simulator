@@ -2,7 +2,7 @@
   --primary-color: black;
   --secondary-color: #595f6e;
   --light-color: #cfdce4;
-  --nav-color: rgb(228, 228, 25);
+  --nav-color: rgba(228, 228, 25, 0.99);
   --contrast-color: white;
   --shadow: #95a5a6;
   --alert-color: red;
@@ -238,6 +238,9 @@ h3 span {
 }
 .fuel-formula {
   justify-content: center;
+  align-items: end;
+  margin: auto;
+  height: fit-content;
 }
 .fuel-name {
   width: 7.5em;
