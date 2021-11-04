@@ -162,7 +162,8 @@ Datos de entrada (en caso de no haber sido introducidos, tomará el predetermina
 const browserProcess = (fuels, data, options, combustion) => {
 
   let lang = 'en';  const browserLang = window.location.pathname.split('/');
-  if (browserLang.length > 0 && browserLang[1] != "") lang = browserLang[1];
+  logger.debug(browserLang)
+  if (browserLang.length > 0) browserLang.forEach(element => {if (element == 'es') lang = 'es'});
 
   const browserData = extractURIdata(window.location.search.substr(1).split('&'));
   if (browserData !== {}) insertBrowserData(browserData, fuels, data, options);
