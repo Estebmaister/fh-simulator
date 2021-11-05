@@ -14,7 +14,7 @@
  * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
-const {newtonRaphson, options, logger, round, roundDict, units} = require('./utils');
+const {newtonRaphson, options, logger, round, roundDict, initSystem} = require('./utils');
 const data = require('../data/data.json')
 const dryAirN2Percentage = 79.05
 const dryAirO2Percentage = 20.95
@@ -232,6 +232,7 @@ const adFlame = (fuels, products, tIni, o2required) => {
 */
 const combSection = (airExcess, fuels, params) => {
   //logger.debug("airExcess in call: " + airExcess)
+  const units = initSystem(params.unitSystem)
   const debug_data = {
     err: "",
     atmPressure: units.pressure(params.p_atm),
@@ -239,7 +240,8 @@ const combSection = (airExcess, fuels, params) => {
     "humidity_%":  round(params.humidity),
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
-    moisture: units.moist(moistAirMolesPerO2(params.t_amb, params.humidity))
+    moisture: units.moist(moistAirMolesPerO2(params.t_amb, params.humidity)),
+    unitSystem: units.system
   };
   const compounds = data.filter((element, i, arr) => element.Formula in fuels)
   let normalFuel = {...fuels}
@@ -293,7 +295,6 @@ const combSection = (airExcess, fuels, params) => {
     debug_data["H2OPressure_%"] = round(100 * air.H2O)
     debug_data["N2Pressure_%"] = round(100 * air.N2)
     debug_data["O2Pressure_%"] = round(100 *air.O2)
-    debug_data.unitSystem = units.system
 
     products['O2'] = o2excess - products['O2'] // Subtracting the O2 used in combustion
     products['N2'] += products['O2'] * (air.N2/air.O2)
