@@ -6,14 +6,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" href="../img/fav.png" />
 
-	<title>Simulador de horno de proceso</title>
-	<meta name="description" content="Simulador de horno de proceso" />
+	<title>Simulador de Hornos de Proceso de Tiro Natural</title>
+	<meta name="description" content="Simulador de Hornos de Proceso de Tiro Natural" />
 	<meta name="author" content="Esteban Camargo" />
 	<meta name="keywords" content="simulator" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 	<!-- WhatsApp Description -->
-	<meta property="og:title" content="Simulador de horno de proceso" />
+	<meta property="og:title" content="Simulador de Hornos de Proceso de Tiro Natural" />
 	<meta property="og:description" content="Simulador desarrollado como tesis de grado en la USB" />
 	<meta property="og:image" content="../img/fav.png" />
 	<meta property="og:url" content="#" />
@@ -50,7 +50,8 @@
   </header>
   <main>
     <section id="data-sect">
-      <h1>Simulador de horno de procesos</h1>
+      <h1>Simulador de Hornos de Proceso de Tiro Natural</h1>
+      <h4>(Enfocado a usos educativos)</h4>
       <p>Página de prueba, una vista inicial para el ingreso de datos.</p>
     </section>
     <form id="data-form" method="GET" action="./result.html">
@@ -82,28 +83,28 @@
   
           <div class="form-div"> 
             <p class="project-info">
-              Temperatura Ambiente T<sub>a</sub> <input name="t_amb" type="number" placeholder="25.0">
+              Temperatura Ambiente T<sub>a</sub> <input step="0.001" name="t_amb" type="number" placeholder="25.0">
             </span> °C</span>
             </p> 
             <p class="project-info">
-              Humedad Relativa RH <input name="humidity" type="number" placeholder="0.0"> %
+              Humedad Relativa RH <input step="0.001" name="humidity" type="number" placeholder="0.0"> %
             </p>
             <p class="project-info">
-              Presión Atmosférica <input name="p_atm" type="number" placeholder="0.0">
+              Presión Atmosférica <input step="0.001" name="p_atm" type="number" placeholder="0.0">
             </span> kPa</span>
             </p>
             <p class="project-info">
-              Exceso de Aire <input name="air_excess" type="number" placeholder="0.0"> %
+              Exceso de Aire <input step="0.001" name="air_excess" type="number" placeholder="0.0"> %
             </p>
           </div>
         </div>
   
         <div class="form-block">
           <hr>
-          <h3>Gas de Combustión (GC)<br> <span><i><sub>(Para una combustión adecuada de combustible gaseoso, se recomienda alcanzar 3% de O2 en GC a base seca.)</sub> </i></span> </h3>
+          <h3>Gases de Combustión (GC)<br> <span><i><sub>(Para una combustión adecuada de combustible gaseoso, se recomienda alcanzar 3% de O2 en GC a base seca.)</sub> </i></span> </h3>
   
           <div class="form-div"> 
-            <p class="project-info">Exceso de O<sub>2</sub> en GC <input name="o2_excess" type="number" min="0" max="30" placeholder="0.0"> %</p>
+            <p class="project-info">Exceso de O<sub>2</sub> en GC <input name="o2_excess" type="number" min="0" max="30" step="0.001" placeholder="0.0"> %</p>
             <p class="project-info">Base de muestreo de O2 <select name="o2_basis">
               <option value="wet">base húmeda</option>
               <!-- <option value="dry">base seca</option> -->
@@ -116,7 +117,7 @@
       <h3>Combustible</h3>
 
       <div class="form-div"> 
-        <p class="project-info">Temperatura del combustible T<sub>f</sub> <input name="t_fuel" placeholder="25.0" type="number"> °C </p>
+        <p class="project-info">Temperatura del combustible T<sub>f</sub> <input name="t_fuel" placeholder="25.0" step="0.001" type="number"> °C </p>
         <p class="project-info">Combustible especificado como <select name="fuel_percent">
         <option value="mole_percent">porcentaje molar</option> 
         <!-- <option value="mass_percent">mass percent</option> -->
@@ -190,7 +191,7 @@
       <div class="fuel-compound">
         <p class="fuel-name">n-Penteno      </p><p class="fuel-formula">C<sub>5</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C5H10"  id="C5H10"  placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
       </div>
-      <div class="fuel-compound">
+      <!-- <div class="fuel-compound">
         <p class="fuel-name">Benzeno        </p><p class="fuel-formula">C<sub>6</sub>H<sub>6</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C6H6"   id="C6H6"   placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
       </div>
       <div class="fuel-compound">
@@ -198,13 +199,13 @@
       </div>
       <div class="fuel-compound">
         <p class="fuel-name">Xyleno         </p><p class="fuel-formula">C<sub>8</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C8H10"  id="C8H10"  placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
-      </div>
+      </div> -->
       <div class="fuel-compound">
         <p class="fuel-name">Acetileno      </p><p class="fuel-formula">C<sub>2</sub>H<sub>2</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H2"   id="C2H2"   placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
       </div>
-      <div class="fuel-compound">
+      <!-- <div class="fuel-compound">
         <p class="fuel-name">Naftaleno      </p><p class="fuel-formula">C<sub>10</sub>H<sub>8</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C10H8"  id="C10H8"  placeholder="0.00" type="number" class="inp" step="0.0001"></p>
-      </div>
+      </div> -->
       <div class="fuel-compound">
         <p class="fuel-name">Metanol        </p><p class="fuel-formula">CH<sub>3</sub>OH           </p> <p class="fuel-input"><input max="100" min="0.00" name="CH3OH"  id="CH3OH"  placeholder="0.00" type="number" class="inp" step="0.0001"></p>
       </div>
