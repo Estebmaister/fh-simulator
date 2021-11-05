@@ -88,6 +88,10 @@ const insertBrowserData = (browserData, fuels, data, options) => {
 				case "fuel_percent":
 					
 					break;
+        case "unit_system":
+          logger.debug(key, browserData[key])
+          options.unitSystem = browserData[key];
+          break;
 				default:
 					break;
 			}

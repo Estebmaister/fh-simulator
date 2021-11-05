@@ -59,6 +59,7 @@ const createParams = (options) => {
     //TODO: let duty be a variable
     // t_in_rad: 250 + options.tempToK, // K (process in rad sect)
     // t_stack: 400 + options.tempToK, //TODO: (This isn't used) - K (flue gases out)
+    unitSystem: options.unitSystem,
   }
   return params
 }

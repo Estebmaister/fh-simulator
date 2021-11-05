@@ -214,7 +214,7 @@ const englishSystem = { //(US Customary)
   //TODO: change default
   cp: (number) => round(number * 1) + " kJ/kmol K",
   power: (number) => round(number * 3.4121416331) + " Btu/h",
-  moist: (number) => round(number * 1) + " lb-H2O/lb",
+  moist: (number) => round(number * 1e3 * 28.349523125) + " oz-H2O/lb",
   system: "ENGLISH"
 }
 
@@ -237,29 +237,28 @@ const siSystem = {
   vol_flow: (number) => round(number * 1) + " m3/h",
   cp: (number) => round(number * 1) + " kJ/kmol K",
   power: (number) => round(number * 1) + " W",
-  moist: (number) => round(number * 1) + " kg-H2O/kg",
+  moist: (number) => round(number * 1e3) + " g-H2O/kg",
   system: "SI"
 }
 
-const initSystem = (options) => {
-  if (typeof options.unitSystem !== "string") {
+const initSystem = (unitSystem) => {
+  if (typeof unitSystem !== "string") {
     log("warn", 
-    `invalid type (${options.unitSystem}) for unit system, using default SI`)
+    `invalid type (${unitSystem}) for unit system, using default SI`)
     return siSystem
   }
-  switch (options.unitSystem.toLowerCase()) {
+  switch (unitSystem.toLowerCase()) {
     case "si":
       return siSystem;
     case "english":
       return englishSystem;
     default:
       log("warn", 
-      options.unitSystem.toLowerCase() + 
+      unitSystem.toLowerCase() + 
       ' - invalid unit system, using default SI')
       return siSystem;
   }
 }
-const units = initSystem(options)
 
 module.exports = {
   newtonRaphson,
@@ -268,5 +267,5 @@ module.exports = {
   logger,
   round,
   roundDict,
-  units
+  initSystem
 };
