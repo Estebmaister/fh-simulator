@@ -118,6 +118,7 @@ Datos de entrada (en caso de no haber sido introducidos, tomará el predetermina
   Presión parcial de H2O:   ${result.debug_data["H2OPressure_%"]} %
   Presión parcial de N2:    ${result.debug_data["N2Pressure_%"]} %
   Presión parcial de O2:    ${result.debug_data["O2Pressure_%"]} %
+  Contenido húmedo (w):     ${result.debug_data["moisture"]}-AireSeco
 
 Moles de gases de combustión total y porcentajes por cada mol de combustible
 
@@ -168,6 +169,7 @@ Input Data
   Partial Pressure H2O: ${result.debug_data["H2OPressure_%"]} %
   Partial Pressure N2 : ${result.debug_data["N2Pressure_%"]} %
   Partial Pressure O2 : ${result.debug_data["O2Pressure_%"]} %
+  Moisture content (w): ${result.debug_data["moisture"]}-dryAir
 
 Total flue gas moles and percentage (per fuel mol)
 

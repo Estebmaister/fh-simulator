@@ -135,6 +135,7 @@ const moistAirMolesPerO2 = (temperature, relativeHumidity) => {
   // w is the weight ratio of water vapour and dry air. (kg-w_vap/kg-dry_a)
   // simplification 0.62 * 1e-5 * pw
   const w = 0.018 * pw / ( 0.029 * (options.pAtm - pw ) )
+  return w
   // weight ratio converted to water per oxygen in air
   return w * 7.655
 }
@@ -238,6 +239,7 @@ const combSection = (airExcess, fuels, params) => {
     "humidity_%":  round(params.humidity),
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
+    moisture: units.moist(moistAirMolesPerO2(params.t_amb, params.humidity))
   };
   const compounds = data.filter((element, i, arr) => element.Formula in fuels)
   let normalFuel = {...fuels}
