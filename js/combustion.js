@@ -347,7 +347,7 @@ const combSection = (airExcess, fuels, params) => {
   params.Cp_air = Cp_multicomp(air, true);
   params.Cp_fuel = Cp_multicomp(normalFuel, true);
 
-  roundDict(products)
+  roundDict(products), roundDict(flows), roundDict(debug_data)
   if (debug_data.err == "") delete debug_data.err;
   return {flows, products, debug_data}
 }
