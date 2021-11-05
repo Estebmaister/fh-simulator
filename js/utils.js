@@ -146,10 +146,10 @@ const getOptions = () => {
   const optObject = {
     // Entry default arguments
     verbose: true,          // boolean
-    tAmb: tempToK + 26.6667,// K
-    humidity: 50,           // %
+    tAmb: tempAmbRef,     // K
+    humidity: 0,            // %
     o2Excess: .01 * 0,      // fr
-    airExcess: .01 * 80,    // fr
+    airExcess: .01 * 0,     // fr
     pAtm: 101_325,          // Pa
     unitSystem: "SI",       // string
   
@@ -170,10 +170,10 @@ const getOptions = () => {
   if (typeof process == 'undefined') return optObject;
 
   optObject.verbose = process.argv[2] == "true";
-  optObject.tAmb = tempToK + parseFloat(process.argv[3]) || tempAmbRef - 4;
-  optObject.humidity = 1e-10 + parseFloat(process.argv[4]) || 70;
+  optObject.tAmb = tempToK + parseFloat(process.argv[3]) || tempAmbRef;
+  optObject.humidity = 1e-10 + parseFloat(process.argv[4]) || 0;
   optObject.o2Excess = .01 * parseFloat(process.argv[5]) || .01 * 0;
-  optObject.airExcess = 1e-10 + .01 * parseFloat(process.argv[6]) || .01 * 80;
+  optObject.airExcess = 1e-10 + .01 * parseFloat(process.argv[6]) || .01 * 0;
   optObject.pAtm = parseFloat(process.argv[7]) || 1e5;
   optObject.unitSystem = process.argv[8];
   // Newton Raphson arguments
@@ -183,14 +183,12 @@ const getOptions = () => {
 };
 const options = getOptions();
 
+const round = (number) => (Math.round(number*1e3)/1e3).toFixed(3)
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
-    if(!isNaN(value)){
-      object[key] = Math.round(value*1e3)/1e3
-    }
+    if(!isNaN(value)) object[key] = round(value);
   }
 }
-const round = (number) => Math.round(number*1e3)/1e3
 
 if (options.verbose) log("debug",JSON.stringify(options, null, 2))
 
@@ -214,7 +212,7 @@ const englishSystem = { //(US Customary)
   mass_flow: (number) => round(number * 2.2046244202) + " lb/s",
   vol_flow: (number) => round(number * 35.314666721) + " f3/h",
   //TODO: change default
-  cp: (number) => round(number * 1) + " kJ/kmol-K",
+  cp: (number) => round(number * 1) + " kJ/kmol K",
   power: (number) => round(number * 3.4121416331) + " Btu/h",
   system: "ENGLISH"
 }
@@ -236,7 +234,7 @@ const siSystem = {
   mass: (number) => round(number * 1e-3) + " kg",
   mass_flow: (number) => round(number * 1) + " kg/s",
   vol_flow: (number) => round(number * 1) + " m3/h",
-  cp: (number) => round(number * 1) + " kJ/kmol-K",
+  cp: (number) => round(number * 1) + " kJ/kmol K",
   power: (number) => round(number * 1) + " W",
   system: "SI"
 }

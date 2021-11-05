@@ -78,6 +78,8 @@ footer {
   padding: 2px;
   width: 5em;
   height: 12px;
+  opacity: 0.9;
+  transition: 0.3s;
 
   font-size: 10px;
   font-family: sans-serif;
@@ -92,6 +94,12 @@ footer {
 }
 #lang span {
   font-weight: 800;
+}
+#lang:hover {
+  background-color: var(--primary-color,#000);
+  color: var(--contrast-color, #fff);
+  font-size: 13px;
+  height: 15px;
 }
 
 /* -------    Navbar (header)------*/
@@ -203,7 +211,7 @@ footer {
   padding: 2em;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
   text-align: center;
 }
 
@@ -235,6 +243,11 @@ h3 span {
   align-items: center;
   height: 2em;
   width: 4em;
+  transition: 0.4s;
+}
+.fuel-input:hover {
+  width: 4.1em;
+  height: 2.1em;
 }
 .fuel-formula {
   justify-content: center;
@@ -252,17 +265,21 @@ form div button {
   padding: 0 1em;
   margin: 2em 0 0.5em;
   height: 2em;
+  width: 6em;
   border: none;
   background-color: var(--contrast-color, #fff);
   border-radius: 4px;
   cursor: pointer;
   color: var(--primary-color, #000);
   font-weight: 600;
+  opacity: 0.9;
+  transition: 0.4s;
 }
-
 form div button:hover {
   background-color: var(--primary-color,#000);
   color: var(--contrast-color, #fff);
+  height: 2.4em;
+  width: 7em;
 }
 
 input, select {
@@ -273,6 +290,10 @@ input, select {
 /* Just enough to 4 decimals */
 input[type="number"] {
   width: 4.1em;
+  transition: 0.4s;
+}
+input[type="number"]:hover {
+  width: 4.2em;
 }
 
 input:invalid+span:after {
