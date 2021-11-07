@@ -18,6 +18,11 @@ const {newtonRaphson, options, logger, round, roundDict, initSystem} = require('
 const data = require('../data/data.json')
 const dryAirN2Percentage = 79.05
 const dryAirO2Percentage = 20.95
+const dryAir = {
+  O2: .01 * dryAirO2Percentage,
+  N2: .01 * dryAirN2Percentage,
+  H2O: 0
+};
 
 //TODO: expanse the use of the error in result dictionary
 /** Check if the percentages of the fuels sums 100% */
@@ -130,11 +135,11 @@ const pressureH2OinAir = (temperature, relativeHumidity) => {
 }
 
 /** Temperature should be in K, humidity %[0,100] */
-const moistAirMolesPerO2 = (temperature, relativeHumidity) => {
+const moistAirWeightRatio = (temperature, relativeHumidity) => {
   const pw = pressureH2OinAir(temperature, relativeHumidity)
   // w is the weight ratio of water vapour and dry air. (kg-w_vap/kg-dry_a)
   // simplification 0.62 * 1e-5 * pw
-  const w = 0.018 * pw / ( 0.029 * (options.pAtm - pw ) )
+  const w = data[31].MW * pw / ( MW_multicomp(dryAir) * (options.pAtm - pw ) )
   return w
   // weight ratio converted to water per oxygen in air
   return w * 7.655
@@ -240,7 +245,7 @@ const combSection = (airExcess, fuels, params) => {
     "humidity_%":  round(params.humidity),
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
-    moisture: units.moist(moistAirMolesPerO2(params.t_amb, params.humidity)),
+    moisture: units.moist(moistAirWeightRatio(params.t_amb, params.humidity)),
     unitSystem: units.system[params.unitSystem]
   };
   const compounds = data.filter((element, i, arr) => element.Formula in fuels)
@@ -254,12 +259,7 @@ const combSection = (airExcess, fuels, params) => {
     SO2: 0,
     N2: 0,
   };
-
-  const air = {
-    O2: .01 * dryAirO2Percentage,
-    N2: .01 * dryAirN2Percentage,
-    H2O: 0
-  };
+  const air = {...dryAir};
 
   // for every element in the fuel compounds
   for (const element of compounds) {
@@ -299,7 +299,7 @@ const combSection = (airExcess, fuels, params) => {
     products['O2'] = o2excess - products['O2'] // Subtracting the O2 used in combustion
     products['N2'] += products['O2'] * (air.N2/air.O2)
     products['H2O'] += products['N2']* (waterPressure / (air.N2*params.p_atm))
-    //moistAirMolesPerO2(params.t_amb, params.humidity)
+    //moistAirWeightRatio(params.t_amb, params.humidity)
   }
 
 
@@ -359,7 +359,7 @@ const combSection = (airExcess, fuels, params) => {
 // logger.info( `Cp_dry_${data[33].Substance} Cp0(kJ/kmol-K): `+
 //     `${Cp0(data[33], true)( (options.tAmb + 15+273.15)*0.5 )}`)
 // logger.info(`H2O-mol per O2-mol in air ${params.humidity}% RH): `+
-//   `${moistAirMolesPerO2(params.t_amb, params.humidity)}`)
+//   `${moistAirWeightRatio(params.t_amb, params.humidity)}`)
 
 // logger.default(combustionH(data[7]).toString())
 // logger.default(deltaH(data[7])(options.tempAmbRef))
