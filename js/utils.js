@@ -214,8 +214,8 @@ const englishSystem = { //(US Customary)
   //TODO: change default
   cp: (number) => round(number * 1) + " kJ/kmol K",
   power: (number) => round(number * 3.4121416331) + " Btu/h",
-  moist: (number) => round(number * 1e3 * 28.349523125) + " oz-H2O/lb",
-  system: "ENGLISH"
+  moist: (number) => round(number * 1e3) + "x10^(-3) lb-H2O/lb",
+  system: {en: "ENGLISH", es: "INGLÉS"}
 }
 
 const siSystem = {
@@ -238,7 +238,7 @@ const siSystem = {
   cp: (number) => round(number * 1) + " kJ/kmol K",
   power: (number) => round(number * 1) + " W",
   moist: (number) => round(number * 1e3) + " g-H2O/kg",
-  system: "SI"
+  system: {en: "SI", es: "SI"}
 }
 
 const initSystem = (unitSystem) => {
