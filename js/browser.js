@@ -144,8 +144,8 @@ Moles de gases de combustión total y porcentajes por cada mol de combustible
   Exceso de aire usado: ${result.flows["air_excess_%"]} %
   Moles O2 requeridos/mol de combustible (teórico): ${result.flows["O2_mol_req_theor"]}
 
-  Relación A/C molar:       ${result.flows["AC"]}
-  Relación A/C másica:      ${result.flows["AC_mass"]}
+  Relación A/C molar húmeda:  ${result.flows["AC"]}
+  Relación A/C másica húmeda: ${result.flows["AC_mass"]}
   Relación A/C molar (aire seco, teórica):    ${result.flows["AC_theor_dryAir"]}
   Relación A/C másica (aire húmedo, teórica): ${result.flows["AC_mass_theor_moistAir"]}
 
@@ -195,8 +195,8 @@ Total flue gas moles and percentage (per fuel mol)
   Air excess used : ${result.flows["air_excess_%"]} %
   Moles O2 required/fuel-mol (theoretical): ${result.flows["O2_mol_req_theor"]}
 
-  A/C molar relation:         ${result.flows["AC"]}
-  A/C mass relation:          ${result.flows["AC_mass"]}
+  A/C molar moist relation:   ${result.flows["AC"]}
+  A/C mass moist relation:    ${result.flows["AC_mass"]}
   A/C molar relation (dry air, theoretical):   ${result.flows["AC_theor_dryAir"]}
   A/C mass relation (moist air, theoretical):  ${result.flows["AC_mass_theor_moistAir"]}
 
