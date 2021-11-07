@@ -323,6 +323,18 @@ input:valid+span:after {
 .toggle {
   margin: 1em 0.5em 0.5em;
 }
+@media screen and (max-width: 585px) {
+  .toggle {
+    text-align: center;
+    width: 12em;
+  }
+  .tgl-btn {
+    text-align: initial;
+  }
+  form div button {
+    margin: auto;
+  }
+}
 .tgl {
   display: none;
 }

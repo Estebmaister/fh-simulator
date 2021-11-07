@@ -241,7 +241,7 @@ const combSection = (airExcess, fuels, params) => {
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
     moisture: units.moist(moistAirMolesPerO2(params.t_amb, params.humidity)),
-    unitSystem: units.system
+    unitSystem: units.system[params.unitSystem]
   };
   const compounds = data.filter((element, i, arr) => element.Formula in fuels)
   let normalFuel = {...fuels}
