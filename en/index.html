@@ -7,13 +7,13 @@
 	<link rel="icon" href="../img/fav.png" />
 
 	<title>Fire Heater Sim</title>
-	<meta name="description" content="Fire Heater Simulator" />
+	<meta name="description" content="Fire heater natural draft simulator" />
 	<meta name="author" content="Esteban Camargo" />
 	<meta name="keywords" content="simulator" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 	<!-- WhatsApp Description -->
-	<meta property="og:title" content="Fire Heater Simulator" />
+	<meta property="og:title" content="Fire heater natural draft simulator" />
 	<meta property="og:description" content="Esteban's public website, curriculum and projects." />
 	<meta property="og:image" content="../img/fav.png" />
 	<meta property="og:url" content="#" />
@@ -50,8 +50,8 @@
   </header>
   <main>
     <section id="data-sect">
-      <h1>Fire heater simulator</h1>
-      <h4>For educational porpoise only</h4>
+      <h1>Fire heater natural draft simulator</h1>
+      <h4>(Designed to instruct engineers and operators)</h4>
       <p>Testing page, a simple view for the input and output.</p>
     </section>
     <form id="data-form" method="GET" action="./result.html">
@@ -100,7 +100,9 @@
   
         <div class="form-block">
           <hr>
-          <h3>Flue Gas <br> <span><i><sub>(For healthy combustion with gas fuels, 3% Oxygen in flue gas on dry basis is targeted.)</sub> </i></span> </h3>
+          <h3>Flue Gas 
+            <br> <span><i><sub>(For healthy combustion with gas fuels, 3% Oxygen in flue gas on dry basis is targeted.)</sub> </i></span> 
+          </h3>
   
           <div class="form-div"> 
             <p class="project-info">Flue gas O<sub>2</sub> Excess <input name="o2_excess" type="number" min="0" max="30" step="0.001" placeholder="0.0"> %</p>
@@ -116,15 +118,15 @@
       <h3>Fuel Gas</h3>
 
       <div class="form-div"> 
-        <p class="project-info">Fuel gas temperature T<sub>f</sub> <input name="t_fuel" step="0.001" placeholder="25.0" type="number"> °C </p>
-        <p class="project-info">Fuel gas Specified as <select name="fuel_percent">
-        <option value="mole_percent">mole percent</option> 
-        <!-- <option value="mass_percent">mass percent</option> -->
-        </select></p>
+        <!-- <p class="project-info">Fuel gas Specified as <select name="fuel_percent">
+          <option value="mole_percent">mole percent</option> 
+          <option value="mass_percent">mass percent</option>
+        </select></p> -->
       </div> 
-
+      
       <div class="form-div comp"> 
-        <p class="project-info">Fuel gas Composition</p>
+        <p class="project-info">Temperature T<sub>f</sub> <input name="t_fuel" step="0.001" placeholder="25.0" type="number"> °C </p>
+        <p class="project-info">Composition</p>
         <p class="project-info">Total <span id="total" style="font-weight: bold;"> 0 </span></p>
       </div> 
 
@@ -227,12 +229,12 @@
       </div>
           
       <div class="form-div"> 
-        <button>Calculate</button>
         <div class="toggle">
           <span>Results Unit System </span> 
           <input class="tgl" id="unit_system" name="unit_system" type="checkbox" value="english"/>
           <label class="tgl-btn" data-tg-off="SI" data-tg-on="ENGLISH" for="unit_system"></label>
         </div>
+        <button>Calculate</button>
       </div>
       <!----> 
       <!-- Form first version -->

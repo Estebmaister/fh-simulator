@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" href="../img/fav.png" />
 
-	<title>Simulador de Hornos de Proceso de Tiro Natural</title>
+	<title>Simulador de hornos</title>
 	<meta name="description" content="Simulador de Hornos de Proceso de Tiro Natural" />
 	<meta name="author" content="Esteban Camargo" />
 	<meta name="keywords" content="simulator" />
@@ -50,12 +50,12 @@
   </header>
   <main>
     <section id="data-sect">
-      <h1>Simulador de Hornos de Proceso de Tiro Natural</h1>
-      <h4>(Enfocado a usos educativos)</h4>
+      <h1>Simulador de hornos de proceso de tiro natural</h1>
+      <h4>(Diseñado para la instrucción de ingenieros y operadores)</h4>
       <p>Página de prueba, una vista inicial para el ingreso de datos.</p>
     </section>
     <form id="data-form" method="GET" action="./result.html">
-      <h2>Datos del proyecto</h2>
+      <h2>Datos operacionales básicos</h2>
 
       <div class="form-div">
         <p class="project-info">
@@ -101,7 +101,9 @@
   
         <div class="form-block">
           <hr>
-          <h3>Gases de Combustión (GC)<br> <span><i><sub>(Para una combustión adecuada de combustible gaseoso, se recomienda alcanzar 3% de O2 en GC a base seca.)</sub> </i></span> </h3>
+          <h3>Gases de Combustión (GC) 
+            <br> <span><i><sub>(Para una combustión adecuada de combustible gaseoso, se recomienda alcanzar 3% de O2 en GC a base seca.)</sub> </i></span>
+          </h3>
   
           <div class="form-div"> 
             <p class="project-info">Exceso de O<sub>2</sub> en GC <input name="o2_excess" type="number" min="0" max="30" step="0.001" placeholder="0.0"> %</p>
@@ -117,15 +119,15 @@
       <h3>Combustible</h3>
 
       <div class="form-div"> 
-        <p class="project-info">Temperatura del combustible T<sub>f</sub> <input name="t_fuel" placeholder="25.0" step="0.001" type="number"> °C </p>
-        <p class="project-info">Combustible especificado como <select name="fuel_percent">
-        <option value="mole_percent">porcentaje molar</option> 
-        <!-- <option value="mass_percent">mass percent</option> -->
-        </select></p>
+        <!-- <p class="project-info">Combustible especificado como <select name="fuel_percent">
+          <option value="mole_percent">porcentaje molar</option> 
+          <option value="mass_percent">mass percent</option>
+        </select></p> -->
       </div> 
-
+      
       <div class="form-div comp"> 
-        <p class="project-info">Composición del combustible</p>
+        <p class="project-info">Temperatura T<sub>f</sub> <input name="t_fuel" placeholder="25.0" step="0.001" type="number"> °C </p>
+        <p class="project-info">Composición</p>
         <p class="project-info">Total <span id="total" style="font-weight: bold;"> 0 </span></p>
       </div> 
 
@@ -228,12 +230,12 @@
       </div>
           
       <div class="form-div"> 
-        <button>Calcular</button>
         <div class="toggle">
           <span>Sistema de Unidades en Resultados </span> 
           <input class="tgl" id="unit_system" name="unit_system" type="checkbox" value="english"/>
           <label class="tgl-btn" data-tg-off="SI" data-tg-on="INGLÉS" for="unit_system"></label>
         </div>
+        <button>Calcular</button>
       </div>
       <!----> 
       <!-- Form first version -->
