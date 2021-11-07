@@ -200,9 +200,8 @@ const englishSystem = { //(US Customary)
   //TODO: change default
   fouling_factor: (number) => round(number * 1) + " h-ft2-°F/Btu",
 
-  //TODO: change default
-  "energy/mass": (number) => round(number * 1) + " kJ/kg",
-  "energy/vol": (number) => round(number * 1) + " kJ/m3",
+  "energy/mass": (number) => round(number * 0.9478171203 / 2.2046244202) + " Btu/lb",
+  "energy/vol": (number) => round(number * 0.9478171203 / 35.314666721) + " Btu/ft3",
   area: (number) => round(number * 10.763910417) + " ft2",
   length: (number) => round(number * 3.280839895) + " ft",
   temp: (number) => round(number * 1.8) + " °R",
