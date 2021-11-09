@@ -152,6 +152,7 @@ const getOptions = () => {
     airExcess: .01 * 0,     // fr
     pAtm: 101_325,          // Pa
     unitSystem: "SI",       // string
+    lang: "en",
   
     // Newton Raphson arguments
     NROptions: {
@@ -197,8 +198,7 @@ const englishSystem = { //(US Customary)
   "mass/mol": (number) => round(number * 2.2046244202) + " lb/kmol",
   heat_flow : (number) => round(number * 3.4121416331) + " MMBtu/h",
   heat_flux: (number) => round(number * 3.4121416331/10.763910417) + " Btu/h-ft2",
-  //TODO: change default
-  fouling_factor: (number) => round(number * 1) + " h-ft2-°F/Btu",
+  fouling_factor: (number) => round(number * 10.763910417*1.8/0.9478171203) + " h-ft2-°F/Btu",
 
   "energy/mass": (number) => round(number * 0.9478171203 / 2.2046244202) + " Btu/lb",
   "energy/vol": (number) => round(number * 0.9478171203 / 35.314666721) + " Btu/ft3",
@@ -210,11 +210,10 @@ const englishSystem = { //(US Customary)
   mass: (number) => round(number * 2.2046244202e-3) + " lb",
   mass_flow: (number) => round(number * 2.2046244202) + " lb/s",
   vol_flow: (number) => round(number * 35.314666721) + " f3/h",
-  //TODO: change default
-  cp: (number) => round(number * 1) + " kJ/kmol K",
+  cp: (number) => round(number * 0.9478171203/1.8) + " Btu/kmol °F",
   power: (number) => round(number * 3.4121416331) + " Btu/h",
   moist: (number) => round(number * 1e3) + "x10^(-3) lb-H2O/lb",
-  system: {en: "ENGLISH", es: "INGLÉS"}
+  system: {en: "English", es: "Inglés"}
 }
 
 const siSystem = {

@@ -21,7 +21,7 @@ const extractURIdata = (argumentsArray) => {
 }
 
 // Modify the fuels and options object with the Browser Data
-const insertBrowserData = (browserData, fuels, data, options) => {
+const insertBrowserData = (browserData, fuels, data, options, lang) => {
 	const browserFuels = {}
 	const fuelCompounds = data.filter( element => element.Formula in browserData )
 
@@ -90,7 +90,8 @@ const insertBrowserData = (browserData, fuels, data, options) => {
 					break;
         case "unit_system":
           logger.debug(key, browserData[key])
-          options.unitSystem = browserData[key];
+          if (browserData[key] != undefined)
+            options.unitSystem = browserData[key];
           break;
 				default:
 					break;
@@ -216,9 +217,10 @@ Total flue gas moles and percentage (per fuel mol)
 // Process the data and start the combustion algorithm
 const browserProcess = (fuels, data, options, combustion) => {
 
-  let lang = 'en';  const browserLang = window.location.pathname.split('/');
-  logger.debug(browserLang)
+  let lang = 'en';  
+  const browserLang = window.location.pathname.split('/'); // ',en,result.html'}
   if (browserLang.length > 0) browserLang.forEach(element => {if (element == 'es') lang = 'es'});
+  options.lang = lang;
 
   const browserData = extractURIdata(window.location.search.substr(1).split('&'));
   if (browserData !== {}) insertBrowserData(browserData, fuels, data, options);
