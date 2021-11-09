@@ -369,6 +369,7 @@ input:valid+span:after {
 }
 .tgl + .tgl-btn:after {
   content: attr(data-tg-on);
+  visibility: hidden;
   transform: rotateY(-180deg);
 }
 .tgl + .tgl-btn:before {
@@ -383,6 +384,7 @@ input:valid+span:after {
   transform: rotateY(180deg);
 }
 .tgl:checked + .tgl-btn:after {
+  visibility: inherit;
   transform: rotateY(0);
   color: var(--contrast-color);
   background: var(--primary-color);
