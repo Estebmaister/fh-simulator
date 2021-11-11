@@ -4,11 +4,11 @@
   "description": "Run this simulator with the following command:",
   "main": "app.js",
   "dependencies": {
-    "csv-parse": "^4.15.4",
+    "csv-parse": "^4.16.3",
     "csv-parser": "^3.0.0",
     "fs": "0.0.1-security",
     "stream": "0.0.2",
-    "webpack": "^5.60.0",
+    "webpack": "^5.62.2",
     "webpack-cli": "^4.9.1"
   },
   "devDependencies": {},

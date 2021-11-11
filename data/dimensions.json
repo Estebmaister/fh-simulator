@@ -1,0 +1,58 @@
+[
+  {
+    "Name": "Fired Heater",
+    "Value": "Proyecto IQ"
+  },
+  {
+    "Name": "Data",
+    "Value": "Operacional"
+  },
+  {
+    "Name": "Design-Q(Duty)",
+    "Value": 81,
+    "Units": "MMBtu/h"
+  },
+  {
+    "Name": "Flow",
+    "Value": 500590,
+    "Units": "kg/h"
+  },
+  {
+    "Name": "Grav-Esp",
+    "Value": 0.84
+  },
+  {
+    "Name": "APIdegree",
+    "Value": 37
+  },
+  {
+    "Name": "TS",
+    "Value": 772,
+    "Units": "ºF"
+  },
+  {
+    "Name": "TE",
+    "Value": 678,
+    "Units": "ºF"
+  },
+  {
+    "Name": "∆T",
+    "Value": 94,
+    "Units": "ºF"
+  },
+  {
+    "Name": "CpE",
+    "Value": 0.676,
+    "Units": "Btu/lb.ºF"
+  },
+  {
+    "Name": "CpS",
+    "Value": 0.703,
+    "Units": "Btu/lb.ºF"
+  },
+  {
+    "Name": "Q (Duty)",
+    "Value": 71.5276,
+    "Units": "MMBtu/h"
+  }
+]

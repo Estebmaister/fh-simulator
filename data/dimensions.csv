@@ -1,0 +1,14 @@
+Name,           Value,  Units
+Fired Heater,   Proyecto IQ		
+Data,           Operacional
+
+Design-Q(Duty),	81,	    MMBtu/h	
+Flow,	        500590, kg/h
+Grav-Esp,       0.84
+APIdegree,	    37.0
+TS,             772,    ºF	
+TE,             678,    ºF	
+∆T,             94,     ºF	 
+CpE,            0.676,	Btu/lb.ºF	
+CpS,            0.703,	Btu/lb.ºF	
+Q (Duty),   	71.5276,MMBtu/h	
