@@ -2,22 +2,21 @@
  * Exported functions from this file
  ******************************************************************
  * @combSection fuels, options, humidity, airExcess
- * @version  1.00
+ * @version  1.01
  * @param   {fuels object} valid i.e. {'CH4': 1}.
- * @return  {result object} flows, products
+ * @return  {result object} flows, products, debug_data
  * 
  * @author  Esteban Camargo
  * @date    17 Jul 2021
- * @call    node . true true 25 70 80 1e5
- * @callParams verbose, check for changes in csv, t_amb, humidity, air_excess, p_amb
- * 
- * Note: No check is made for NaN or undefined input numbers.
+ * @call    from the principal file
+ * @callParams airExcess, fuels, params
  *
  *****************************************************************/
 const {newtonRaphson, options, logger, round, roundDict, initSystem} = require('./utils');
-const data = require('../data/data.json')
-const dryAirN2Percentage = 79.05
-const dryAirO2Percentage = 20.95
+const data = require('../data/data.json');
+const dryAirN2Percentage = 79.05;
+const dryAirO2Percentage = 20.95;
+const N2O2relation = dryAirN2Percentage/dryAirO2Percentage;
 const dryAir = {
   O2: .01 * dryAirO2Percentage,
   N2: .01 * dryAirN2Percentage,
@@ -41,7 +40,10 @@ const checkFuelData = (fuels, compounds, result = {}) => {
   // Check if all the components in the fuels are in the data filtered
   const badFuels = Math.abs(compounds.length - Object.keys(fuels).length)
   const check1 = badFuels === 0
-  if (!check1) result.err += `[some fuels aren't in the database, #badFuels: ${badFuels}],`
+  if (!check1) {
+    logger.error(`[some fuels aren't in the database, #badFuels: ${badFuels}],`)
+    result.err += `[some fuels aren't in the database, #badFuels: ${badFuels}],`
+  }
   return check1
 }
 
@@ -251,23 +253,30 @@ const combSection = (airExcess, fuels, params) => {
   const compounds = data.filter((element, i, arr) => element.Formula in fuels)
   let normalFuel = {...fuels}
   if (!checkObjectFraction(fuels, debug_data)) normalFuel = normalize(fuels, "combSection");
-  if (!checkFuelData(normalFuel, compounds, debug_data)) return debug_data;
   const products = {
-    O2: 0,
-    H2O: 0,
-    CO2: 0,
-    SO2: 0,
-    N2: 0,
-  };
+    O2:  0, N2:  0, H2O: 0,
+    CO2: 0, SO2: 0,  };
   const air = {...dryAir};
+  if (!checkFuelData(normalFuel, compounds, debug_data)) {};//TODO: return {products, debug_data};
 
   // for every element in the fuel compounds
   for (const element of compounds) {
-    // calculating every product of combustion per fuel element
+    // calculates every product of combustion per fuel element
     for (const product in products) {
-      //logger.default(`${element['Formula']} req = ${product} ` +
-      //  `${element[product]*normalFuel[element['Formula']]}` )
+      if (product == 'N2') {
+        if (element['Formula'] == 'N2' || element['Formula'] =='"N2a') {
+          products[product] += normalFuel[element['Formula']];
+          continue;
+        // } else if (element['Formula'] == 'O2') {
+        //   products[product] += element['O2']*normalFuel[element['Formula']]*N2O2relation;
+        //   continue;
+        };
+        products[product] += element['O2']*normalFuel[element['Formula']]*N2O2relation;
+        continue;
+      };
       products[product] += element[product]*normalFuel[element['Formula']]
+      // logger.default(`${element['Formula']} req = ${product} ` +
+      //   `${element[product]*normalFuel[element['Formula']]}` )
     }
   }
 
@@ -277,11 +286,12 @@ const combSection = (airExcess, fuels, params) => {
   let o2required = products['O2']
   let o2excess = o2required * (1 + airExcess)
   // If O2 requirements are negative 
-  if (products['O2'] <= 0) {
-    logger.error('o2 in fuel is greater than needed, airExcess set to 0')
+  if (products['O2'] <= 0 || products['N2'] < 0) {
+    logger.error(`airExcess set to 0, O2 in fuel is greater than or equal to needed.`+
+    ` Products O2:${products['O2']}, N2:${products['N2']}`)
     o2excess = 0
     o2required = 0
-    products['N2'] = 0
+    products['N2'] = normalFuel['N2']
     products['O2'] = -products['O2']
   } else {
     const waterPressure = pressureH2OinAir(params.t_amb, params.humidity)
