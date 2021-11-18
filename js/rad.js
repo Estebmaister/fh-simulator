@@ -4,14 +4,7 @@
  * @radSection (params)
  * @version  1.00
  * @param   {params object} valid params object.
- * @return  {number or false} a number is the iterations reach the result, 
- *          false if not.
- * Effective Gas Temperature (Tg)
- * 
- * @author  Esteban Camargo
- * @date    17 Jul 2021
- * @call    node . true true 25 70 80 1e5
- * @callParams verbose, check for changes in csv, t_amb, humidity, air_excess, p_amb
+ * @return  {rad_result object} 
  * 
  * Q_total = Uc * A * LMTD
  * For a "well mixed" radiant section this temperature is assumed 
@@ -22,7 +15,7 @@
  * Q_out = Q_R + Q_shield + Q_losses + Q_flue_gases
  * Q_R = Q_rad + Q_conv = Q_fluid(out-in) = m_fluid*Cp_fluid(t_out - t_in)
  *****************************************************************/
-const {newtonRaphson, log} = require('./utils');
+const {newtonRaphson, logger} = require('./utils');
 
 /** Calculates the required mass fluid and the necessary
  * temperature of the rad section
@@ -33,6 +26,7 @@ const {newtonRaphson, log} = require('./utils');
 */
 const radSection = (params) => {
   let rad_result = {}
+  // Calling the function according to the params given
   if (params.t_out !== undefined) {
     rad_result = radSection_full(undefined, params.t_out, params)
   } else if (params.m_fuel !== undefined) {
@@ -40,11 +34,6 @@ const radSection = (params) => {
   } else {
     params.err += "-wrong call for rad section, no seed for mass fuel or out temp."
   }
-  // radSection_nr = (t_out) => {
-  //     [t_difference, rad_result] = radSection_full(null, t_out, params)
-  //     return t_difference
-  // }
-  // const mass_fluid = newtonRaphson(radSection_nr, params.m_fuel_seed, params.NROptions)
   return rad_result
 }
 
@@ -87,13 +76,13 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
 
   const // Fired heater parameters
     /** - number of tubes in rad section */
-    N = params.tubes_rad || 60,
+    N = params.N_rad || 60,
     /** - number of shield tubes */
-    N_shld = params.shld_tubes_rad || 8,
+    N_shld = params.N_shld || 8,
     /** (m) effective tube length*/
-    L = params.tube_l_rad || 20.024,
+    L = params.L_rad || 20.024,
     /** (m) external diameter rad section */
-    Do = params.do_rad || 0.219,
+    Do = params.Do_rad || 0.219,
     /** (m) center to center distance of tube */
     CtoC = params.cToC_rad || 0.394,
     /** - emissive factor */
@@ -179,7 +168,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     // Approximating t_in_rad with assumption for 30% of duty
     //TODO: make this assumption a variable
     t_in = params.t_in_conv + duty * 0.3 / (m_fluid*Cp_fluid)
-    log(`${t_in} vs ${params.t_in_rad}`)
+    logger.info(`${t_in} vs ${params.t_in_rad}`)
 
     // Calculating Tg (effective gas temp)
     const TgBalance_OutTemp = (tG) => m_fluid*Cp_fluid*(t_out - t_in) - (Q_rad(tG) + Q_conv(tG))
@@ -201,7 +190,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     //TODO: make this assumption a variable
     t_in = params.t_in_conv + duty * 0.3 / (m_fluid*Cp_fluid)
     t_out_seed = params.t_in_conv + duty / (m_fluid*Cp_fluid)
-    log(`t_in_rad, seed: ${t_in} vs problem: ${params.t_in_rad}`)
+    logger.info(`t_in_rad, seed: ${t_in} vs problem: ${params.t_in_rad}`)
 
     // Calculating Tg (effective gas temp)
     //TODO: t_out isn't set needs recalculate
@@ -215,10 +204,10 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     if (t_out != false) params.t_out = t_out
 
     // Discrepancies
-    log(`t_out, seed: ${t_out_seed} vs calculated: ${t_out}`)
+    logger.info(`t_out, seed: ${t_out_seed} vs calculated: ${t_out}`)
     duty = m_fluid*Cp_fluid*(t_out - params.t_in_conv)
     t_in_2 = params.t_in_conv + duty * 0.3 / (m_fluid*Cp_fluid)
-    log(`t_in_rad, seed: ${t_in} vs calc: ${t_in_2}`)
+    logger.info(`t_in_rad, seed: ${t_in} vs calc: ${t_in_2}`)
   } else {
     params.err += "-wrong call for rad section, no seed for mass fuel or out temp."
   }
@@ -252,7 +241,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "Cp_air": Cp_air,
     "Cp_flue": Cp_flue(Tg),
   }
-  //log("debug", JSON.stringify(rad_result, null, 2))
+  //logger.info("debug", JSON.stringify(rad_result, null, 2))
 
   //let t_out_recall = t_in - t_out + (Q_rad(Tg) + Q_conv(Tg)) / (m_fluid*Cp_fluid)
   return rad_result
