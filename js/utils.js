@@ -140,6 +140,20 @@ function newtonRaphson (f, fp, x0, options, name) {
 const tempToK = 273.15
 const tempAmbRef = tempToK + 25; // 298.15
 
+const unitConv = {
+  CtoK: (n) => n+tempToK,
+  CtoF: (n) => n*9/5 + 32,
+  FtoC: (n) => (n-32)*5/9,
+  LbtoKg: (n) => n/2.20462,
+  KgtoLb: (n) => n*2.20462,
+  KjtoBtu: (n) => n/1.05506,
+  BtutoKj: (n) => n*1.05506,
+  FttoM: (n) => n*3.28084,
+  MtoFt: (n) => n/3.28084,
+  IntoM: (n) => n*39.3701,
+  MtoIn: (n) => n/39.3701,
+}
+
 /** Example for a call of this file: 
  * node . false 26.6667 50 0 20 1.01325e5 SI */ 
 const getOptions = () => {
@@ -175,7 +189,7 @@ const getOptions = () => {
   optObject.humidity = 1e-10 + parseFloat(process.argv[4]) || 0;
   optObject.o2Excess = .01 * parseFloat(process.argv[5]) || .01 * 0;
   optObject.airExcess = 1e-10 + .01 * parseFloat(process.argv[6]) || .01 * 0;
-  optObject.pAtm = parseFloat(process.argv[7]) || 1e5;
+  optObject.pAtm = parseFloat(process.argv[7]) || 1.01325e5;
   optObject.unitSystem = process.argv[8];
   // Newton Raphson arguments
   optObject.NROptions.verbose = process.argv[2] == "true";
@@ -187,7 +201,7 @@ const options = getOptions();
 const round = (number) => (Math.round(number*1e3)/1e3).toFixed(3)
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
-    if(!isNaN(value)) object[key] = round(value);
+    if(!isNaN(value) && value !== "") object[key] = round(value);
   }
 }
 
@@ -263,6 +277,7 @@ module.exports = {
   options,
   log,
   logger,
+  unitConv,
   round,
   roundDict,
   initSystem

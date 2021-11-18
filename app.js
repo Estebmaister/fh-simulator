@@ -14,7 +14,7 @@
  * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
-const {newtonRaphson, options, logger, round, units} = require('./js/utils');
+const {newtonRaphson, options, logger, round, units, unitConv} = require('./js/utils');
 const {combSection} = require('./js/combustion');
 const {radSection} = require('./js/rad');
 const {shieldSection} = require('./js/shield');
@@ -26,12 +26,24 @@ const createParams = (options) => {
   const params = {
     Cp_fluid: 2.5744 * 105.183, /** (kJ/kmol-K) */
     m_fluid: 225_700 / 105.183, /** (kmol/h) */
-  
+    
     // Mechanic variables for heater
-    N: 60, /** - number of tubes in rad section */
-    N_shld: 8, /** - number of shield tubes */
-    L: 20.024, /** (m) effective tube length*/
-    Do: 0.219, /** (m) external diameter rad section */
+    N: 60,                    /** - number of tubes in rad section */
+    L: unitConv.FttoM(60),    /** (m) effective tube length*/
+    Do: unitConv.IntoM(8.625),/** (m) external diameter rad section */
+    
+    N_rad: 42,                /** - number of tubes */
+    L_rad: unitConv.FttoM(60),/** (m) effective tube length*/
+    Do_rad: unitConv.IntoM(8.625),/** (m) external diameter */
+    
+    N_cnv: 40,                /** - number of tubes */
+    L_cnv: unitConv.FttoM(60),/** (m) effective tube length*/
+    Do_cnv: unitConv.IntoM(8.625),/** (m) external diameter */
+    
+    N_shld: 16,               /** - number of tubes */
+    L_shld: unitConv.FttoM(60),/** (m) effective tube length*/
+    Do_shld: unitConv.IntoM(8.625),/** (m) external diameter */
+
     CtoC: 0.394, /** (m) center to center distance of tube */
     F: 0.97, /** - emissive factor */
     alpha: 0.835, /** - alpha factor */
@@ -71,7 +83,7 @@ const combustion = (fuels, options) => {
   // if params.o2Excess is set, start airExcess iteration
   if (params.o2Excess != 0) {
     const comb_o2 = (airExcess) => {
-      combO2 = combSection(airExcess, fuels, params)
+      const combO2 = combSection(airExcess, fuels, params)
       logger.info( "O2%: " + combO2.flows['O2_%'] +
         " vs O2excess: " + params.o2Excess * 100)
       return combO2.flows['O2_%'] / 100 - params.o2Excess
@@ -103,13 +115,16 @@ let fuels = {
   iC4H10: .0075, C2H4: .0158, C3H6: .0277,
 }
 // fuels ={
-//   H2: .8,
-//   O2: .2
+//   H2: .7,
+//   O2: .2,
+//   N2: .1
 // }
 
 if (typeof window !== 'undefined') {
   browserProcess(fuels, data, options, combustion)
 } else {
+  // logger.info(JSON.stringify(fuels))
+  // logger.info(JSON.stringify(options))
   const result = combustion(fuels, options)
   logger.debug(JSON.stringify(result, null, 2))
 }
