@@ -317,7 +317,7 @@ const combSection = (airExcess, fuels, params) => {
   params.adFlame = newtonRaphson(
     adFlame(normalFuel, products, params.t_amb, o2excess),
     1400, params.NROptions, "fuel_adFlame")
-  // logger.info( "Adiabatic flame temp (K): " + params.adFlame)
+  logger.info( "Adiabatic flame temp: " + units.tempC(params.adFlame))
 
   let totalPerMol = 0; totalPerM_Dry = 0
   for (const product in products) {

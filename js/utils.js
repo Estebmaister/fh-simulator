@@ -141,32 +141,40 @@ const tempToK = 273.15
 const tempAmbRef = tempToK + 25; // 298.15
 
 const unitConv = {
+  RtoK: (n) => n*(5/9),
   CtoK: (n) => n+tempToK,
   CtoF: (n) => n*9/5 + 32,
   FtoC: (n) => (n-32)*5/9,
+
   LbtoKg: (n) => n/2.20462,
   KgtoLb: (n) => n*2.20462,
+
   KjtoBtu: (n) => n/1.05506,
   BtutoKj: (n) => n*1.05506,
+
   FttoM: (n) => n*3.28084,
   MtoFt: (n) => n/3.28084,
   IntoM: (n) => n*39.3701,
   MtoIn: (n) => n/39.3701,
+
+  CpENtoCpSI: (n) => n*1.8/0.94781712,
+  BtuHtoW: (n) => n/3.4121416331,
 }
 
 /** Example for a call of this file: 
- * node . false 26.6667 50 0 20 1.01325e5 SI */ 
+ * node . false 26.6667 50 0 20 1.01325e5 SI
+ * */ 
 const getOptions = () => {
   const optObject = {
     // Entry default arguments
-    verbose: true,          // boolean
-    tAmb: tempAmbRef,     // K
-    humidity: 0,            // %
-    o2Excess: .01 * 0,      // fr
-    airExcess: .01 * 0,     // fr
-    pAtm: 101_325,          // Pa
+    verbose:    true,       // boolean
+    tAmb:       tempAmbRef, // K
+    humidity:   0,          // %
+    o2Excess:   .01 * 0,    // fr
+    airExcess:  .01 * 0,    // fr
+    pAtm:       101_325,    // Pa
     unitSystem: "SI",       // string
-    lang: "en",
+    lang:       "en",       // string
   
     // Newton Raphson arguments
     NROptions: {
@@ -184,15 +192,15 @@ const getOptions = () => {
   
   if (typeof process == 'undefined') return optObject;
 
-  optObject.verbose = process.argv[2] == "true";
-  optObject.tAmb = tempToK + parseFloat(process.argv[3]) || tempAmbRef;
-  optObject.humidity = 1e-10 + parseFloat(process.argv[4]) || 0;
-  optObject.o2Excess = .01 * parseFloat(process.argv[5]) || .01 * 0;
-  optObject.airExcess = 1e-10 + .01 * parseFloat(process.argv[6]) || .01 * 0;
-  optObject.pAtm = parseFloat(process.argv[7]) || 1.01325e5;
-  optObject.unitSystem = process.argv[8];
+  optObject.verbose =                process.argv[2] == "true";
+  optObject.tAmb =tempToK+parseFloat(process.argv[3])     || tempAmbRef;
+  optObject.humidity =    parseFloat(process.argv[4])     || 0;
+  optObject.o2Excess =    parseFloat(process.argv[5])*.01 || .01 * 0;
+  optObject.airExcess =   parseFloat(process.argv[6])*.01 || .01 * 0;
+  optObject.pAtm =        parseFloat(process.argv[7])     || 1.01325e5;
+  optObject.unitSystem =             process.argv[8];
   // Newton Raphson arguments
-  optObject.NROptions.verbose = process.argv[2] == "true";
+  optObject.NROptions.verbose =    process.argv[2] == "true";
 
   return optObject
 };
@@ -208,49 +216,49 @@ const roundDict = (object = {}) => {
 if (options.verbose) log("debug",JSON.stringify(options, null, 2))
 
 const englishSystem = { //(US Customary)
-  "energy/mol": (number) => round(number * 0.9478171203) + " Btu/mol",
-  "mass/mol": (number) => round(number * 2.2046244202) + " lb/kmol",
-  heat_flow : (number) => round(number * 3.4121416331) + " MMBtu/h",
-  heat_flux: (number) => round(number * 3.4121416331/10.763910417) + " Btu/h-ft2",
-  fouling_factor: (number) => round(number * 10.763910417*1.8/0.9478171203) + " h-ft2-°F/Btu",
+  "energy/mol":   (n) => round(n * 0.94781712) + " Btu/mol",
+  "mass/mol":     (n) => round(n * 2.2046244202) + " lb/lb-mol",
+  heat_flow :     (n) => round(n * 3.4121416331) + " MMBtu/h",
+  heat_flux:      (n) => round(n * 3.4121416331/10.763910417) + " Btu/h-ft2",
+  fouling_factor: (n) => round(n * 10.763910417*1.8/0.94781712) + " h-ft2-°F/Btu",
+  "energy/mass":  (n) => round(n * 0.94781712 / 2.2046244202) + " Btu/lb",
+  "energy/vol":   (n) => round(n * 0.94781712 / 35.314666721) + " Btu/ft3",
 
-  "energy/mass": (number) => round(number * 0.9478171203 / 2.2046244202) + " Btu/lb",
-  "energy/vol": (number) => round(number * 0.9478171203 / 35.314666721) + " Btu/ft3",
-  area: (number) => round(number * 10.763910417) + " ft2",
-  length: (number) => round(number * 3.280839895) + " ft",
-  temp: (number) => round(number * 1.8) + " °R",
-  tempC: (number) => round((number-tempToK)*9/5 + 32) + " °F",
-  pressure: (number) => round(number * 0.0001450377) + " psi",
-  mass: (number) => round(number * 2.2046244202e-3) + " lb",
-  mass_flow: (number) => round(number * 2.2046244202) + " lb/s",
-  vol_flow: (number) => round(number * 35.314666721) + " f3/h",
-  cp: (number) => round(number * 0.9478171203/1.8) + " Btu/kmol °F",
-  power: (number) => round(number * 3.4121416331) + " Btu/h",
-  moist: (number) => round(number * 1e3) + "x10^(-3) lb-H2O/lb",
-  system: {en: "English", es: "Inglés"}
+  area:     (n) => round(n * 10.763910417)    + " ft2",
+  length:   (n) => round(n * 3.280839895)     + " ft",
+  temp:     (n) => round(n * 1.8)             + " °R",
+  tempC:    (n) => round(unitConv.CtoF(n-tempToK)) + " °F",
+  pressure: (n) => round(n * 0.0001450377)    + " psi",
+  mass:     (n) => round(n * 2.2046244202e-3) + " lb",
+  mass_flow:(n) => round(n * 2.2046244202)    + " lb/s",
+  vol_flow: (n) => round(n * 35.314666721)    + " f3/h",
+  cp:       (n) => round(n * 0.94781712/1.8)  + " Btu/lb-mol °F",
+  power:    (n) => round(n * 3.4121416331)    + " Btu/h",
+  moist:    (n) => round(n * 1e3)             + "x10^(-3) lb-H2O/lb",
+  system:   {en: "English", es: "Inglés"}
 }
 
 const siSystem = {
-  "energy/mol": (number) => round(number * 1) + " kJ/mol",
-  "mass/mol": (number) => round(number * 1) + " kg/kmol",
-  heat_flow: (number) => round(number * 1) + " MW/h",
-  heat_flux: (number) => round(number * 1) + " W/m2",
-  fouling_factor: (number) => round(number * 1) + " m2-K/W",
+  "energy/mol":   (n) => round(n * 1) + " kJ/mol",
+  "mass/mol":     (n) => round(n * 1) + " kg/kmol",
+  heat_flow:      (n) => round(n * 1) + " MW/h",
+  heat_flux:      (n) => round(n * 1) + " W/m2",
+  fouling_factor: (n) => round(n * 1) + " m2-K/W",
 
-  "energy/mass": (number) => round(number * 1) + " kJ/kg",
-  "energy/vol": (number) => round(number * 1) + " kJ/m3",
-  area: (number) => round(number * 1) + " m2",
-  length: (number) => round(number * 1) + " m",
-  tempC: (number) => round(number * 1 - tempToK) + " °C",
-  temp: (number) => round(number * 1) + " K",
-  pressure: (number) => round(number * 1e-3) + " kPa",
-  mass: (number) => round(number * 1e-3) + " kg",
-  mass_flow: (number) => round(number * 1) + " kg/s",
-  vol_flow: (number) => round(number * 1) + " m3/h",
-  cp: (number) => round(number * 1) + " kJ/kmol K",
-  power: (number) => round(number * 1) + " W",
-  moist: (number) => round(number * 1e3) + " g-H2O/kg",
-  system: {en: "SI", es: "SI"}
+  "energy/mass":  (n) => round(n * 1) + " kJ/kg",
+  "energy/vol":   (n) => round(n * 1) + " kJ/m3",
+  area:     (n) => round(n * 1)    + " m2",
+  length:   (n) => round(n * 1)    + " m",
+  tempC:    (n) => round(n * 1-tempToK) + " °C",
+  temp:     (n) => round(n * 1)    + " K",
+  pressure: (n) => round(n * 1e-3) + " kPa",
+  mass:     (n) => round(n * 1e-3) + " kg",
+  mass_flow:(n) => round(n * 1)    + " kg/s",
+  vol_flow: (n) => round(n * 1)    + " m3/h",
+  cp:       (n) => round(n * 1)    + " kJ/kmol K",
+  power:    (n) => round(n * 1)    + " W",
+  moist:    (n) => round(n * 1e3)  + " g-H2O/kg",
+  system:   {en: "SI", es: "SI"}
 }
 
 const initSystem = (unitSystem) => {
