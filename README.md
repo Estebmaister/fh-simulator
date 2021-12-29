@@ -3,7 +3,7 @@
 Make sure you have `node` installed and run this simulator with the following command in the terminal:
 
 ```sh
-node . false 26.6667 50 0 20 1.01325e5 SI
+node . false SI 26.6667 50 0 20 1.01325e5
 ```
 
 Arguments:
