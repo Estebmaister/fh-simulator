@@ -54,24 +54,24 @@ const log = function(...arguments) {
       }
       break;
   }
-}
+}//TODO: Delete this unused function
 const logByLevel = (...arguments) => {
   let argumentsText = ""
   for (var i = 1; i < arguments.length; i++) {
     argumentsText += arguments[i]
   }
   console.log(`{'${arguments[0]}': '${argumentsText}'}`);
-}
+};
 const logger = {
   info: (...arguments) => logByLevel("INFO", arguments),
   warn: (...arguments) => logByLevel("WARN", arguments),
   error: (...arguments) => logByLevel("ERROR", arguments),
   debug: (...arguments) => logByLevel("DEBUG", arguments),
   default: (...arguments) => logByLevel("DEFAULT", arguments),
-}
+};
 
 /** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
-function newtonRaphson (f, fp, x0, options, name) {
+const newtonRaphson = (f, fp, x0, options, name) => {
   let x1, y, yp, tol, maxIter, iter, yph, ymh, yp2h, ym2h, h, hr, verbose, eps;
 
   // Interpret variadic forms:
@@ -135,7 +135,7 @@ function newtonRaphson (f, fp, x0, options, name) {
   }
 
   return false;
-}
+};
 
 /** Returns a linear function to approximate the value,
  * in case that the value is constant or there isn't data
@@ -151,15 +151,31 @@ const linearApprox = ({x1,x2,y1,y2}) => {
     return () => y1;
   const m = (y2 - y1) / (x2 - x1);
   return (x) => m * (x - x1) + y1;
-}
+};
 
+/** (Tref1, Tref2, T1) Returns a function of temperature (T2) with three other values of temp */
+const LMTD = (t_cold_in, t_cold_out, t_hot_in, co_current) => {
+  
+  let // counter-current
+    delta_t1 = t_hot_in - t_cold_out,
+    delta_t2 = (t_hot_out) => t_hot_out - t_cold_in;
+  if (co_current) { // co-current
+    delta_t1 = t_hot_in - t_cold_out;
+    delta_t2 = (t_hot_out) => t_hot_out - t_cold_in;
+  }
 
-const tempToK = 273.15
-const tempAmbRef = tempToK + 25; // 298.15
+  return (t) => delta_t1 - delta_t2(t) / ln( delta_t1 / delta_t2(t) );
+  // (tg_sh) => ( (tg_r - tf_out) - (tg_sh - tf_in) ) / ln( (tg_r - tf_out) / (tg_sh-tf_in) );
+};
+
+const 
+  tempToK = 273.15,
+  tempAmbRef = tempToK + 25; // 298.15 K
 
 const unitConv = {
   RtoK: (n) => n*(5/9),
   KtoR: (n) => n*(9/5),
+  KtoF: (n) => n*(9/5) - 459.67,
   CtoK: (n) => n+tempToK,
   CtoF: (n) => n*(9/5) + 32,
   FtoC: (n) => (n-32)*(5/9),
@@ -179,7 +195,7 @@ const unitConv = {
   CpENtoCpSI: (n) => n*1.05506/(5/9)*2.20462,
   kwENtokwSI: (n) => n*1.05506/(5/9)*3.28084,
   BtuHtoW: (n) => n/3.4121416331,
-}
+};
 
 /** Example for a call of this file: 
  * node . false SI 26.6667 50 0 20 1.01325e5
@@ -233,6 +249,45 @@ const roundDict = (object = {}) => {
   };
 };
 
+/** Normalize an object of fuels/products */
+const normalize = (fuels, name) => {
+  const normalFuel = {...fuels};
+  const total = Object.values(normalFuel).reduce((acc, value)=> acc + value);
+  for (const fuel in normalFuel) {
+    normalFuel[fuel] = normalFuel[fuel]/total;
+  };
+  if (options.verbose) 
+    logger.debug(`Normalizing ${name}, total: ${total}`);
+  return normalFuel;
+};
+
+/** Viscosity equation func(temp [K]) for certain substance in data */
+const miu = ({u0, u1, u2, Substance}) => {
+  // Viscosity equation from NIST data with polynomial approx. R2=1
+  // u2*T^2 + u1*T + u0  (valid from 300K to 1200K)
+  if (u0 == 0 || u0 == "-") {
+    if (options.verbose) 
+      log("debug", `Viscosity func called for '${Substance}' without coffs`);
+    return () => 0;
+  };
+  return (temp) => u0 + u1* temp + u2* temp**2;
+};
+
+/** returns a Viscosity function of temp for certain flue composition */
+const flueViscosity = (data, flue) => {
+  const 
+    normalFlue = normalize(flue, "flueViscosity"),
+    so2_v = miu(data[34]),
+    h2o_v = miu(data[31]),
+    co2_v = miu(data[6]),
+    n2_v = miu(data[3]),
+    o2_v = miu(data[2]);
+
+  return (t) => normalFlue.CO2*co2_v(t) + normalFlue.SO2*so2_v(t)
+  + normalFlue.H2O*h2o_v(t) + normalFlue.O2*o2_v(t) + normalFlue.N2*n2_v(t);
+};
+
+
 if (options.verbose) log("debug",JSON.stringify(options, null, 2));
 
 const englishSystem = { //(US Customary)
@@ -259,8 +314,9 @@ const englishSystem = { //(US Customary)
     unitConv.KtoR(1)/unitConv.mtoft(1) )      + " BTU/h-ft-F",
   convect:  (n) => round( unitConv.kJtoBTU(n) /
     unitConv.KtoR(1)/(unitConv.mtoft(1)**2) ) + " BTU/h-ft2-F",
+  viscosity:(n) => round(n * 1)    + " cP",
   system:   {en: "English", es: "Inglés"}
-}
+};
 
 const siSystem = {
   "energy/mol":   (n) => round(n * 1) + " kJ/mol",
@@ -284,8 +340,9 @@ const siSystem = {
   moist:    (n) => round(n * 1e3)  + " g-H2O/kg",
   thermal:  (n) => round(n * 1)    + " kJ/h-m-C",
   convect:  (n) => round(n * 1)    + " kJ/h-m2-C",
+  viscosity:(n) => round(n * 1)    + " cP",
   system:   {en: "SI", es: "SI"}
-}
+};
 
 const initSystem = (unitSystem) => {
   if (typeof unitSystem !== "string") {
@@ -304,16 +361,19 @@ const initSystem = (unitSystem) => {
       ' - invalid unit system, using default SI')
       return siSystem;
   }
-}
+};
 
 module.exports = {
-  newtonRaphson,
   options,
+  unitConv,
+  newtonRaphson,
   log,
   logger,
-  unitConv,
   round,
   roundDict,
   linearApprox,
-  initSystem
+  initSystem,
+  normalize,
+  flueViscosity,
+  LMTD
 };
