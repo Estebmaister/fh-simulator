@@ -210,34 +210,45 @@ const ncv = (fuels, products, compounds, tAmb) => {
 * Internal units (kJ/kmol)
 * Function to create the adiabatic flame equation 
 * used in the newton raphson method to find adFlame temp */
-const adFlame = (fuels, products, tIni, o2required) => {
+const adFlame = (normalFuels, products, tIni, o2required) => {
+  if (tIni === undefined) tIni = options.tAmb;
+  if (o2required === undefined) o2required = 0;
   const 
-    fuelCompounds = data.filter(elem => elem.Formula in fuels),
+    fuelCompounds = data.filter(elem => elem.Formula in normalFuels),
+    // ..._H = (t) => hf0 + MW * Cp(t_prom) * (t - t_amb)
     o2_H =  deltaH(data.filter(elem => elem.Formula == "O2")[0]),
     n2_H =  deltaH(data.filter(elem => elem.Formula == "N2")[0]),
     co2_H = deltaH(data.filter(elem => elem.Formula == "CO2")[0]),
     h2o_H = deltaH(data.filter(elem => elem.Formula == "H2O")[0]),
     so2_H = deltaH(data.filter(elem => elem.Formula == "SO2")[0]);
-  if (tIni === undefined) tIni = options.tAmb;
-  if (o2required === undefined) o2required = 0;
 
-  // enthalpy of the products at the new temp minus dry air inlet
-  const pEnthalpy = (t) => products.CO2*co2_H(t) + products.SO2*so2_H(t)
-  + products.H2O*h2o_H(t) + products.O2*o2_H(t) + products.N2*n2_H(t)
-  - products.N2*n2_H(tIni) - o2required*o2_H(tIni);
+  // Products enthalpy at the new temp minus dry air inlet
+  const pEnthalpy = (t) => products.O2*o2_H(t) + products.SO2*so2_H(t) +
+    products.H2O*h2o_H(t) + products.CO2*co2_H(t) + 
+    products.N2*n2_H(t) - products.N2*n2_H(tIni) - o2required*o2_H(tIni);
   
-  // initial enthalpy of the fuel
-  const enthalpy = [];
+  // Reactants enthalpy (fuel)
+  const rEnthalpy = [];
   let i = 0;
-  for (const fuel in fuels) {
-    enthalpy[i] = fuels[fuel]*deltaH(
+  for (const fuel in normalFuels) {
+    // fuelFraction * [hf0 + MW * Cp(t_prom) * (tIni - t_amb)]
+    rEnthalpy[i] = normalFuels[fuel]*deltaH(
       fuelCompounds.filter(elem => elem.Formula == fuel)[0]
     )(tIni);
     i++;
   }
+
+  // logger.debug(`
+  // products: ${JSON.stringify(products)}
+  // t_amb: ${options.tempAmbRef}
+  // t_ini: ${tIni}
+  // H2O  : ${products.H2O*h2o_H(tIni)}
+  // H2O_f: ${h2o_H(tIni)}
+  // rEntal:${rEnthalpy.reduce((acc, value)=> acc + value)}
+  // `)
   
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
-  return (t) => pEnthalpy(t) - enthalpy.reduce((acc, value)=> acc + value);
+  return (t) => pEnthalpy(t) - rEnthalpy.reduce((acc, value)=> acc + value);
 };
 
 /** In this process the params object will be updated
@@ -320,10 +331,11 @@ const combSection = (airExcess, fuels, params) => {
   };
 
 
-  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb);
+  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb) /
+    MW_multicomp(normalFuel); // kJ/kg
   params.adFlame = newtonRaphson(
     adFlame(normalFuel, products, params.t_amb, o2excess),
-    1700, params.NROptions, "fuel_adFlame");
+    2000, params.NROptions, "fuel_adFlame");
   logger.info( `Adiabatic flame temp: [${round(params.adFlame)} K]`+
     ` ${units.tempC(params.adFlame)}`);
 
@@ -333,40 +345,43 @@ const combSection = (airExcess, fuels, params) => {
     if (product !== 'H2O') totalPerM_Dry += products[product];
   };
   const flows = {
-    total_flow: round(totalPerMol),
-    dry_total_flow: round(totalPerM_Dry), 
-    // 'O2%_DRY': round(100*products['O2'] /totalPerM_Dry),
-    // 'CO2%_DRY':round(100*products['CO2']/totalPerM_Dry),
-    // 'N2%_DRY': round(100*products['N2'] /totalPerM_Dry),
-    'N2_%': round(100*products['N2'] /totalPerMol),
-    'H2O_%':round(100*products['H2O']/totalPerMol),
-    'CO2_%':round(100*products['CO2']/totalPerMol),
-    'O2_%': round(100*products['O2'] /totalPerMol),
+    total_flow: totalPerMol,
+    dry_total_flow: totalPerM_Dry,
+    // 'O2%_DRY': 100*products['O2'] /totalPerM_Dry,
+    // 'CO2%_DRY':100*products['CO2']/totalPerM_Dry,
+    // 'N2%_DRY': 100*products['N2'] /totalPerM_Dry,
+    'N2_%': 100*products['N2'] /totalPerMol,
+    'H2O_%':100*products['H2O']/totalPerMol,
+    'CO2_%':100*products['CO2']/totalPerMol,
+    'O2_%': 100*products['O2'] /totalPerMol,
 
-    O2_mol_req_theor: round(o2required),
+    O2_mol_req_theor: o2required,
     O2_mass_req_theor:units.mass(o2required * data[2].MW),
-    'air_excess_%':   round(100 * params.airExcess),
-    AC:               round(o2excess / air.O2),
-    AC_theor_dryAir:  round(o2required / (.01 * dryAirO2Percentage)),
-    AC_mass:          round( o2excess / air.O2 * 
-                      MW_multicomp(air)/MW_multicomp(normalFuel)),
-    AC_mass_theor_moistAir: round(o2required / air.O2 * 
-                      MW_multicomp(air)/MW_multicomp(normalFuel)),
+    'air_excess_%':   100 * params.airExcess,
+    AC:               o2excess / air.O2,
+    AC_theor_dryAir:  o2required / (.01 * dryAirO2Percentage),
+    AC_mass:          o2excess / air.O2 * 
+                      MW_multicomp(air)/MW_multicomp(normalFuel),
+    AC_mass_theor_moistAir: o2required / air.O2 * 
+                      MW_multicomp(air)/MW_multicomp(normalFuel),
 
     fuel_MW: units["mass/mol"](MW_multicomp(normalFuel)),
     fuel_Cp: units.cp(Cp_multicomp(normalFuel, true)(params.t_fuel)),
     flue_MW: units["mass/mol"](MW_multicomp(products)),
     flue_Cp_Tamb: units.cp(Cp_multicomp(products, true)(params.t_amb)),
-    NCV: units["energy/mol"](params.NCV)
+    NCV: units["energy/mass"](params.NCV)
   };
 
-  params.m_fuel_seed  = 120; /** (kmol/h) */
-  params.m_flue_ratio = flows.total_flow;
-  params.m_air_ratio  = flows.AC;
-  /** Functions of temp (kJ/kmol-K) */
-  params.Cp_flue = Cp_multicomp(products, false);
-  params.Cp_air  = Cp_multicomp(air, false);
-  params.Cp_fuel = Cp_multicomp(normalFuel, false);
+  params.Pco2 = products['CO2']/totalPerMol; // fraction
+  params.Ph2o = products['H2O']/totalPerMol; // fraction
+
+  params.m_flue_ratio = totalPerMol * MW_multicomp(products)/MW_multicomp(normalFuel);  // kg/h
+  params.m_air_ratio  = o2excess / air.O2 * MW_multicomp(air)/MW_multicomp(normalFuel); // kg/h
+
+  /** Functions of temp (kJ/kg-K) */
+  params.Cp_flue = Cp_multicomp(products);
+  params.Cp_air  = Cp_multicomp(air);
+  params.Cp_fuel = Cp_multicomp(normalFuel);
 
   roundDict(products), roundDict(flows), roundDict(debug_data);
   if (debug_data.err == "") delete debug_data.err;

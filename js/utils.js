@@ -137,6 +137,11 @@ function newtonRaphson (f, fp, x0, options, name) {
   return false;
 }
 
+/** Returns a linear function to approximate the value,
+ * in case that the value is constant or there isn't data
+ * about the changes, it can be called with only "y1"
+ * to make a function that always return y1.
+ */
 const linearApprox = ({x1,x2,y1,y2}) => {
   if (typeof y1 !== "number") {
     logger.error(`call for linearApprox with bad value: ${y1}`)
@@ -181,6 +186,10 @@ const unitConv = {
  * */ 
 const getOptions = () => {
   const optObject = {
+    // constants
+    tempToK,
+    tempAmbRef,
+
     // Entry default arguments
     verbose:    true,       // boolean
     tAmb:       tempAmbRef, // K
@@ -198,37 +207,33 @@ const getOptions = () => {
       maxIterations: 20,
       h: 1e-4,
       verbose: true
-    },
-  
-    // constants
-    tempToK,
-    tempAmbRef
-  }
+    }
+  };
   
   if (typeof process == 'undefined') return optObject;
 
   optObject.verbose =                process.argv[2] == "true";
   optObject.unitSystem =             process.argv[3];
-  optObject.tAmb =tempToK+parseFloat(process.argv[4])     || tempAmbRef;
-  optObject.humidity =    parseFloat(process.argv[5])     || 0;
-  optObject.o2Excess =    parseFloat(process.argv[6])*.01 || .01 * 0;
-  optObject.airExcess =   parseFloat(process.argv[7])*.01 || .01 * 0;
-  optObject.pAtm =        parseFloat(process.argv[8])     || 1.01325e5;
+  optObject.tAmb =tempToK+parseFloat(process.argv[4]) || tempAmbRef;
+  optObject.humidity =    parseFloat(process.argv[5]) || 0;
+  optObject.o2Excess =.01*parseFloat(process.argv[6]) || .01 * 0;
+  optObject.airExcess=.01*parseFloat(process.argv[7]) || .01 * 0;
+  optObject.pAtm =        parseFloat(process.argv[8]) || 1.01325e5;
   // Newton Raphson arguments
-  optObject.NROptions.verbose =    process.argv[2] == "true";
+  optObject.NROptions.verbose =      process.argv[2] == "true";
 
-  return optObject
+  return optObject;
 };
 const options = getOptions();
 
-const round = (number) => (Math.round(number*1e3)/1e3).toFixed(3)
+const round = (number) => (Math.round(number*1e3)/1e3).toFixed(3);
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
     if(!isNaN(value) && value !== "") object[key] = round(value);
-  }
-}
+  };
+};
 
-if (options.verbose) log("debug",JSON.stringify(options, null, 2))
+if (options.verbose) log("debug",JSON.stringify(options, null, 2));
 
 const englishSystem = { //(US Customary)
   "energy/mol":   (n) => round(unitConv.kJtoBTU(n)) + " Btu/mol",
@@ -260,7 +265,7 @@ const englishSystem = { //(US Customary)
 const siSystem = {
   "energy/mol":   (n) => round(n * 1) + " kJ/mol",
   "mass/mol":     (n) => round(n * 1) + " kg/kmol",
-  heat_flow:      (n) => round(n*1e-6)+ " MW/h",
+  heat_flow:      (n) => round(n*1e-6)+ " MJ/h",
   heat_flux:      (n) => round(n * 1) + " W/m2",
   fouling_factor: (n) => round(n * 1) + " m2-K/W",
 

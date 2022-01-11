@@ -14,7 +14,7 @@
  * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
-const {newtonRaphson, options, logger, linearApprox, unitConv} = require('./js/utils');
+const {newtonRaphson, options, logger, linearApprox, unitConv, initSystem} = require('./js/utils');
 const {combSection} = require('./js/combustion');
 const {radSection} = require('./js/rad');
 const {shieldSection} = require('./js/shield');
@@ -24,25 +24,27 @@ const data = require('./data/data.json');
 const createParams = (options) => {
   const params = {
     /** Inlet Amb Variables */
-    p_atm: options.pAtm,          // Pa 
-    t_air: options.tAmb,          // K (atm) 
-    t_fuel: options.tAmb,         // K (atm) 
-    t_amb: options.tAmb,          // K 
-    humidity: options.humidity,   // % 
-    airExcess: options.airExcess, // % * 0.01 
-    o2Excess: options.o2Excess,   // % * 0.01 
+    p_atm: options.pAtm,          // (Pa) 
+    t_air: options.tAmb,          // (K) (atm) 
+    t_fuel: options.tAmb,         // (K) (atm) 
+    t_amb: options.tAmb,          // (K) 
+    humidity: options.humidity,   // (%) 
+    airExcess: options.airExcess, // (% * .01) 
+    o2Excess: options.o2Excess,   // (% * .01) 
     
     /** Process Variables */
-    duty_conv_dist: 0.3,    // -
-    efficiency: 0.8,        // -
+    Rfi:                0,  // (h-m2-C/kJ)
+    duty_conv_dist:    .3,  // (-)
+    efficiency:        .8,  // (-)
+    heat_loss_percent: .015,// (% * .01)
     max_duty: 
       unitConv.BTUtokJ(
         71.5276 * 1e3),     // (kJ/h)
     m_fluid: 500_590,       // (kg/h) 
-    miu: linearApprox({
+    miu_fluid: linearApprox({
       x1:unitConv.FtoK(678),y1:1.45,
       x2:unitConv.FtoK(772),y2:0.96
-    }),                     // (cp)
+    }),                     // (cP)
     Cp_fluid: linearApprox({
       x1:unitConv.FtoK(678),y1:unitConv.CpENtoCpSI(0.676),
       x2:unitConv.FtoK(772),y2:unitConv.CpENtoCpSI(0.703)
@@ -52,49 +54,54 @@ const createParams = (options) => {
       x2:unitConv.FtoK(772),y2:unitConv.kwENtokwSI(0.035)
     }),                     // (kJ/h-m-C)
 
-    t_in_conv:unitConv.FtoK(678),// K 
-    t_out:    unitConv.FtoK(772),// K (process global)
+    t_in_conv:unitConv.FtoK(678), // (K) 
+    t_out:    unitConv.FtoK(772), // (K) global process out
     /* 
-    m_fuel: 100, // (kmol/h)
-    t_out: undefined, // 628.15 - 315 K (process global)
-    t_in_rad: 250 + options.tempToK, // K (process in rad sect)
-
+    m_fuel: 100,      // (kg/h)
+    t_out: undefined, // (K) global process out
     */
     
-    /** Mechanic variables for heater */
+   /** Mechanic variables for heater */
+   //TODO: This value for CtoC should not be used. 
+    CtoC: unitConv.intom(2),  // (m) center to c tube distance
     h_conv: unitConv.BTUtokJ(1.5) /unitConv.RtoK(1)/ 
       (unitConv.fttom(1)**2), // (kJ/h-m2-C)
-    CtoC: unitConv.intom(2),  // (m) center to center distance of tube 
-    kw_tube: unitConv.BTUtokJ(11.508)/
-      unitConv.RtoK(1)/unitConv.fttom(1), // (kJ/h-m-C)
+    kw_tube: unitConv.BTUtokJ(11.508) / unitConv.RtoK(1) /
+      unitConv.fttom(1),      // (kJ/h-m-C)
+    Pass_number: 2,           // - number of tube passes
 
+    Pitch_rad: unitConv.intom(8), // (m) NPS
     N_rad: 42,                    // - number of tubes 
     L_rad: unitConv.fttom(60),    // (m) tube effective length
     Do_rad: unitConv.intom(8.625),// (m) tube external diameter
-    Di_rad: unitConv.intom(8),    // (m) tube internal diameter
+    Sch_rad:unitConv.intom(0.322),// (m) Schedule thickness
+    Di_rad: unitConv.intom(8.625 - 0.322),// (m) tube internal diameter
 
-    Width_rad:  17.50,// (ft) internal diameter
-    Length_rad: 27.00,// (ft) internal diameter
-    Tall_rad:   64.55,// (ft) internal diameter
+    Width_rad:  17.50,            // (ft) width in rad sect
+    Length_rad: 64.55,            // (ft) length in rad sect
+    Height_rad: 27.00,            // (ft) height in rad sect
     
-    N_cnv: 40,                   // - number of tubes 
-    L_cnv: unitConv.fttom(60),   // (m) effective tube length
-    Do_cnv:unitConv.intom(6.625),// (m) external diameter 
+    N_cnv: 40,                    // - number of tubes 
+    L_cnv: unitConv.fttom(60),    // (m) effective tube length
+    Do_cnv:unitConv.intom(6.625), // (m) external diameter 
+    Sch_cnv:unitConv.intom(0.28), // (m) Schedule thickness
     
+    Pitch_shld: unitConv.intom(6),// (m) NPS
     N_shld: 16,                   // - number of tubes 
     L_shld: unitConv.fttom(60),   // (m) effective tube length
     Do_shld:unitConv.intom(6.625),// (m) external diameter 
 
     /** Miscellaneous */
-    unitSystem: options.unitSystem,
-    lang: options.lang,
-    NROptions: options.NROptions,
+    unitSystem: options.unitSystem, // SI or English
+    lang: options.lang,             // EN or ES
+    NROptions: options.NROptions,   // {object options}
+    units: initSystem(options.unitSystem)
   }
   return params
 }
 
 const combustion = (fuels, options) => {
-  const params = createParams(options)
+  const params = createParams(options);
   //TODO: create a function for this process
   // if params.o2Excess is set, start airExcess iteration
   if (params.o2Excess != 0) {
@@ -115,13 +122,13 @@ const combustion = (fuels, options) => {
 
   const comb_result = combSection(params.airExcess, fuels, params)
   const rad_result = radSection(params)
-  logger.info( "Radiant section (K) Tg: " + rad_result.t_g)
-  logger.info("Fuel mass (kg/h) " + rad_result.m_fuel)
   /*
+  logger.info("Rad sect Tg: " + params.units.tempC(rad_result.t_g))
+  logger.info("Fuel mass:   " + params.units.mass_flow(rad_result.m_fuel))
   shieldSection(params)
   convSection(params)
-  return comb_result
   // */
+  return comb_result
 }
 
 let fuels = { 
@@ -130,10 +137,8 @@ let fuels = {
   iC4H10: .0075, C2H4: .0158, C3H6: .0277,
 }
 // fuels ={
-// //   CH4: 1,
-//   H2: .7,
-//   O2: .2,
-//   N2: .1
+//   CH4: 1,
+//   // H2: .7, O2: .2, N2: .1
 // }
 
 if (typeof window !== 'undefined') {
