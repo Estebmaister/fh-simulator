@@ -11,7 +11,7 @@ const dataFormulas = [
 ]
 // set the default fuels at first load
 for (const key in defaultFuels) {
-  document.getElementById(key).value = parseFloat(defaultFuels[key]) *100;
+  document.getElementById(key).value = Math.round((parseFloat(defaultFuels[key]) * 10000)) / 100;
 }
 
 // totalRecalculate change the total value for every new entry at the fuel composition
