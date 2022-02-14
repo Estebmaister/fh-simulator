@@ -34,7 +34,7 @@ const createParams = (options) => {
     
     /** Process Variables */
     Rfi:                0,  // (h-m2-C/kJ)
-    duty_conv_dist:    .3,  // (-)
+    duty_rad_dist:     .7,  // (-)
     efficiency:        .8,  // (-)
     heat_loss_percent: .015,// (% * .01)
     max_duty: 
@@ -62,7 +62,7 @@ const createParams = (options) => {
     */
     
    /** Mechanic variables for heater */
-   //TODO: This value for CtoC should not be used. 
+   //TODO: This value for CtoC is not in used. 
     CtoC: unitConv.intom(2),  // (m) center to c tube distance
     h_conv: unitConv.BTUtokJ(1.5) /unitConv.RtoK(1)/ 
       (unitConv.fttom(1)**2), // (kJ/h-m2-C)
@@ -70,12 +70,12 @@ const createParams = (options) => {
       unitConv.fttom(1),      // (kJ/h-m-C)
     Pass_number: 2,           // - number of tube passes
 
-    Pitch_rad: unitConv.intom(8), // (m) NPS
-    N_rad: 42,                    // - number of tubes 
-    L_rad: unitConv.fttom(60),    // (m) tube effective length
-    Do_rad: unitConv.intom(8.625),// (m) tube external diameter
-    Sch_rad:unitConv.intom(0.322),// (m) Schedule thickness
-    Di_rad: unitConv.intom(8.625 - 0.322),// (m) tube internal diameter
+    Pitch_rad: unitConv.intom(8.0),// (m) NPS
+    N_rad:  42,                    // - number of tubes 
+    L_rad:  unitConv.fttom(62.00), // (m) tube effective length
+    Do_rad: unitConv.intom(8.625), // (m) tube external diameter
+    Sch_rad:unitConv.intom(0.322), // (m) Schedule thickness
+    Di_rad: unitConv.intom(8.625-0.322),// (m) tube internal diameter
 
     Width_rad:  17.50,            // (ft) width in rad sect
     Length_rad: 64.55,            // (ft) length in rad sect
@@ -144,8 +144,10 @@ let fuels = {
 if (typeof window !== 'undefined') {
   browserProcess(fuels, data, options, combustion)
 } else {
-  // logger.info(JSON.stringify(fuels))
-  // logger.info(JSON.stringify(options))
-  const result = combustion(fuels, options)
+  /** 
+  logger.info(JSON.stringify(fuels))
+  logger.info(JSON.stringify(options))
   logger.debug(JSON.stringify(result, null, 2))
+  */
+  const result = combustion(fuels, options)
 }

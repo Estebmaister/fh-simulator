@@ -12,7 +12,16 @@
  * @callParams airExcess, fuels, params
  *
  *****************************************************************/
-const {newtonRaphson, options, logger, round, roundDict, initSystem} = require('./utils');
+const {
+  newtonRaphson,
+  options,
+  logger,
+  round,
+  roundDict,
+  initSystem,
+  normalize,
+  flueViscosity
+} = require('./utils');
 const data = require('../data/data.json');
 const dryAirN2Percentage = 79.05;
 const dryAirO2Percentage = 20.95;
@@ -46,18 +55,6 @@ const checkFuelData = (fuels, compounds, result = {}) => {
     result.err += `[some fuels aren't in the database, #badFuels: ${badFuels}],`;
   };
   return check1;
-};
-
-/** Normalize an object of fuels/products */
-const normalize = (fuels, name) => {
-  normalFuel = {...fuels};
-  total = Object.values(normalFuel).reduce((acc, value)=> acc + value);
-  for (const fuel in normalFuel) {
-    normalFuel[fuel] = normalFuel[fuel]/total;
-  };
-  if (options.verbose) 
-    logger.debug(`Normalizing ${name}, total: ${total}`);
-  return normalFuel;
 };
 
 /** (kJ/kg K) to call returning function use Kelvin units 
@@ -382,6 +379,8 @@ const combSection = (airExcess, fuels, params) => {
   params.Cp_flue = Cp_multicomp(products);
   params.Cp_air  = Cp_multicomp(air);
   params.Cp_fuel = Cp_multicomp(normalFuel);
+
+  params.flueViscosity = flueViscosity(data, products);
 
   roundDict(products), roundDict(flows), roundDict(debug_data);
   if (debug_data.err == "") delete debug_data.err;
