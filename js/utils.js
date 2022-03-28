@@ -24,80 +24,65 @@
  *
  *****************************************************************/
 
-const log = function(...arguments) {
-  if (arguments.length === 0) return;
-
-  switch (arguments[0]) {
-    case "warn":
-      for (var i = 1; i < arguments.length; i++) {
-        console.log(`{"WARN": "${arguments[i]}"}`);
-      }
+const logByLevel = (...stringsList) => {
+  let finalText = "" + stringsList[1][0]
+  for (var i = 1; i < stringsList[1].length; i++) {
+    finalText += " " + stringsList[1][i]
+  }
+  switch (stringsList[0]) {
+    case "DEBUG":
+      if (options.verbose) console.debug(JSON.parse(`{"${stringsList[0]}": ${finalText}}`));
       break;
-    case "info":
-      for (var i = 1; i < arguments.length; i++) {
-        console.log(`{"INFO": "${arguments[i]}"}`);
-      }
+    case "INFO":
+      console.info( `{ \x1b[32;1m${stringsList[0]}\x1b[0m: "${finalText}"}`);
       break;
-    case "error":
-      for (var i = 1; i < arguments.length; i++) {
-        console.error(`{"ERROR": "${arguments[i]}"}`);
-      }
+    case "ERROR":
+      console.error(`{ \x1b[31;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
       break;
-    case "debug":
-      for (var i = 1; i < arguments.length; i++) {
-        console.debug(`{"DEBUG": ${arguments[i]}}`);
-      }
+    case "WARN":
+      console.warn( `{ \x1b[35;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
       break;
     default:
-      for (var i = 0; i < arguments.length; i++) {
-        console.log(`{"DEFAULT": "${arguments[i]}"}`);
-      }
+      console.log(  `{ \x1b[34;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
       break;
   }
-}//TODO: Delete this unused function
-const logByLevel = (...arguments) => {
-  let argumentsText = ""
-  for (var i = 1; i < arguments.length; i++) {
-    argumentsText += arguments[i]
-  }
-  console.log(`{'${arguments[0]}': '${argumentsText}'}`);
 };
 const logger = {
-  info: (...arguments) => logByLevel("INFO", arguments),
-  warn: (...arguments) => logByLevel("WARN", arguments),
-  error: (...arguments) => logByLevel("ERROR", arguments),
-  debug: (...arguments) => logByLevel("DEBUG", arguments),
-  default: (...arguments) => logByLevel("DEFAULT", arguments),
+  info:   (...stringsList) => logByLevel("INFO", stringsList),
+  warn:   (...stringsList) => logByLevel("WARN", stringsList),
+  error:  (...stringsList) => logByLevel("ERROR", stringsList),
+  debug:  (...stringsList) => logByLevel("DEBUG", stringsList),
+  default:(...stringsList) => logByLevel("DEFAULT", stringsList),
 };
 
 /** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
-const newtonRaphson = (f, fp, x0, options, name) => {
-  let x1, y, yp, tol, maxIter, iter, yph, ymh, yp2h, ym2h, h, hr, verbose, eps;
+const newtonRaphson = (f, fp, x0, nrOptions, name) => {
+  let x1, y, yp, iter, yph, ymh, yp2h, ym2h;
 
   // Interpret variadic forms:
   if (typeof fp !== 'function') {
-    name = options;
-    options = x0;
+    name = nrOptions;
+    nrOptions = x0;
     x0 = fp;
     fp = null;
   }
 
-  options = options || {};
-  tol = options.tolerance === undefined ? 1e-7 : options.tolerance;
-  eps = options.epsilon === undefined ? 2.22e-15 : options.epsilon;
-  maxIter = options.maxIterations === undefined ? 20 : options.maxIterations;
-  h = options.h === undefined ? 1e-4 : options.h;
-  verbose = options.verbose === undefined ? false : options.verbose;
-  hr = 1 / h;
+  const 
+    opts = nrOptions || {},
+    tol = opts.tolerance === undefined ? 1e-7 : opts.tolerance,
+    eps = opts.epsilon === undefined ? 2.22e-15 : opts.epsilon,
+    h = opts.h === undefined ? 1e-4 : opts.h,
+    hr = 1 / h,
+    maxIter = opts.maxIterations === undefined ? 20 : opts.maxIterations;
 
   iter = 0;
   while (iter++ < maxIter) {
-      // Compute the value of the function:
-      y = f(x0);
+    // Compute the value of the function:
+    y = f(x0);
 
-      if (fp) {
+    if (fp) {
       yp = fp(x0);
-      } else {
+    } else {
       // Needs numerical derivatives:
       yph = f(x0 + h);
       ymh = f(x0 - h);
@@ -105,34 +90,27 @@ const newtonRaphson = (f, fp, x0, options, name) => {
       ym2h = f(x0 - 2 * h);
 
       yp = ((ym2h - yp2h) + 8 * (yph - ymh)) * hr / 12;
-      }
+    }
 
-      // Check for badly conditioned update (extremely small first deriv relative to function):
-      if (Math.abs(yp) <= eps * Math.abs(y)) {
-      if (verbose) {
-          log("info", `Newton-Raphson (${name}): failed to converged due to nearly zero first derivative`);
-      }
+    // Check for badly conditioned update (extremely small first deriv relative to function):
+    if (Math.abs(yp) <= eps * Math.abs(y)) {
+      logger.error(`Newton-Raphson (${name}): failed to converged due to nearly zero first derivative`);
       return false;
-      }
+    }
 
-      // Update the guess:
-      x1 = x0 - y / yp;
+    // Update the guess:
+    x1 = x0 - y / yp;
 
-      // Check for convergence:
-      if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
-      if (verbose) {
-          log("info", `Newton-Raphson (${name}): converged to x = ${x1} after ${iter} iterations`);
-      }
+    // Check for convergence:
+    if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
+      logger.debug(`{"Newton-Raphson":"${name}", "var converged to":${x1}, "iterations":${iter}}`);
       return x1;
-      }
+    }
 
-      // Transfer update to the new guess:
-      x0 = x1;
+    // Transfer update to the new guess:
+    x0 = x1;
   }
-
-  if (verbose) {
-      log("info", `Newton-Raphson (${name}): Maximum iterations reached (${maxIter})`);
-  }
+  logger.error(`Newton-Raphson (${name}): Maximum iterations reached (${maxIter})`);
 
   return false;
 };
@@ -153,19 +131,24 @@ const linearApprox = ({x1,x2,y1,y2}) => {
   return (x) => m * (x - x1) + y1;
 };
 
-/** (Tref1, Tref2, T1) Returns a function of temperature (T2) with three other values of temp */
+
+/** (Tref1, Tref2, T1, co-current) Returns a function of temperature (T2) 
+ * with the other three values of temp as constants.
+ * counter-current by default, for co-current set the four argument as true.
+ * */
 const LMTD = (t_cold_in, t_cold_out, t_hot_in, co_current) => {
   
-  let // counter-current
+  let // counter-current (default)
     delta_t1 = t_hot_in - t_cold_out,
     delta_t2 = (t_hot_out) => t_hot_out - t_cold_in;
-  if (co_current) { // co-current
-    delta_t1 = t_hot_in - t_cold_out;
-    delta_t2 = (t_hot_out) => t_hot_out - t_cold_in;
-  }
-
+    
+    if (co_current) { // co-current
+      delta_t1 = t_hot_in - t_cold_out;
+      delta_t2 = (t_hot_out) => t_hot_out - t_cold_in;
+    }
+    
+  // (tg_sh) => ( (tg_r - tf_out) - (tg_sh - tf_in) ) / ln( (tg_r - tf_out) / (tg_sh-tf_in) )
   return (t) => delta_t1 - delta_t2(t) / ln( delta_t1 / delta_t2(t) );
-  // (tg_sh) => ( (tg_r - tf_out) - (tg_sh - tf_in) ) / ln( (tg_r - tf_out) / (tg_sh-tf_in) );
 };
 
 const 
@@ -246,7 +229,7 @@ const round = (number) => (Math.round(number*1e3)/1e3).toFixed(3);
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
     if(!isNaN(value) && value !== "") object[key] = round(value);
-  };
+  }
 };
 
 /** Normalize an object of fuels/products */
@@ -255,9 +238,9 @@ const normalize = (fuels, name) => {
   const total = Object.values(normalFuel).reduce((acc, value)=> acc + value);
   for (const fuel in normalFuel) {
     normalFuel[fuel] = normalFuel[fuel]/total;
-  };
+  }
   if (options.verbose) 
-    logger.debug(`Normalizing ${name}, total: ${total}`);
+    logger.debug(`{"Normalizing": "${name}", "total": ${total}}`);
   return normalFuel;
 };
 
@@ -267,9 +250,9 @@ const miu = ({u0, u1, u2, Substance}) => {
   // u2*T^2 + u1*T + u0  (valid from 300K to 1200K)
   if (u0 == 0 || u0 == "-") {
     if (options.verbose) 
-      log("debug", `Viscosity func called for '${Substance}' without coffs`);
+      logger.debug(`"Viscosity func called for '${Substance}' without coffs"`);
     return () => 0;
-  };
+  }
   return (temp) => u0 + u1* temp + u2* temp**2;
 };
 
@@ -288,7 +271,7 @@ const flueViscosity = (data, flue) => {
 };
 
 
-if (options.verbose) log("debug",JSON.stringify(options, null, 2));
+if (options.verbose) logger.debug(`${JSON.stringify(options, null, 2)}`);
 
 const englishSystem = { //(US Customary)
   "energy/mol":   (n) => round(unitConv.kJtoBTU(n)) + " Btu/mol",
@@ -346,7 +329,7 @@ const siSystem = {
 
 const initSystem = (unitSystem) => {
   if (typeof unitSystem !== "string") {
-    if (options.verbose) log("warn", 
+    if (options.verbose) logger.warn( 
     `invalid type (${unitSystem}) for unit system, using default SI`);
     return siSystem
   }
@@ -356,8 +339,7 @@ const initSystem = (unitSystem) => {
     case "english":
       return englishSystem;
     default:
-      log("warn", 
-      unitSystem.toLowerCase() + 
+      logger.warn(unitSystem.toLowerCase() + 
       ' - invalid unit system, using default SI')
       return siSystem;
   }
@@ -367,7 +349,6 @@ module.exports = {
   options,
   unitConv,
   newtonRaphson,
-  log,
   logger,
   round,
   roundDict,
