@@ -1,9 +1,9 @@
 /******************************************************************
  * Exported functions from this file
  ******************************************************************
- * @combustion fuels, options, humidity, airExcess
+ * @heaterFunc fuelsObject, options, humidity, airExcess
  * @version  1.00
- * @param   {fuels object} valid i.e. {'CH4': 1}.
+ * @param   {fuelsObject object} valid i.e. {'CH4': 1}.
  * @return  {result object} flows, products
  * 
  * @author  Esteban Camargo
@@ -21,16 +21,16 @@ const {shieldSection} = require('./js/shield');
 const {browserProcess} = require('./js/browser');
 const data = require('./data/data.json');
 
-const createParams = (options) => {
-  const params = {
+const createParams = (opts) => {
+  return {
     /** Inlet Amb Variables */
-    p_atm: options.pAtm,          // (Pa) 
-    t_air: options.tAmb,          // (K) (atm) 
-    t_fuel: options.tAmb,         // (K) (atm) 
-    t_amb: options.tAmb,          // (K) 
-    humidity: options.humidity,   // (%) 
-    airExcess: options.airExcess, // (% * .01) 
-    o2Excess: options.o2Excess,   // (% * .01) 
+    p_atm: opts.pAtm,          // (Pa) 
+    t_air: opts.tAmb,          // (K) (atm) 
+    t_fuel: opts.tAmb,         // (K) (atm) 
+    t_amb: opts.tAmb,          // (K) 
+    humidity: opts.humidity,   // (%) 
+    airExcess: opts.airExcess, // (% * .01) 
+    o2Excess: opts.o2Excess,   // (% * .01) 
     
     /** Process Variables */
     Rfi:                0,  // (h-m2-C/kJ)
@@ -61,11 +61,12 @@ const createParams = (options) => {
     t_out: undefined, // (K) global process out
     */
     
-   /** Mechanic variables for heater */
-   //TODO: This value for CtoC is not in used. 
+    /** Mechanic variables for heater */
+    //TODO: Unused value for CtoC. 
     CtoC: unitConv.intom(2),  // (m) center to c tube distance
     h_conv: unitConv.BTUtokJ(1.5) /unitConv.RtoK(1)/ 
       (unitConv.fttom(1)**2), // (kJ/h-m2-C)
+    // TODO: make kw_tube parameter a temp function
     kw_tube: unitConv.BTUtokJ(11.508) / unitConv.RtoK(1) /
       unitConv.fttom(1),      // (kJ/h-m-C)
     Pass_number: 2,           // - number of tube passes
@@ -92,62 +93,62 @@ const createParams = (options) => {
     Do_shld:unitConv.intom(6.625),// (m) external diameter 
 
     /** Miscellaneous */
-    unitSystem: options.unitSystem, // SI or English
-    lang: options.lang,             // EN or ES
-    NROptions: options.NROptions,   // {object options}
-    units: initSystem(options.unitSystem)
+    verbose: opts.verbose,       // True or False
+    unitSystem: opts.unitSystem, // SI or English
+    lang: opts.lang,             // EN or ES
+    NROptions: opts.NROptions,   // {object options}
+    units: initSystem(opts.unitSystem)
   }
-  return params
 }
 
-const combustion = (fuels, options) => {
-  const params = createParams(options);
+const heaterFunc = (fuels, opts) => {
+  const params = createParams(opts);
   //TODO: create a function for this process
   // if params.o2Excess is set, start airExcess iteration
   if (params.o2Excess != 0) {
-    const comb_o2 = (airExcess) => {
-      const combO2 = combSection(airExcess, fuels, params)
+    const comb_o2 = (airExcessVal) => {
+      const combO2 = combSection(airExcessVal, fuels, params)
       logger.info( "O2%: " + combO2.flows['O2_%'] +
         " vs O2excess: " + params.o2Excess * 100)
       return combO2.flows['O2_%'] / 100 - params.o2Excess
     }
     const airExcess = newtonRaphson(comb_o2, .5, 
       params.NROptions, "o2_excess_to_air")
-    if (airExcess != false) {
-      params.airExcess = airExcess
-    }
+    if (airExcess) params.airExcess = airExcess;
   } else {
-    params.airExcess = options.airExcess
+    params.airExcess = opts.airExcess
   }
 
   const comb_result = combSection(params.airExcess, fuels, params)
-  const rad_result = radSection(params)
-  /*
+  comb_result.rad_result = radSection(params)
+  shieldSection(params)
+  /* calls to logs
   logger.info("Rad sect Tg: " + params.units.tempC(rad_result.t_g))
   logger.info("Fuel mass:   " + params.units.mass_flow(rad_result.m_fuel))
   shieldSection(params)
   convSection(params)
-  // */
+  //*/
   return comb_result
 }
 
-let fuels = { 
+let fuelsObject = { 
   H2:     .1142, N2:   .0068, CO:   .0066, CO2: .0254, 
   CH4:    .5647, C2H6: .1515, C3H8: .0622, C4H10: .0176, 
   iC4H10: .0075, C2H4: .0158, C3H6: .0277,
 }
-// fuels ={
+// fuelsObject ={
 //   CH4: 1,
 //   // H2: .7, O2: .2, N2: .1
 // }
 
 if (typeof window !== 'undefined') {
-  browserProcess(fuels, data, options, combustion)
+  browserProcess(fuelsObject, data, options, heaterFunc)
 } else {
   /** 
-  logger.info(JSON.stringify(fuels))
+  const result = heaterFunc(fuelsObject, options)
+  logger.info(JSON.stringify(fuelsObject))
   logger.info(JSON.stringify(options))
   logger.debug(JSON.stringify(result, null, 2))
   */
-  const result = combustion(fuels, options)
+  heaterFunc(fuelsObject, options)
 }
