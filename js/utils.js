@@ -10,9 +10,9 @@
  * @return  {number or false} a number is the iterations reach the result, 
  *          false if not.
  * 
- * @log (level, args)
+ * @logger {info,warn,error,debug,default}
  * @version  1.00
- * @param   {level} optional string like "error", "info" or "debug".
+ * @param   {argument} optional string or object to print.
  * @return  {null} prints to the console.
  * 
  * @author  Esteban Camargo
@@ -20,7 +20,7 @@
  * @call    node . true true 25 70 80 1e5
  * @callParams verbose, check for changes in csv, t_amb, humidity, air_excess, p_amb
  * 
- * Note: No check is made for NaN or undefined input numbers.
+ * //TODO: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
 
@@ -180,9 +180,7 @@ const unitConv = {
   BtuHtoW: (n) => n/3.4121416331,
 };
 
-/** Example for a call of this file: 
- * node . false SI 26.6667 50 0 20 1.01325e5
- * */ 
+/** Example call from terminal: node . false SI 26.6667 50 0 20 1.01325e5 */ 
 const getOptions = () => {
   const optObject = {
     // constants
@@ -224,6 +222,7 @@ const getOptions = () => {
   return optObject;
 };
 const options = getOptions();
+if (options.verbose) logger.debug(`${JSON.stringify(options, null, 2)}`);
 
 const round = (number) => (Math.round(number*1e3)/1e3).toFixed(3);
 const roundDict = (object = {}) => {
@@ -256,7 +255,11 @@ const miu = ({u0, u1, u2, Substance}) => {
   return (temp) => u0 + u1* temp + u2* temp**2;
 };
 
-/** returns a Viscosity function of temp for certain flue composition */
+/** returns a Viscosity function of temp for certain flue composition.
+ * 
+ * Should be called in the combustion section after flue composition 
+ * is determined.
+*/
 const flueViscosity = (data, flue) => {
   const 
     normalFlue = normalize(flue, "flueViscosity"),
@@ -269,9 +272,6 @@ const flueViscosity = (data, flue) => {
   return (t) => normalFlue.CO2*co2_v(t) + normalFlue.SO2*so2_v(t)
   + normalFlue.H2O*h2o_v(t) + normalFlue.O2*o2_v(t) + normalFlue.N2*n2_v(t);
 };
-
-
-if (options.verbose) logger.debug(`${JSON.stringify(options, null, 2)}`);
 
 const englishSystem = { //(US Customary)
   "energy/mol":   (n) => round(unitConv.kJtoBTU(n)) + " Btu/mol",

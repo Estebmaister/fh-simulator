@@ -136,6 +136,7 @@ let fuelsObject = {
   CH4:    .5647, C2H6: .1515, C3H8: .0622, C4H10: .0176, 
   iC4H10: .0075, C2H4: .0158, C3H6: .0277,
 }
+// Fuel for debugging purpose
 // fuelsObject ={
 //   CH4: 1,
 //   // H2: .7, O2: .2, N2: .1

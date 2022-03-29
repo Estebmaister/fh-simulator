@@ -33,9 +33,10 @@ const dryAir = {
 };
 
 //TODO: expanse the use of the error in result dictionary
-/** Check if the percentages of the fuels sums 100% */
+/** Check if the percentages of the fuels sums 100%.
+ * In case of check fail an error will be attached to the result.
+*/
 const checkObjectFraction = (fuels, result = {}) => {
-  // Check if the percentages of the fuels sums 100% 
   const total = Object.values(fuels).reduce((acc, value)=> acc + value)
   const tolerance = 3e-12
   const check1 = Math.abs(1 - total) <= tolerance
@@ -44,9 +45,10 @@ const checkObjectFraction = (fuels, result = {}) => {
   return check1;
 };
 
-/** Check if all the components in the fuels are in the data filtered */
+/** Check if all the components in the fuels are in the data filtered.
+ * In case of a bad fuel entered an error will be attached to the result.
+*/
 const checkFuelData = (fuels, compounds, result = {}) => {
-  // Check if all the components in the fuels are in the data filtered
   const badFuels = Math.abs(compounds.length - 
     Object.keys(fuels).length);
   const check1 = badFuels === 0;
@@ -251,6 +253,28 @@ const adFlame = (normalFuels, products, tIni, o2required) => {
   return (t) => pEnthalpy(t) - rEnthalpy.reduce((acc, value)=> acc + value);
 };
 
+/** For every element in the fuel compounds 
+ * calculates every product of combustion per fuel element
+ * filling the product object.
+*/
+const combPerFuelCompound = (compounds, products, normalFuel) => {
+  for (const elem of compounds) {
+    for (const product in products) {
+      if (product == 'N2') {
+        if (elem['Formula'] == 'N2' || elem['Formula'] =='"N2a') {
+          products[product] += normalFuel[elem['Formula']];
+          continue;
+        }
+        products[product] += elem['O2']*normalFuel[elem['Formula']]*N2O2relation;
+        continue;
+      }
+      products[product] += elem[product]*normalFuel[elem['Formula']];
+      // logger.default(`${elem['Formula']} req = ${product} ` +
+      //   `${elem[product]*normalFuel[elem['Formula']]}` )
+    }
+  }
+}
+
 /** In this process the params object will be updated
 *  in every function call with the combustion data
 */
@@ -268,36 +292,22 @@ const combSection = (airExcess, fuels, params) => {
     unitSystem: units.system[params.lang]
   };
   const compounds = data.filter((elem, i, arr) => elem.Formula in fuels)
+
   let normalFuel = {...fuels};
   if (!checkObjectFraction(fuels, debug_data)) normalFuel = normalize(fuels, "combSection");
+  checkFuelData(normalFuel, compounds, debug_data);
+
   const products = {
     O2:  0, N2:  0, H2O: 0,
     CO2: 0, SO2: 0,  };
   const air = {...dryAir};
-  //TODO: decide what should do if (!checkFuelData(normalFuel, compounds, debug_data)) return {products, debug_data};
+  // filling products object with stoichiometric ratio
+  combPerFuelCompound(compounds, products, normalFuel);
 
-  // TODO: make this a function
-  // for every element in the fuel compounds
-  for (const elem of compounds) {
-    // calculates every product of combustion per fuel elem
-    for (const product in products) {
-      if (product == 'N2') {
-        if (elem['Formula'] == 'N2' || elem['Formula'] =='"N2a') {
-          products[product] += normalFuel[elem['Formula']];
-          continue;
-        }
-        products[product] += elem['O2']*normalFuel[elem['Formula']]*N2O2relation;
-        continue;
-      }
-      products[product] += elem[product]*normalFuel[elem['Formula']];
-      // logger.default(`${elem['Formula']} req = ${product} ` +
-      //   `${elem[product]*normalFuel[elem['Formula']]}` )
-    }
-  }
-
-  /** Percentage of O2 in excess 100% + x% airExcess */
+  // air excess and humidity shouldn't be less than 0
   if (airExcess - 0.000001 < 0) airExcess = 0;
   if (params.humidity - 0.000001 < 0) params.humidity = 0;
+  /** Percentage of O2 in excess = 100% + x% airExcess */
   let o2required = products['O2'];
   let o2excess = o2required * (1 + airExcess);
   // If O2 requirements are negative 
