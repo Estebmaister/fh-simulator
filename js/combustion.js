@@ -33,9 +33,10 @@ const dryAir = {
 };
 
 //TODO: expanse the use of the error in result dictionary
-/** Check if the percentages of the fuels sums 100% */
+/** Check if the percentages of the fuels sums 100%.
+ * In case of check fail an error will be attached to the result.
+*/
 const checkObjectFraction = (fuels, result = {}) => {
-  // Check if the percentages of the fuels sums 100% 
   const total = Object.values(fuels).reduce((acc, value)=> acc + value)
   const tolerance = 3e-12
   const check1 = Math.abs(1 - total) <= tolerance
@@ -44,16 +45,17 @@ const checkObjectFraction = (fuels, result = {}) => {
   return check1;
 };
 
-/** Check if all the components in the fuels are in the data filtered */
+/** Check if all the components in the fuels are in the data filtered.
+ * In case of a bad fuel entered an error will be attached to the result.
+*/
 const checkFuelData = (fuels, compounds, result = {}) => {
-  // Check if all the components in the fuels are in the data filtered
   const badFuels = Math.abs(compounds.length - 
     Object.keys(fuels).length);
   const check1 = badFuels === 0;
   if (!check1) {
     logger.error(`[some fuels aren't in the database, #badFuels: ${badFuels}],`);
     result.err += `[some fuels aren't in the database, #badFuels: ${badFuels}],`;
-  };
+  }
   return check1;
 };
 
@@ -66,15 +68,15 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
   // Teta = T(Kelvin)
   return (teta) => {
     // Approximate equation valid from 250 K to 1200 K.
-    if (teta < 250) logger.warn(`temp [${round(teta)}]`+
-      ` ${Substance} bellow range for Cp0 formula`);
-    if (teta > 1200 && options.verbose) logger.warn(`temp `+
-      `[${round(teta)}] ${Substance} above range for Cp0 formula`);
+    if (teta < 250) logger.debug(`"Cp0", "temp": ${round(teta)},`+
+      `"Msg": "${Substance} bellow range for Cp0 formula"`);
+    if (teta > 1200 && options.verbose) logger.debug(`"Cp0", "temp": ${round(teta)},`+
+      `"Msg": "${Substance} above range for Cp0 formula"`);
     if (c0 === "-") {
-      logger.warn(`wrong use of Cp0, called for compound `+
-      `${Substance}, no data found`);
+      logger.debug(`"Cp0", "Msg": "Wrong use, called for compound `+
+      `${Substance}, no data found"`);
       return 0;
-    };
+    }
     if (molResult) return MW*(c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)
     return (c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)
   }
@@ -98,7 +100,7 @@ const Cp_multicomp = (fuels, molResult) => {
     cps[i] = (t) => normalFuel[fuel] * Cp0(
       fuelComps.filter(elem => elem.Formula == fuel)[0], molResult)(t);
     i++;
-  };
+  }
   
   return cps.reduce((acc, val) => ((t) => acc(t) + val(t)), (t) => 0);
 };
@@ -117,7 +119,7 @@ const MW_multicomp = (fuels) => {
   for (const fuel in normalFuel) {
     MWs += fuelComps.filter(elem => elem.Formula == fuel)[0].MW * 
     normalFuel[fuel];
-  };
+  }
   return MWs;
 };
 
@@ -136,13 +138,16 @@ const pressureH2OinAir = (temperature, relativeHumidity) => {
 /** Temperature should be in K, humidity %[0,100] */
 const moistAirWeightRatio = (temperature, relativeHumidity) => {
   const pw = pressureH2OinAir(temperature, relativeHumidity)
-  // w is the weight ratio of water vapour and dry air. (kg-w_vap/kg-dry_a)
-  // simplification 0.62 * 1e-5 * pw
+  // returned value is the weight ratio of water vapour and dry air. (kg-w_vap/kg-dry_a)
+  return data[31].MW * pw / 
+  ( MW_multicomp(dryAir) * (options.pAtm - pw ) );
+  // a simplification can be: 0.62 * 1e-5 * pw
+  
+  /* weight ratio converted to water per oxygen in air
   const w = data[31].MW * pw / 
     ( MW_multicomp(dryAir) * (options.pAtm - pw ) );
-  return w;
-  // weight ratio converted to water per oxygen in air
   return w * 7.655;
+  //*/
 };
 
 /** (kJ/kmol), Enthalpy of formation plus delta enthalpy 
@@ -154,13 +159,13 @@ const deltaH = (compound, t) => {
         ` called for compound ${compound.Substance} without data`);
       if (t === undefined) return () => 0;
       return 0;
-    };
+    }
     if (t === undefined) return () => compound.h0
     return compound.h0;
-  };
+  }
   // hf0 + deltaH(tempAmbRef -> t)
-  if (t === undefined) return (t) => compound.h0 + compound.MW * 
-    Cp0(compound)((options.tempAmbRef+t)/2) * (t-options.tempAmbRef);
+  if (t === undefined) return (tempParam) => compound.h0 + compound.MW * 
+    Cp0(compound)((options.tempAmbRef+tempParam)/2) * (tempParam-options.tempAmbRef);
 
   return compound.h0 + compound.MW * 
     Cp0(compound)((options.tempAmbRef+t)/2) * (t-options.tempAmbRef);
@@ -182,8 +187,8 @@ const combustionH = (compound, t, tIni, liquidWater) => {
   // making tIni equal to t_amb if not specified
   if (tIni === undefined) tIni = options.tAmb;
 
-  if (t === undefined) return (t) => compound.CO2*co2_H(t) + compound.SO2*so2_H(t)
-    + compound.H2O*h2o_H(t) - deltaH(compound)(tIni) - compound.O2*o2_H(tIni);
+  if (t === undefined) return (tempParam) => compound.CO2*co2_H(tempParam) + compound.SO2*so2_H(tempParam)
+    + compound.H2O*h2o_H(tempParam) - deltaH(compound)(tIni) - compound.O2*o2_H(tIni);
   
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
   return ( compound.CO2*co2_H(t) + compound.SO2*so2_H(t) + compound.H2O*h2o_H(t)
@@ -248,11 +253,33 @@ const adFlame = (normalFuels, products, tIni, o2required) => {
   return (t) => pEnthalpy(t) - rEnthalpy.reduce((acc, value)=> acc + value);
 };
 
+/** For every element in the fuel compounds 
+ * calculates every product of combustion per fuel element
+ * filling the product object.
+*/
+const combPerFuelCompound = (compounds, products, normalFuel) => {
+  for (const elem of compounds) {
+    for (const product in products) {
+      if (product == 'N2') {
+        if (elem['Formula'] == 'N2' || elem['Formula'] =='"N2a') {
+          products[product] += normalFuel[elem['Formula']];
+          continue;
+        }
+        products[product] += elem['O2']*normalFuel[elem['Formula']]*N2O2relation;
+        continue;
+      }
+      products[product] += elem[product]*normalFuel[elem['Formula']];
+      // logger.default(`${elem['Formula']} req = ${product} ` +
+      //   `${elem[product]*normalFuel[elem['Formula']]}` )
+    }
+  }
+}
+
 /** In this process the params object will be updated
 *  in every function call with the combustion data
 */
 const combSection = (airExcess, fuels, params) => {
-  //logger.debug("airExcess in call: " + airExcess);
+  logger.debug(`{"airExcess in call": ${airExcess}}`);
   const units = initSystem(params.unitSystem);
   const debug_data = {
     err: "",
@@ -264,40 +291,23 @@ const combSection = (airExcess, fuels, params) => {
     moisture: units.moist(moistAirWeightRatio(params.t_amb, params.humidity)),
     unitSystem: units.system[params.lang]
   };
-  const 
-    compounds = data.filter((elem, i, arr) => elem.Formula in fuels),
-    normalFuel = {...fuels};
+  const compounds = data.filter((elem, i, arr) => elem.Formula in fuels)
+
+  let normalFuel = {...fuels};
   if (!checkObjectFraction(fuels, debug_data)) normalFuel = normalize(fuels, "combSection");
+  checkFuelData(normalFuel, compounds, debug_data);
+
   const products = {
     O2:  0, N2:  0, H2O: 0,
     CO2: 0, SO2: 0,  };
   const air = {...dryAir};
-  if (!checkFuelData(normalFuel, compounds, debug_data)) {};//TODO: return {products, debug_data};
+  // filling products object with stoichiometric ratio
+  combPerFuelCompound(compounds, products, normalFuel);
 
-  // for every element in the fuel compounds
-  for (const elem of compounds) {
-    // calculates every product of combustion per fuel elem
-    for (const product in products) {
-      if (product == 'N2') {
-        if (elem['Formula'] == 'N2' || elem['Formula'] =='"N2a') {
-          products[product] += normalFuel[elem['Formula']];
-          continue;
-        // } else if (elem['Formula'] == 'O2') {
-        //   products[product] += elem['O2']*normalFuel[elem['Formula']]*N2O2relation;
-        //   continue;
-        };
-        products[product] += elem['O2']*normalFuel[elem['Formula']]*N2O2relation;
-        continue;
-      };
-      products[product] += elem[product]*normalFuel[elem['Formula']];
-      // logger.default(`${elem['Formula']} req = ${product} ` +
-      //   `${elem[product]*normalFuel[elem['Formula']]}` )
-    };
-  };
-
-  /** Percentage of O2 in excess 100% + x% airExcess */
+  // air excess and humidity shouldn't be less than 0
   if (airExcess - 0.000001 < 0) airExcess = 0;
   if (params.humidity - 0.000001 < 0) params.humidity = 0;
+  /** Percentage of O2 in excess = 100% + x% airExcess */
   let o2required = products['O2'];
   let o2excess = o2required * (1 + airExcess);
   // If O2 requirements are negative 
@@ -325,7 +335,7 @@ const combSection = (airExcess, fuels, params) => {
     products['O2'] = o2excess - products['O2']; // Subtracting the O2 used in combustion
     products['N2']  += products['O2']* (air.N2/air.O2);
     products['H2O'] += products['N2']* (waterPressure/(air.N2*params.p_atm));
-  };
+  }
 
 
   params.NCV = -ncv(normalFuel, products, compounds, params.t_amb) /
@@ -340,7 +350,7 @@ const combSection = (airExcess, fuels, params) => {
   for (const product in products) {
     totalPerMol += products[product];
     if (product !== 'H2O') totalPerM_Dry += products[product];
-  };
+  }
   const flows = {
     total_flow: totalPerMol,
     dry_total_flow: totalPerM_Dry,
@@ -382,7 +392,7 @@ const combSection = (airExcess, fuels, params) => {
 
   params.flueViscosity = flueViscosity(data, products);
 
-  roundDict(products), roundDict(flows), roundDict(debug_data);
+  roundDict(products); roundDict(flows); roundDict(debug_data);
   if (debug_data.err == "") delete debug_data.err;
   return {flows, products, debug_data};
 };
@@ -392,7 +402,6 @@ const combSection = (airExcess, fuels, params) => {
 //     `${Cp0(data[33], true)( (options.tAmb + 15+273.15)*0.5 )}`)
 // logger.info(`H2O-mol per O2-mol in air ${params.humidity}% RH): `+
 //   `${moistAirWeightRatio(params.t_amb, params.humidity)}`)
-
 // logger.default(combustionH(data[7]).toString())
 // logger.default(deltaH(data[7])(options.tempAmbRef))
 // logger.default(combustionH(data[7],500,true) / data[7].MW)

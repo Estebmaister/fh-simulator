@@ -5,9 +5,8 @@ const {logger} = require('./utils');
 const extractURIdata = (argumentsArray) => {
 	if (argumentsArray == "") return {};
 	let resultObject = {};
-	for (let i = 0; i < argumentsArray.length; ++i)
-	{
-		const argumentPair = argumentsArray[i].split('=', 2);
+  for (const iterator of argumentsArray) {
+    const argumentPair = iterator.split('=', 2);
 		if (argumentPair.length == 1) {
 			resultObject[argumentPair[0]] = "";
 		}
@@ -16,17 +15,82 @@ const extractURIdata = (argumentsArray) => {
 				argumentPair[1].replace(/\+/g, " ")
 				);
 		}
-	}
+  }
 	return resultObject;
 }
 
+// Logic to modified default options with data from browser
+const optionsModifier = (browserData, options) => {
+  const
+    maxHumidity = 100,
+    maxPatm = 1e3,
+    maxAirExcess = 300,
+    maxO2Excess = 30,
+    maxTamb = 100;
+  let optValue;
+  switch (key) {
+    case "project_title":
+      // TODO: not set yet
+      break;
+    case "project_n":
+      // TODO: not set yet
+      break;
+    case "revision_n":
+      // TODO: not set yet
+      break;
+    case "date":
+      // TODO: not set yet
+      break;
+    case "t_amb":
+      optValue = parseFloat(browserData[key])
+      if (optValue > -options.tempToK && optValue < maxTamb) 
+        options.tAmb = optValue +options.tempToK;
+      break;
+    case "humidity":
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0 && optValue <= maxHumidity) 
+        options.humidity = optValue;
+      break;
+    case "p_atm":
+      optValue = parseFloat(browserData[key])
+      if (optValue > 1e-3 && optValue < maxPatm) 
+        options.pAtm = optValue *1e3;
+      break;
+    case "air_excess":
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0 && optValue <= maxAirExcess) 
+        options.airExcess = optValue * .01;
+      break;
+    case "o2_excess":
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0 && optValue <= maxO2Excess) 
+        options.o2Excess = optValue * .01;
+      break;
+    case "o2_basis":
+      
+      break;
+    case "t_fuel":
+      
+      break;
+    case "fuel_percent":
+      
+      break;
+    case "unit_system":
+      logger.debug(`${key}: ${browserData[key]}`)
+      options.unitSystem = browserData[key];
+      break;
+    default:
+      break;
+  }
+}
+
 // Modify the fuels and options object with the Browser Data
-const insertBrowserData = (browserData, fuels, data, options, lang) => {
+const insertBrowserData = (browserData, fuels, data, options) => {
 	const browserFuels = {}
-	const fuelCompounds = data.filter( element => element.Formula in browserData )
+	const fuelCompounds = data.filter(element => element.Formula in browserData)
 
 	for (const key in browserData) {
-		const compoundArray = fuelCompounds.filter(element => element.Formula == key)
+		const compoundArray = fuelCompounds.filter(element => element.Formula==key)
 		if (compoundArray.length === 1 && browserData[key] !== "") {
 			const fuelFrac = parseFloat(browserData[key])
 			if (fuelFrac > 0 && fuelFrac <= 100) {
@@ -34,72 +98,13 @@ const insertBrowserData = (browserData, fuels, data, options, lang) => {
 			} else {
 				logger.error(`fuel fraction invalid (${fuelFrac}) for ${key}`)
 			}
-		} else if (browserData[key] !== "") {
-			let optValue
-			switch (key) {
-				case "project_title":
-					
-					break;
-				case "project_n":
-					
-					break;
-				case "revision_n":
-					
-					break;
-				case "date":
-					
-					break;
-				case "t_amb":
-					// logger.debug(key, browserData[key])
-					optValue = parseFloat(browserData[key])
-					if (optValue > -options.tempToK && optValue < 100) 
-						options.tAmb = optValue +options.tempToK;
-					break;
-				case "humidity":
-					// logger.debug(key, browserData[key])
-					optValue = parseFloat(browserData[key])
-					if (optValue >= 0 && optValue <= 100) 
-						options.humidity = optValue;
-					break;
-				case "p_atm":
-					// logger.debug(key, browserData[key])
-					optValue = parseFloat(browserData[key])
-					if (optValue > 1e-3 && optValue < 1e3) 
-						options.pAtm = optValue *1e3;
-					break;
-				case "air_excess":
-					// logger.debug(key, browserData[key])
-					optValue = parseFloat(browserData[key])
-					if (optValue >= 0 && optValue <= 300) 
-						options.airExcess = optValue * .01;
-					break;
-				case "o2_excess":
-					// logger.debug(key, browserData[key])
-					optValue = parseFloat(browserData[key])
-					if (optValue >= 0 && optValue <= 30) 
-						options.o2Excess = optValue * .01;
-					break;
-				case "o2_basis":
-					
-					break;
-				case "t_fuel":
-					
-					break;
-				case "fuel_percent":
-					
-					break;
-        case "unit_system":
-          logger.debug(key, browserData[key])
-          if (browserData[key] != undefined)
-            options.unitSystem = browserData[key];
-          break;
-				default:
-					break;
-			}
+		} else if (browserData[key] !== "" && browserData[key] !== undefined) {
+      // Case when the key is not empty and isn't a fuel either
+			optionsModifier(browserData, options);
 		}
 	}
 
-	if (Object.keys(browserFuels).length !== 0) fuels = browserFuels
+	if (Object.keys(browserFuels).length !== 0) fuels = browserFuels;
 }
 
 const outputData = (result, browserData, lang) => {
@@ -109,7 +114,8 @@ const outputData = (result, browserData, lang) => {
   let outputString = ''
   if (lang == 'es') {
     outputString = `
-Datos de entrada (en caso de no haber sido introducidos, tomará el predeterminado)
+Datos de entrada
+  (en caso de no haber sido introducidos, tomará el predeterminado)
 
   Sistema de unidades:   ${result.debug_data["unitSystem"]}
   Presión atmosférica:   ${result.debug_data["atmPressure"]}
@@ -218,7 +224,7 @@ Total flue gas moles and percentage (per fuel mol)
 const browserProcess = (fuels, data, options, combustion) => {
 
   let lang = 'en';  
-  const browserLang = window.location.pathname.split('/'); // ',en,result.html'}
+  const browserLang = window.location.pathname.split('/'); // ex ',en,result.html'}
   if (browserLang.length > 0) browserLang.forEach(element => {if (element == 'es') lang = 'es'});
   options.lang = lang;
 

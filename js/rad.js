@@ -15,12 +15,7 @@
  * Q_out = Q_R + Q_shield + Q_losses + Q_flue_gases
  * Q_R = Q_rad + Q_conv = Q_fluid(out-in) = m_fluid*Cp_fluid(t_out - t_in)
  *****************************************************************/
-const {
-  newtonRaphson, 
-  logger, 
-  round, 
-  unitConv
-} = require('./utils');
+const {newtonRaphson, logger, round, unitConv} = require('./utils');
 
 // TODO: delete after testing inside
 const {options, initSystem} = require('./utils');
@@ -49,7 +44,7 @@ const emissivity = (pl) => {
 
   return (temp) => A(temp) + B(temp)*pl + C(temp)*pl**2 + D(temp)*pl**3;
 };
-logger.debug(`emissivity: ${emissivity(5.207)(1498)}`);
+logger.warn(`{"emissivity": ${emissivity(5.207)(1498)}}`);
 
 /** (m2) parameters must be in ft */
 const Ar_calc = (width, length, height) => {
@@ -61,7 +56,7 @@ const Ar_calc = (width, length, height) => {
   const Ar2 = 2*(22.7+5.3+1)*width + 2*wall_length + base;
   const Ar = 2*wall_width + 2*wall_length + 1.234*base;
 
-  logger.debug(`Ar prev (ft): ${Ar2} vs Ar mine (ft): ${Ar}`);
+  logger.warn(`{"Ar prev (ft)": ${Ar2},"Ar calc (ft)": ${Ar}}`);
 
   return unitConv.fttom(Ar)*unitConv.fttom(1);
 };
@@ -82,17 +77,17 @@ const effectivity = (pl, alpha, Acp, a_shld, Acp_shld, Ar) => {
   };
 
   const factors = (factor, constant = constants) => {
-    return ((Aw_aAcp) => 
-    constant.a[factor]*Aw_aAcp**3 + 
-    constant.b[factor]*Aw_aAcp**2 + 
-    constant.c[factor]*Aw_aAcp + constant.d[factor]);
+    return ((Aw_a_Acp) => 
+    constant.a[factor]*Aw_a_Acp**3 + 
+    constant.b[factor]*Aw_a_Acp**2 + 
+    constant.c[factor]*Aw_a_Acp + constant.d[factor]);
   };
 
   const 
     A = factors("A"),
     B = factors("B"),
     C = factors("C");
-  // logger.debug(`Aw/aAcp: ${round(Aw_aAcp)}, A: ${round(A(Aw_aAcp))}, B: ${round(B(Aw_aAcp))}, C: ${round(C(Aw_aAcp))}`);
+  // log logger.debug(`Aw/aAcp: ${round(Aw_aAcp)}, A: ${round(A(Aw_aAcp))}, B: ${round(B(Aw_aAcp))}, C: ${round(C(Aw_aAcp))}`);
 
   return (temp) => A(Aw_aAcp) + B(Aw_aAcp)*emiss(temp) + C(Aw_aAcp)*emiss(temp)**2;
 };
@@ -125,15 +120,16 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     t_in = 0,
     /** (K) of the fluid process */
     t_out =   params.t_out,    // (K)
-    /** (kmol/h) */
+    /** (kg/h) */
     m_fuel = m_fuel_seed || params.m_fuel;
   
   if (params === null || params === undefined) params = {}
   const // Temperatures
-    t_air =   params.t_air,    // (K)
-    t_fuel =  params.t_fuel,   // (K)
-    t_amb =   params.t_amb,    // (K)
-    t_in_conv=params.t_in_conv,// (K)
+    t_air     = params.t_air,    // (K)
+    t_fuel    = params.t_fuel,   // (K)
+    t_amb     = params.t_amb,    // (K)
+    t_in_conv = params.t_in_conv,// (K)
+    // (K) Fluid bulk temperature
     Tb = (tOut, tIn = t_in) => 0.5*(tIn + tOut);
 
     const // Fired heater parameters
@@ -162,8 +158,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     params.Pitch_rad / params.Do_rad,
 
     /** (-) Ratio pitch/external_diameter of tubes */
-    ratio_pitch_do_shld = params.Pass_number * 
-    params.Pitch_shld / params.Do_shld,
+    //TODO: unused ratio_pitch_do_shld = params.Pass_number * params.Pitch_shld / params.Do_shld,
     
     /** (h-m2-C/kJ) internal fouling factor */
     Rfi =     params.Rfi,
@@ -201,9 +196,9 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     heat_loss_percent = params.heat_loss_percent || .015,
     /** (kg/h) */
     m_fluid = params.m_fluid                  || 225_700,
-    /** (kmol/h) */
+    /** (kg/h) */
     m_air =   (mFuel = m_fuel) => params.m_air_ratio*mFuel,
-    /** (kmol/h) */
+    /** (kg/h) */
     m_flue =  (mFuel = m_fuel) => params.m_flue_ratio*mFuel,
     /** (kJ/kg) net calorific value */
     NCV =     params.NCV,
@@ -223,15 +218,15 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   /** (kJ/h) Duty in the radiant section */
   let duty_rad = 0;
   const 
-  // TODO: set this coff
-  /** Emissive (effectivity) factor as function of temp */
+    /** Emissive (effectivity) factor as function of temp */
     F = (temp) => effectivity(PL, alpha, Acp, alpha_shld, Acp_shld, Ar)(unitConv.KtoF(temp)),
     //F = effectivity(PL, alpha, Acp, alpha_shld, Acp_shld, Ar),
-  /** Prandtl value (miu*Cp/kw) of the fluid as function of temp */
+    /** Prandtl value (miu*Cp/kw) of the fluid as function of temp */
     prandtl = (t) => miu(t) * Cp_fluid(t) *  3.6/kw_fluid(t),
-  /** Reynolds value (G*Di/miu) of the fluid as function of temp */
-    reynolds = (t) => 
-      (m_fluid/3.6/(pi*(Di**2))) * Di/miu(t);
+    /** Mass flow per area unit */
+    G = (m_fluid/3.6/(pi*(Di**2))), // 3.6 conversion factor
+    /** Reynolds value (G*Di/miu) of the fluid as function of temp */
+    reynolds = (t) => G * Di/miu(t);
 
   /** (kJ/h-m2-C) internal heat transfer coff */
   const hi = (tB,tW = tB) => .023 * (kw_fluid(tB) / Di) * 
@@ -263,7 +258,6 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
 
   // ******* Heat taken out of radiant section ********
   //
-  //TODO: factor de perdida (%)
   /** Heat losses through setting (1.5% of Q_release) */
   const Q_losses = (mFuel = m_fuel) => heat_loss_percent * Q_rls(mFuel);
 
@@ -318,7 +312,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     flame = newtonRaphson(
       TgBalance_OutTemp, 1000, params.NROptions, "rad_Tg_Tout"
     );
-    if (flame != false) t_g = flame;
+    if (flame) t_g = flame;
 
     // Calculating fuel mass
     const mFuelBalance = (mFuel) => Q_out(t_g, t_out, mFuel) - Q_in(mFuel);
@@ -329,26 +323,24 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     m_fuel = newtonRaphson(
       mFuelBalance, mass_fuel_seed, params.NROptions, "rad_mFuel"
     );
-    if (m_fuel != false) params.m_fuel = m_fuel;
+    if (m_fuel) params.m_fuel = m_fuel;
 
-    logger.info(`
-  vars with t_out given:
-    T_(in) given:           ${unitSystem.tempC(t_in_conv)}
-    T_(out) given:          ${unitSystem.tempC(t_in)}
-    T_(inRad) from Duty est:${unitSystem.tempC(t_in)}
-    T_(out) from Duty est:  ${unitSystem.tempC(t_out)}
-    T_(w) from Duty est:    ${unitSystem.tempC(Tw(Tb(t_out)))}
-    M_(seed): ${unitSystem.mass_flow(mass_fuel_seed)}
-    Prandtl:  ${round(prandtl(Tb(t_out)))}
-    Reynolds: ${round(reynolds(Tb(t_out)))}
-    Alpha:    ${round(alpha)}
-    MBL:      ${round(MBL)}
-    Pco2:     ${round(params.Pco2)}
-    Ph2o:     ${round(params.Ph2o)}
-    PL:       ${round(PL)}
-    F(Tg):    ${round(F(t_g))}
-    F_desired:${0.635}
-  `);
+    logger.info(`vars with t_out given",
+    "T_(in) given":           "${unitSystem.tempC(t_in_conv)}",
+    "T_(out) given":          "${unitSystem.tempC(t_in)}",
+    "T_(inRad) from Duty est":"${unitSystem.tempC(t_in)}",
+    "T_(out) from Duty est":  "${unitSystem.tempC(t_out)}",
+    "T_(w) from Duty est":    "${unitSystem.tempC(Tw(Tb(t_out)))}",
+    "M_(seed)": "${unitSystem.mass_flow(mass_fuel_seed)}",
+    "Prandtl":  ${round(prandtl(Tb(t_out)))},
+    "Reynolds": ${round(reynolds(Tb(t_out)))},
+    "Alpha":    ${round(alpha)},
+    "MBL":      ${round(MBL)},
+    "Pco2":     ${round(params.Pco2)},
+    "Ph2o":     ${round(params.Ph2o)},
+    "PL":       ${round(PL)},
+    "F(Tg)":    ${round(F(t_g))},
+    "F_desired":"${0.635}`);
 
   } else if (m_fuel_seed !== undefined) { // Given mass_fuel
     // Duty effective from from q release by fuel
@@ -369,7 +361,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     flame = newtonRaphson(
       TgBalance_MassFuel, 1000, params.NROptions, "rad_Tg_mFuel"
     );
-    if (flame != false) t_g = flame;
+    if (flame) t_g = flame;
 
     // Calculating t_out
     const tOutBalance = (tOut) => m_fluid * Cp_fluid(t_in,t_out_seed) * 
@@ -378,7 +370,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     t_out = newtonRaphson(
       tOutBalance, t_out_seed, params.NROptions, "rad_Tout"
     );
-    if (t_out != false) params.t_out = t_out;
+    if (t_out) params.t_out = t_out;
 
     // Discrepancies on recalculation
     logger.info(`t_out, seed: ${t_out_seed} vs calc: ${t_out}`)
@@ -394,29 +386,31 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   }
 
   // TODO: Delete debugger
-  logger.debug(`
-  vars to check:
-    tG:         ${unitSystem.tempC(t_g)} vs 1500F
-    kw_tube:    ${unitSystem.thermal(kw_tube)}
-    kw_fluid:   ${unitSystem.thermal(kw_fluid(Tb(t_out)))}
-    h_conv:     ${unitSystem.convect(h_conv)}
-    duty:       ${unitSystem.heat_flow(duty)}
-    duty_rad:   ${unitSystem.heat_flow(duty_rad)}
-    At_rad:     ${unitSystem.area(At)}
-    duty_flux:  ${unitSystem.heat_flux(duty_rad/At)}
-    Do/Di:      ${round(Do/Di)}
-    hi refer:   ${unitSystem.convect( 2992 )}
-    hi post 1:  ${unitSystem.convect( hi(Tb(t_out) ) )}
-    hi post 2:  ${unitSystem.convect( hi(Tb(t_out),Tw(Tb(t_out)) ) )}
-    hi post 3:  ${unitSystem.convect( hi(Tb(t_out),Tw(Tb(t_out),Tw(Tb(t_out)) ) ) )}
-    factor_hi pre: ${Rfi + 1/2992                        + (Di*Math.log(Do/Di)/(2*kw_tube))}
-    factor_hi post:${Rfi + 1/hi(Tb(t_out),Tw(Tb(t_out))) + (Di*Math.log(Do/Di)/(2*kw_tube))}
+  logger.warn(`"vars to check in rad section",
+    "tG":         "${unitSystem.tempC(t_g)} vs 1500F",
+    "kw_tube":    "${unitSystem.thermal(kw_tube)}",
+    "kw_fluid":   "${unitSystem.thermal(kw_fluid(Tb(t_out)))}",
+    "h_conv":     "${unitSystem.convect(h_conv)}",
+    "duty":       "${unitSystem.heat_flow(duty)}",
+    "duty_rad":   "${unitSystem.heat_flow(duty_rad)}",
+    "At_rad":     "${unitSystem.area(At)}",
+    "duty_flux":  "${unitSystem.heat_flux(duty_rad/At)}",
+    "Do/Di":      ${round(Do/Di)},
+    "hi refer":   "${unitSystem.convect( 2992 )}",
+    "hi post 1":  "${unitSystem.convect( hi(Tb(t_out) ) )}",
+    "hi post 2":  "${unitSystem.convect( hi(Tb(t_out),Tw(Tb(t_out)) ) )}",
+    "hi post 3":  "${unitSystem.convect( hi(Tb(t_out),Tw(Tb(t_out),Tw(Tb(t_out)) ) ) )}",
+    "factor_hi pre": ${Rfi + 1/2992                        + (Di*Math.log(Do/Di)/(2*kw_tube))},
+    "factor_hi post":${Rfi + 1/hi(Tb(t_out),Tw(Tb(t_out))) + (Di*Math.log(Do/Di)/(2*kw_tube))}
   `)
 
   // **************************************************
-  params.t_out = t_out
-  params.t_in_rad = t_in
-  params.t_g = t_g
+  params.t_out    = t_out;
+  params.t_in_rad = t_in;
+  params.t_g      = t_g;
+  params.duty_rad = duty_rad;
+  params.q_rad_sh = Q_shld(t_g);
+  params.m_flue   = m_flue(m_fuel);
 
   const rad_result = {
     "m_fuel":   m_fuel,
@@ -445,37 +439,33 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "Cp_air":   Cp_air,
     "Cp_flue":  Cp_flue(t_g),
   }
-  logger.debug(`
-    m_fuel:   ${unitSystem.mass_flow( m_fuel )}
-    t_in_rad: ${unitSystem.tempC( t_in )}
-    t_out:    ${unitSystem.tempC( t_out )}
-    Tw:       ${unitSystem.tempC( Tw(Tb(t_out), Tw(Tb(t_out))) )}
-    t_g:      ${unitSystem.tempC( t_g )}
-
-    Q_in:     ${unitSystem.heat_flow( Q_in(m_fuel) )}
-    Q_rls:    ${unitSystem.heat_flow( Q_rls(m_fuel) )}
-    Q_air:    ${unitSystem.heat_flow( Q_air(m_fuel) )}
-    Q_fuel:   ${unitSystem.heat_flow( Q_fuel(m_fuel) )}
-
-    Q_out:    ${unitSystem.heat_flow( Q_out(t_g, t_out, m_fuel) )}
-    Q_flue:   ${unitSystem.heat_flow( Q_flue(t_g) )}
-    Q_losses: ${unitSystem.heat_flow( Q_losses(m_fuel) )}
-    Q_shld:   ${unitSystem.heat_flow( Q_shld(t_g) )}
-    Q_conv:   ${unitSystem.heat_flow( Q_conv(t_g) )}
-    Q_rad:    ${unitSystem.heat_flow( Q_rad(t_g, t_out) )}
-
-    Q_R:      ${unitSystem.heat_flow( Q_R(t_g) )}
-    Q_fluid:  ${unitSystem.heat_flow( Q_fluid() )}
-
-    Cp_fluid: ${unitSystem.cp( Cp_fluid(t_in,t_out) )}
-    Cp_fuel:  ${unitSystem.cp( Cp_fuel )}
-    Cp_air:   ${unitSystem.cp( Cp_air )}
-    Cp_flue:  ${unitSystem.cp( Cp_flue(t_g) )}
-    Vs_flue:  ${unitSystem.viscosity( params.flueViscosity(t_g) )}
+  logger.warn(`{
+    "m_fuel":   "${unitSystem.mass_flow( m_fuel )}",
+    "t_in_rad": "${unitSystem.tempC( t_in )}",
+    "t_out":    "${unitSystem.tempC( t_out )}",
+    "Tw":       "${unitSystem.tempC( Tw(Tb(t_out), Tw(Tb(t_out))) )}",
+    "t_g":      "${unitSystem.tempC( t_g )}",
+    "Q_in":     "${unitSystem.heat_flow( Q_in(m_fuel) )}",
+    "Q_rls":    "${unitSystem.heat_flow( Q_rls(m_fuel) )}",
+    "Q_air":    "${unitSystem.heat_flow( Q_air(m_fuel) )}",
+    "Q_fuel":   "${unitSystem.heat_flow( Q_fuel(m_fuel) )}",
+    "Q_out":    "${unitSystem.heat_flow( Q_out(t_g, t_out, m_fuel) )}",
+    "Q_flue":   "${unitSystem.heat_flow( Q_flue(t_g) )}",
+    "Q_losses": "${unitSystem.heat_flow( Q_losses(m_fuel) )}",
+    "Q_shld":   "${unitSystem.heat_flow( Q_shld(t_g) )}",
+    "Q_conv":   "${unitSystem.heat_flow( Q_conv(t_g) )}",
+    "Q_rad":    "${unitSystem.heat_flow( Q_rad(t_g, t_out) )}",
+    "Q_R":      "${unitSystem.heat_flow( Q_R(t_g) )}",
+    "Q_fluid":  "${unitSystem.heat_flow( Q_fluid() )}",
+    "Cp_fluid": "${unitSystem.cp( Cp_fluid(t_in,t_out) )}",
+    "Cp_fuel":  "${unitSystem.cp( Cp_fuel )}",
+    "Cp_air":   "${unitSystem.cp( Cp_air )}",
+    "Cp_flue":  "${unitSystem.cp( Cp_flue(t_g) )}",
+    "Vs_flue":  "${unitSystem.viscosity( params.flueViscosity(t_g) )}"}
   `);
   //logger.info("debug", JSON.stringify(rad_result, null, 2))
 
-  //let t_out_recall = t_in - t_out + (Q_rad(t_g) + Q_conv(t_g)) / (m_fluid*Cp_fluid(t_in,t_out))
+  // recalculation let t_out_recall = t_in - t_out + (Q_rad(t_g) + Q_conv(t_g)) / (m_fluid*Cp_fluid(t_in,t_out))
   return rad_result
 }
 
