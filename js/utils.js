@@ -148,7 +148,7 @@ const LMTD = (t_cold_in, t_cold_out, t_hot_in, co_current) => {
     }
     
   // (tg_sh) => ( (tg_r - tf_out) - (tg_sh - tf_in) ) / ln( (tg_r - tf_out) / (tg_sh-tf_in) )
-  return (t) => delta_t1 - delta_t2(t) / ln( delta_t1 / delta_t2(t) );
+  return (t) => delta_t1 - delta_t2(t) / Math.log( delta_t1 / delta_t2(t) );
 };
 
 const 

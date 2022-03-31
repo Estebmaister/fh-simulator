@@ -325,6 +325,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     );
     if (m_fuel) params.m_fuel = m_fuel;
 
+    /* TODO: remove this logger *
     logger.info(`vars with t_out given",
     "T_(in) given":           "${unitSystem.tempC(t_in_conv)}",
     "T_(out) given":          "${unitSystem.tempC(t_in)}",
@@ -340,7 +341,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "Ph2o":     ${round(params.Ph2o)},
     "PL":       ${round(PL)},
     "F(Tg)":    ${round(F(t_g))},
-    "F_desired":"${0.635}`);
+    "F_desired":"${0.635}`); //*/
 
   } else if (m_fuel_seed !== undefined) { // Given mass_fuel
     // Duty effective from from q release by fuel
@@ -385,7 +386,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     params.err += "-wrong call for rad section, no seed for mass fuel or out temp."
   }
 
-  // TODO: Delete debugger
+  /* TODO: Delete debugger
   logger.warn(`"vars to check in rad section",
     "tG":         "${unitSystem.tempC(t_g)} vs 1500F",
     "kw_tube":    "${unitSystem.thermal(kw_tube)}",
@@ -402,7 +403,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "hi post 3":  "${unitSystem.convect( hi(Tb(t_out),Tw(Tb(t_out),Tw(Tb(t_out)) ) ) )}",
     "factor_hi pre": ${Rfi + 1/2992                        + (Di*Math.log(Do/Di)/(2*kw_tube))},
     "factor_hi post":${Rfi + 1/hi(Tb(t_out),Tw(Tb(t_out))) + (Di*Math.log(Do/Di)/(2*kw_tube))}
-  `)
+  `) //*/
 
   // **************************************************
   params.t_out    = t_out;
@@ -439,6 +440,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "Cp_air":   Cp_air,
     "Cp_flue":  Cp_flue(t_g),
   }
+  /* TODO: Delete debugger
   logger.warn(`{
     "m_fuel":   "${unitSystem.mass_flow( m_fuel )}",
     "t_in_rad": "${unitSystem.tempC( t_in )}",
@@ -462,7 +464,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "Cp_air":   "${unitSystem.cp( Cp_air )}",
     "Cp_flue":  "${unitSystem.cp( Cp_flue(t_g) )}",
     "Vs_flue":  "${unitSystem.viscosity( params.flueViscosity(t_g) )}"}
-  `);
+  `); //*/
   //logger.info("debug", JSON.stringify(rad_result, null, 2))
 
   // recalculation let t_out_recall = t_in - t_out + (Q_rad(t_g) + Q_conv(t_g)) / (m_fluid*Cp_fluid(t_in,t_out))
