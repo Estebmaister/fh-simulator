@@ -55,9 +55,6 @@ const shieldSection = (params) => {
     miu_fluid= (temp) => params.miu_fluid(temp),
     /** (cP -- g/m-s) flue Viscosity */
     miu_flue = (temp) => params.flueViscosity(temp),
-
-    /** (kJ/h.m2.c) Film convective heat transfer coff */
-    h_conv = params.h_conv || 30.66,
     /** - number of shield tubes */
     N_shld = params.N_shld || 8,
     /** (m) effective tube length*/
@@ -72,7 +69,7 @@ const shieldSection = (params) => {
     Acp_shld = N_shld * params.Pitch_shld * L,
     Ao = 1,
     /** (kJ/h-m2-K^4) */ //TODO: Unused value
-    sigma = 2.041e-7, // 5.67e-11 (W.m-2.K-4)
+    // sigma = 2.041e-7, // 5.67e-11 (W.m-2.K-4)
     /** (m2) Area of tubes in bank */
     At = N_shld * pi * Do * L;
 

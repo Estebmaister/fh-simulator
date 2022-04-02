@@ -115,14 +115,14 @@ const newtonRaphson = (f, fp, x0, nrOptions, name) => {
   return false;
 };
 
-/** Returns a linear function to approximate the value,
+/** Returns a linear function f(x)=y to approximate the value,
  * in case that the value is constant or there isn't data
  * about the changes, it can be called with only "y1"
  * to make a function that always return y1.
  */
 const linearApprox = ({x1,x2,y1,y2}) => {
   if (typeof y1 !== "number") {
-    logger.error(`call for linearApprox with bad value: ${y1}`)
+    logger.error(`call for linearApprox with incorrect value type for y1: ${y1}`)
     return () => 0;
   }
   if (x1 == x2 || x2 == undefined || y2 == undefined) 
@@ -130,6 +130,18 @@ const linearApprox = ({x1,x2,y1,y2}) => {
   const m = (y2 - y1) / (x2 - x1);
   return (x) => m * (x - x1) + y1;
 };
+
+const viscosityApprox = ({t1,t2,v1,v2}) => {
+  if (typeof v1 !== "number") {
+    logger.error(`call for viscosityApprox with incorrect value type for v1: ${v1}`)
+    return () => 0;
+  }
+  if (t1 == t2 || t2 == undefined || v2 == undefined) 
+    return () => v1;
+  const B = Math.log(v1/v2) / (1/t1 - 1/t2)
+  const A = v1 * Math.exp(-B/t1);
+  return (temp) => A * Math.exp(B/temp);
+}
 
 
 /** (Tref1, Tref2, T1, co-current) Returns a function of temperature (T2) 
@@ -353,6 +365,7 @@ module.exports = {
   round,
   roundDict,
   linearApprox,
+  viscosityApprox,
   initSystem,
   normalize,
   flueViscosity,
