@@ -14,12 +14,20 @@
  * Note: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
-const {newtonRaphson, options, logger, linearApprox, unitConv, initSystem} = require('./js/utils');
-const {combSection} = require('./js/combustion');
+const {
+  logger, 
+  options, 
+  unitConv, 
+  initSystem,
+  linearApprox, 
+  newtonRaphson, 
+  viscosityApprox 
+} = require('./js/utils');
+const data = require('./data/data.json');
 const {radSection} = require('./js/rad');
 const {shieldSection} = require('./js/shield');
+const {combSection} = require('./js/combustion');
 const {browserProcess} = require('./js/browser');
-const data = require('./data/data.json');
 
 const createParams = (opts) => {
   return {
@@ -41,9 +49,9 @@ const createParams = (opts) => {
       unitConv.BTUtokJ(
         71.5276 * 1e3),     // (kJ/h)
     m_fluid: 500_590,       // (kg/h) 
-    miu_fluid: linearApprox({
-      x1:unitConv.FtoK(678),y1:1.45,
-      x2:unitConv.FtoK(772),y2:0.96
+    miu_fluid: viscosityApprox({
+      t1:unitConv.FtoK(678),v1:1.45,
+      t2:unitConv.FtoK(772),v2:0.96
     }),                     // (cP)
     Cp_fluid: linearApprox({
       x1:unitConv.FtoK(678),y1:unitConv.CpENtoCpSI(0.676),
