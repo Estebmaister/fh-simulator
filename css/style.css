@@ -12,7 +12,7 @@
 /* ------- 1. Page structure ------*/
 /* ------- 2. Lang switch    ------*/
 /* ------- 3. Navbar (header)------*/
-/* ------- 4. Social         ------*/
+/* ------- 4. Output data    ------*/
 /* ------- 5. Footer         ------*/
 /* ------- 6. Form Structure ------*/
 /* ------- 7. Animation      ------*/
@@ -163,6 +163,13 @@ footer {
 }
 .nav-sec:active {
   background-color: transparent;
+}
+
+/* ------- 4. Output data    ------*/
+pre {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 
 /* -------    Footer         ------*/
