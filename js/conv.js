@@ -1,233 +1,251 @@
-const {newtonRaphson, options, log} = require('./utils');
+const {newtonRaphson, logger, LMTD, round, unitConv} = require('./utils');
 
-const convSection_full = (params) => {
-  //Tube Spacing, in
-  tspc = 8
-  //Number Tubes Wide
-  Nwide = 8
-  //Tube Effective Length, ft
-  tlgth = 13.000
-  //Number Of Tubes = 48
+// TODO: delete after testing inside
+const {options, initSystem} = require('./utils');
+const unitSystem = initSystem('EN');
 
-  // Gas flow, lb/hr = 100,000
-  Wgas = 100_000
+const convSection = (params) => {
+  // Failing in case of a wrong call
+  if (params === null || params === undefined) {
+    logger.error("wrong call for convection section, no parameters set at call.")
+    return {};
+  }
 
-  // hc = Convection heat transfer coefficient, Btu/hr-ft2-F
-  // d_o = Tube outside diameter, in
-  d_o = 4.500
-  // kb = Gas thermal conductivity, Btu/hr-ft-F
-  kb = 0.0315
-  // cp = Gas heat capacity, Btu/lb-F
-  cp = 0.2909
-  // mb = Gas dynamic viscosity, lb/hr-ft
-  mb = 0.0823
-  //net free area
-  NFA = Nwide*tspc/12*tlgth-Nwide*d_o/12*tlgth
-  // Gn = Mass velocity of gas, lb/hr-ft2
-  Gn = Wgas / NFA
+  let
+    tg_in  = params.tg_sh,  // (K) Inlet gas temp coming from shld sect
+    tg_out = 0,             // (K) Outlet gas temp
+    t_out  = params.t_in_sh,// (K) Outlet fluid temp going to shld sect
 
-  // hc = Outside heat transfer coefficient, Btu/hr-ft2-F
-  // For a staggered tube arrangement,
-  hc = 0.33*kb*(12/d_o) * ((cp*mb)/kb)**(1/3) * ((d_o/12)*(Gn/mb))**0.6
-  // And for an inline tube arrangement,
-  hc_inline = 0.26*kb*(12/d_o) * ((cp*mb)/kb)**(1/3) * ((d_o/12)*(Gn/mb))**0.6
+    // --- First estimation: t_in equal to the one given
+    t_in   = params.t_in_conv, // (K) Inlet process fluid temp
+    t_in_calc = 0;  // (K) Recalculation for Inlet process fluid temp
 
-  // hr = Outside radiation heat transfer coefficient, Btu/hr-ft2-F
-  hr = 0
-  // Rfo = Outside fouling resistance, hr-ft2-F/Btu
-  Rfo = 0
-  // he = Effective outside heat transfer coefficient, Btu/hr-ft2-F
-  he = 1/(1/(hc+hr)+Rfo)
-  // hi = Inside film heat transfer coefficient, Btu/hr-ft2-F
-  // tw = Tubewall thickness, in
-  // kw = Tube wall thermal conductivity, Btu/hr-ft-F
-  kw = 
-  // Ao = Outside tube surface area, ft2/ft
-  Ao = 2
-  // Aw = Mean area of tube wall, ft2/ft
-  Aw = 1
-  // Ai = Inside tube surface area, ft2/ft
-  Ai = 1
-  // Rfi = Inside fouling resistance, hr-ft2-F/Btu
-  Rfi = 0
+  /** (K) bulk temp func (second arg default to conv outlet fluid temp) */
+  const Tb = (tIn, tOut = t_out) => 0.5*(tIn + tOut);
+  
+  const // Process Variables
+    m_fluid  = params.m_fluid, // (kg/h) Fluid mass flow
+    m_flue   = params.m_flue,  // (kg/h) Flue mass flow
+    Cp_fluid = (tIn,tOut=tIn) => params.Cp_fluid(Tb(tIn, tOut)), // (kJ/kg.K)
+    Cp_flue  = (tG,tG_out=tG) => params.Cp_flue(Tb(tG, tG_out)), // (kJ/kg.K)
+    kw_fluid = (temp) => params.kw_fluid(temp),//(kJ/h-m-C - J/s-m-C-3.6) fluid thermal conductivity
+    kw_tube  = (temp) => params.kw_tube(temp),// (kJ/h-m-C ->J/s-m-C-3.6) tube thermal cndct
+    kw_flue  = (temp) => params.kw_flue(temp),// (kJ/h-m-C) flue thermal cndct 
+    miu_fluid= (temp) =>params.miu_fluid(temp),//(cP - g/m-s) fluid Viscosity
+    miu_flue = (temp) => params.miu_flue(temp);//(cP - g/m-s) flue Viscosity
 
-  // Outside thermal resistance, hr-ft2-F/Btu
-  Ro = 1/he
-  // Tube wall thermal resistance, hr-ft2-F/Btu
-  // Rwo = (tw/12*kw)*(Ao/Aw)
-  Rwo = 0
-  // Inside thermal resistance, hr-ft2-F/Btu
-  // Rio = ((1/hi)+Rfi)*(Ao/Ai)
-  Rio = 0
-  Rto = Ro + Rwo + Rio
-  Uo = 1/Rto
-  return Uo
-  Q_in = Q_flue_in + Q_fluid_in
-  Q_out = Q_flue_out + Q_fluid_out
+  const // Parameters
+    Rfo = params.Rfo, // (h-m2-C/kJ) external fouling factor
+    Rfi = params.Rfi, // (h-m2-C/kJ) internal fouling factor
+    N  = params.N_conv, // - number of conv tubes
+    L  = params.L_conv, // (m) effective tube length
+    Do = params.Do_conv,// (m) external diameter conv section 
+    Di = params.Do_conv - params.Sch_sh_cnv*2,// (m) int diameter conv sect
+    S_tube = params.Pitch_sh_cnv, // (m) Tube spacing, NPS
+    Nr = params.N_conv/ params.Tpr_conv, // (-) Number of tube rows //TODO: implement
+    
+    Acp = N * S_tube * L,    // (m2) Cold plane area of shld tube bank //TODO: use convective equation
+    At = N *Math.PI *Do *L,  // (m2) Area of tubes in bank, total outside surface area, m2/m
+    Ai = Math.PI *(Di**2) /2,// (m2) Inside tube surface area, m2/m
+    An = ((N/Nr)*(S_tube - Do) + S_tube/2)*L , // Free area for flue flow at shld sect
+    
+    Afo = 1,  // (m2) Fin outside surface area, m2/m // TODO: implement
+    Apo = At, // (m2) Outside tube surface area, m2/m
+    Ef  = 1,  // (-) Fin efficiency
 
-  Q_conv = m_fluid*Cp_fluid*(Tin-zr - Ta)
-  Q_conv = m_flue*Cp_flue*(Tg - Te)
-  Q_conv = At*Uconv*TLMD
+    /** (ft) Mean Beam Length, dim ratio 1-2-1 to 1-2-4*/
+    MBL = 2/3 * (params.Width_rad*params.Length_rad*params.Height_rad) **(1/3), //TODO: implement
+    PL = (params.Ph2o + params.Pco2) * MBL, // PP*MBL
+    
+    cnv_fact = 3_600 * 1e-3; // (g/s -> kg/h) secondsToHours * 1/k
+
+  logger.warn(`Acp_conv: ${ round( unitConv.m2toft2(Acp) ) } ft`);
+
+  const // Process Functions
+    prandtl = (t) => miu_fluid(t)*cnv_fact *Cp_fluid(t)/kw_fluid(t),// (-) miu*Cp/kw
+    prandtl_flue = (t)=> miu_flue(t)*cnv_fact*Cp_flue(t)/kw_flue(t),// (-)
+    G = (m_fluid/cnv_fact) /Ai, // Fluid mass flow per area unit inside tubes
+    reynolds = (t) => G * Di/miu_fluid(t), // (-) G*Di/miu
+    // Gn it's the mass speed based on the free area for the gas flow (the space between the tubes across the heater).
+    Gn = (m_flue/cnv_fact) /An,
+    reynolds_flue = (t) => Gn * Do/miu_flue(t), // (-) G*Di/miu
+
+    j = (tG_b) => colburnFactor(reynolds_flue, Tw, params)(tG_b),
+    gr = (_tB, _tW) => 3.5*cnv_fact, // (Btu/hr-ft2-F) Outside radiation factor //TODO: implement and convert
+
+    /** (kJ/m²h-°C) internal heat transfer coff */
+    hi = (tB, tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *
+      prandtl(tB)**(1/3) *(miu_fluid(tB)/miu_fluid(tW))**.14,
+    /** (kJ/m²h-°C) effective radiative coff wall tube */
+    hr = (tG_b, tW) => 2.2 *gr(tG_b, tW) *(PL)**.50 *(Apo/At)**.75,
+    /** (kJ/m²h-°C) * film heat transfer coff */
+    hc = (tG_b) => j(tG_b) *Gn *Cp_flue(tG_b) *prandtl_flue(tG_b)**(-.67), // hc =.33*(kt_g_b /Do) * (prandtl(t_g_b))**(1/3) * (reynolds(t_g_b) )**.6
+    /** (kJ/m²h-°C) external heat transfer coff */
+    ho = (tG_b, tW) => 1/( 1/(hc(tG_b) +hr(tG_b,tW)) +Rfo ),
+    he = (tG_b, tW) => ho(tG_b, tW) *(Ef*Afo + Apo) / At; //TODO: check fin area calc
+
+    
+  /** Q_fluid = M *Cp *deltaT */
+  const Q_fluid = (tIn, tOut = t_out) => m_fluid *Cp_fluid(tIn, tOut) *(tOut -tIn);
+  const duty_conv = (tIn) => Q_fluid(tIn);
+
+  /** Tw = Average tube wall temperature in Kelvin degrees */
+  const Tw = (tB = Tb(t_out, t_in) , tW = tB, tIn = t_in) => (duty_conv(tIn) /At) * 
+    (Do/Di) *( Rfi +1/hi(tB,tW) +( Di *Math.log(Do/Di) /(2*kw_tube(tW) )) ) +tB;
+
+  /** LMTD counter-current */
+  const LMTD_Tin = (tIn) => LMTD(tIn, t_out, tg_in, tg_out);
+
+  const // Thermal Resistances (hr-ft2-F/Btu)
+    R_int = (tB, tW) => Do/Di * (1/hi(tB, tW) + Rfi),         // Inside
+    R_tube =  (tW)  => Do * Math.log(Do/Di) / (2*kw_tube(tW)),// Tube wall
+    R_ext = (tG_b, tW) => 1/he(tG_b, tW),                     // Outside
+    
+    R_sum = (tG_b, tB, tW) => R_ext(tG_b, tW) + R_tube(tW) + R_int(tB,tW),
+    Uo  = (tG_b, tB, tW) => 1 / R_sum(tG_b, tB, tW);
+  
+  
+  /** Q_flue  = M *Cp *deltaT */
+  const Q_flue = (tG_in, tG_out) => m_flue*Cp_flue(tG_in,tG_out) *(tG_in -tG_out);
+
+  /** Q_conv = Uo *AO *LMTD + Q_rad_conv */
+  const Q_conv = (tIn, tG_in, tG_out) => 
+    Uo( Tb(tG_out, tG_in), Tb(tIn), Tw(Tb(tIn),Tw(Tb(tIn))) ) * At * LMTD_Tin(tIn);
+
+  const tg_out_func = (tG_out) => Q_flue(tg_in, tG_out) - Q_fluid(t_in, t_out);
+  const Tin_conv_func = (tIn) => Q_fluid(tIn) - Q_conv(tIn, tg_in, tg_out);
+
+  // -------- 1st estimation of tg_out   #.#.#.#.#
+  tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_convective-1");
+  t_in_calc = newtonRaphson(Tin_conv_func, t_in, params.NROptions, "T_in_convective-1");
+
+
+  // TODO: Delete debugger
+  logger.warn(`"vars to check in shld section",
+    "t_in_conv":  "${unitSystem.tempC(t_in_calc)} vs ${unitSystem.tempC(t_in)}"`)
+  //*/
+  
+  const
+    normalized_error = 1e-6, // .0001%
+    normalized_diff = (tIn_calc, tIn = t_in) => Math.abs(tIn_calc - tIn) /tIn;
+  let iterations = 0;
+  while (normalized_diff(t_in_calc) > normalized_error) {
+    logger.debug(`"Tin_convective", "t_in_cnv_calc": ${t_in_calc}, "t_in_cnv_sup": ${t_in}`)
+    if (t_in_calc) {
+      t_in = t_in_calc;
+    } else {
+      logger.error("Invalid t_in_calc at convective sect");
+      break;
+    }
+    
+    tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_convective-2");
+    t_in_calc = newtonRaphson(Tin_conv_func, t_in, params.NROptions, "T_in_convective-2");
+
+    // Forced break of loop
+    iterations++;
+    if (iterations > 10) {
+      logger.info(`diff vs error: ${normalized_error}-${normalized_diff(t_in_calc)}`)
+      logger.error("Max iterations reached for inlet temp calc at convective sect");
+      break;
+    }
+  }
+
+  const conv_result = {
+    "t_in_given":params.t_in_conv,
+    "t_in":     t_in,
+    "t_out":    t_out,
+    "Tb":       Tb(t_in),
+    "Tw":       Tw( Tb(t_in), Tw(Tb(t_in)) ),
+    "tg_out":   tg_out,
+    "tg_in":    tg_in,
+    "Tb_g":     Tb(tg_in, tg_out),
+    "LMTD":     LMTD_Tin(t_in),
+    "DeltaA":   (tg_in - t_out),
+    "DeltaB":   (tg_out - t_in),
+
+    "Q_flue":   Q_flue(tg_in, tg_out),
+    "Q_fluid":  Q_fluid(t_in),
+    "Q_conv":   Q_conv(t_in, tg_in, tg_out),
+
+    "Cp_fluid": Cp_fluid(t_in,t_out),
+    "Cp_flue":  Cp_flue(tg_in,tg_out),
+    "miu_fluid":  miu_fluid(Tw(Tb(t_in))) ,
+
+    "kw_fluid":   kw_fluid(Tb(t_in)),
+    "kw_tube":    kw_tube(Tw(Tb(t_in))),
+    "kw_flue":    kw_flue(Tb(tg_in, tg_out)),
+
+    "Prandtl":    round(prandtl(Tb(t_out))),
+    "Reynolds":   round(reynolds(Tb(t_out))),
+    "PrandtlFlue": round(prandtl_flue(Tb(t_out))),
+    "ReynoldsFlue":round(reynolds_flue(Tb(t_out))),
+
+    "At":         At,
+    "Ai":         Ai,
+    "An":         An,
+
+    "hi":         hi( Tb(t_in) ) ,
+    "hi_tw":      hi( Tb(t_in),         Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    "hr":         hr( Tb(tg_out,tg_in), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    "hc":         hc( Tb(tg_in, tg_out) ),
+    "ho":         ho( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    "he":         he( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    "j":          j( Tb(tg_out,tg_in) ) ,
+
+    "Uo":         Uo( Tb(tg_in, tg_out), Tb(t_in), Tw(Tb(t_in)) ),
+    "R_int":      R_int(                 Tb(t_in), Tw(Tb(t_in))),
+    "R_tube":     R_tube(                          Tw(Tb(t_in))),
+    "R_ext":      R_ext(Tb(tg_in, tg_out),         Tw(Tb(t_in))),
+
+    TUBING: {
+      Material:        'A-312 TP321',
+      "No Tubes Wide": params.Tpr_conv,
+      "No Tubes":      N,
+      "Wall Thickness":unitSystem.length(params.Sch_sh_cnv),
+      "Outside Di":    unitSystem.length(Do),
+      "Ef. Length":    unitSystem.length(L),
+      "Tran Pitch":    unitSystem.length(S_tube),
+      "Long Pitch":    unitSystem.length(S_tube)
+    },
+    FINING: {
+      Material:    '11.5-13.5Cr',
+      Type:        'Solid',
+      "Height":    unitSystem.length(params.Lf),
+      "Thickness": unitSystem.length(params.Tf),
+      Dens:        params.Nf + " 1/m",
+      Arrange:     "Staggered Pitch" 
+    }
+  };
+  conv_result.miu_flue = miu_flue(tg_out);
+
+  logger.default(`T_in_given: ${unitSystem.tempC(params.t_in_conv)}, T_in_calc: ${unitSystem.tempC(t_in_calc)}, Tg_out_conv: ${unitSystem.tempC(tg_out)}`);
+
+  params.t_in_conv_calc = t_in;
+  params.tg_conv = tg_out;
+
+  return conv_result;
 }
 
-log(convSection_full())
+const colburnFactor = (reynoldsFlue, tW, parm) => {
+  const
+    C1 = (tB_g) => .25 *reynoldsFlue(tB_g)**(-.35), // Reynolds number correction
 
-const
-  m_fuel = 120, // kmol/h
-  m_air = 1_589.014, // kmol/h
-  m_flue = 1720.9, // kmol/h
-  NCV = 927_844.41, // kJ/kmol net calorific value
-  Cp_fuel = 39.26, // kJ/kmol.KkJ/h
+    Lf = parm.Lf,                         // (m) Fins height
+    Sf = 1/parm.Nf -parm.Tf,              // (m) Fin spacing 
+    C3 = .35 +.65 * Math.exp(-.25*Lf/Sf), // Geometry correction (Solid, staggered pattern)
+
+    Pl = parm.Pitch_sh_cnv,     // (m) Longitudinal tube pitch
+    Pt = parm.Pitch_sh_cnv,     // (m) Transverse tube pitch
+    Nr = parm.N_conv/ parm.Tpr_conv, // (-) Tube row's number
+    C5 = .7 + (.7 -.8 *Math.exp(-.15*Nr**2)) *Math.exp(-Pl/Pt), // Non-equilateral & row correction
+    
+    Df_Do = (2*parm.Lf + parm.Do_conv) / (parm.Do_conv), // (m) Ratio fin's Do per tube's Do
+    
+    Ts = () => tW();// (K) Average fin temperature  //TODO: implement
   
-  //alpha = 0.9086, // -
-  //Sigma = 5.67e-11, //W.m-2.K-4
-  pi = 3.14159; // -
+  return (tB_g) => C1(tB_g) *C3 *C5 *(Df_Do)**.5 *(tB_g/Ts())**.25; // .0055
+};
 
-const
-  t_in_rad = 210, // C (process)
-  t_out_rad = 355, // C
-  t_stack = 400, // C
-  t_datum = 15, // C (amb)
-  T_in = t_in_rad + 273, // K
-  T_out = t_out_rad + 273, // K
-  T_stack = t_stack + 273, // K
-  T_datum = t_datum + 273; // K
-
-
-let t2 = t_out_rad, // Outlet temp of working fluid from convection section, C
-  T1 = 971; // Tg Leaving flue gas temp from radiation section, C
-const
-  t1 = t_in_rad, // Inlet temp of working fluid for heating, C
-  T2 = t_stack, // Leaving flue gas temp from convection section, C
-  td = 15, // datum temp, C
-  Mfluid = 225700, // Flow rate of process fluid, kg/h
-  Cpf = 2.5744, // avg specific heat of process fluid, Kj/kg.C
-  Mgases = 1720.9, // kmol/h // Flow rate of flue gas, kg/h
-  ru = 914.8, // density of process fluid, kg/m3
-  G = 30, //cst // Flue gas velocity through convection section, kg/m2.s
-  L = 20.024, // Effective tube length, m
-  CtoC = 0.250, // m center to center distance of tube
-  Do = 0.168, // External diameter conv section, m
-  Di = Do - 0.008, // Internal diameter of tube, m
-  sigma = 2.041e-7, //kJ/h.m2.K4
-  alpha = 1, // - Relative effectiveness factor of the shield tubes
-  F = 0.97, // - Exchange factor
-  Total_tubes = 40,
-  Numbers_passes = 2,
-  N = 11, // number of tubes layers
-  n = 4, // Number of tubes in a layer
-  N_shld = 8, // Number of shield tubes
-  c = 0.219; // Center-to-center distance of tube spacing, m
-
-/** avg specific heat of flue gases */
-let Cp_av = 1.0775 + 1.1347e-4 * (T2+td)/2; 
-// Qs=Mgases*Cp_av*(T1-T)
-let Qs = 6e8; // Assumed heat absorption by the first layer of tubes, Kj/h
-
-for (let I = 1; I < N; I++) {
-  log("info", "for started")
-  // Calculation of cold plane area of shield tubes
-  let Acp_shld = N_shld*CtoC*L;
-  let Si = pi*Di*L; // Calc of inside tube surface area
-  let So = pi*Do*L; // Calc of outside tube surface area
-  let S = n*Si; // Calc heat exchange surface area at each layer of tubes
-  /** 
-   * From the assumed heat absorption, calculate the temperatures of
-   * the flue gas process fluid by means of appropriate balances
-   * at each tube layer
-   */
-  // Qs=Mgases*Cp_av*(T1-T)
-  let Qc = 0;
-  let t = 0;
-  let T = 0;
-  let Tw = 0;
-  while (Math.abs(Qc-Qs) >= 0.001) {
-    if (Qc != 0) {
-      Qs = Qc;
-    }// 1.end
-    T = T1 - Qs/(Mgases*Cp_av);
-    // Qs=Mfluid*Cpf*(t2-t)
-    // x=0.01;
-    // H=286.8;
-    t = t2 - Qs/(Mfluid*Cpf);
-    // Calcualtion of the logarithm mean temperature difference (LMTD)
-    const Def1 = T1 - t2;
-    const Def2 = T - t;
-    const LMTD = (Def1-Def2)/(Math.log(Def1/(Def2+1e-1000)))+1e-1000;
-    log(`T1 ${T1}; t2 ${t2}; t ${t}; T ${T}; Def2 ${Def2}; Def1 ${Def1}; LMTD: ${LMTD}`)
-    // Calculation tube_wall temperature at tube layer
-    Tw = 100 + 0.5*(t + t2) + 273;
-    // Calculation of Escaping radiation
-    const Qe_rad = sigma*alpha*Acp_shld*F*((T+273)**4-Tw**4);
-    /** Calculation of overall heat exchange coefficient :
-    1/U=(1/hi)+fy+(1/ho)*(Si/So)
-    Calculation of convection coefficient between the 
-    process fluid and the inside wall of the tubes
-    hi=0.023*(k/Di)*pr**(1/3)*Re**0.8*(u/uw)**0.14
-    Let u/uw=1.0 for small variation in viscosity between
-    bulk and wall temperatures
-    k is thermal conductivity of oil(process fluid)
-    */
-    let k = 0.49744 - 29.4604e-5*(t2 + t)/2;
-    // Calculation of Reynolds number, Re = Di*w*ro/u
-    // u is viscosity of process fluid at avg temp of process fluid
-    let u = -0.1919*Math.log((t2+t)/2)*Math.log((t2+t)/2)+0.2295*Math.log((t2+t)/2)-2.9966;
-    u = u/3600;
-    u = Math.exp(u);
-    let ri = Di/2;
-    let ro = Do/2;
-    let w = Mfluid/ (pi*(ri**2)*ru);
-    let Re = Di*w*ru/u;
-    // Calc of prandtl number at the average temp of process fluid
-    const pr = Cpf*u/k;
-    const hi = 0.023*(k/Di)*pr**(1/3)*Re**0.8;
-    /** Calculation of radiation and convection coefficient
-    between the flue gases and the outside surface of the tubes:
-    Estimating of a film coefficient based on pure convection
-    for flue gas flowing normal to a bank of bare tubes
-    hc=0.018*Cpg*G**(2/3)*Tgai**0.3/Do
-    Tga is average flue gas temperature at each a tybe layer
-      */
-    const Tga = (T1 + T)/ 2;
-    Cp_av = 1.0775 + 1.1347e-4*(T1+T)/2;
-    const hc = 0.018*Cp_av*(G**(2/3)) * (Tga**0.3)/Do;
-    // Estimating of a radiation coefficient of the hot gases :
-    const hrg = 9.2e-2*Tga - 34;
-    // Estimating of the total heat-transfer coff for the bare tube conv sec:
-    const ho = 1.1*(hc + hrg);
-    // calculation of f(e,lambda)=fy:
-    // fy=(ro/lambda)*Math.log(ro/ri)
-    // Lambda is thermal conductivity of the tube wall:
-    const lambda = -0.157e-4*(Tw**2) + 79.627e-3*(Tw) + 28.803;
-    // Assume uniform distribution of the the flux over the whole periphery of the tube.
-    const fy = (ro/ lambda)*Math.log(ro/ ri);
-    // Calculation of the overall heat exchange coefficient:
-    // 1/U=(1/hi)+fy+(1/ho)*(Si/So)
-    const K = 1/( (1/ hi) + fy + (1/ ho)*(Si/ So) );
-    // U=1/K;
-    // Uc=U;
-    const Uc = K;
-    // The heat transferred by convection and radiation ...
-    // into the tubes:
-    // Qc=Qe_rad+Uc*Atubes*LMTD
-    // Atube is exchange surface are at each raw of tubes
-    const Atubes = S;
-    Qc = Qe_rad + Uc*Atubes*LMTD;
-  }// 2.end
-  log("Iteration " + I)
-  let Tg = T + 273;
-  log(`The temperature of the flue gas is ${Tg} Kelvin`)
-  let Tf = t+273;
-  log(`The temperature of the process fluid is ${Tf} Kelvin`)
-  log(`The tube wall temperature is ${Tw} Kelvin`)
-  log(`Heat absorbed by heated fluid is //10.2e kJ/h :` + Qc)
-  Qc = 0;
-  if (t==t1) {
-    T = T2;
-    break
-  } else {
-    t2 = t;
-    T1 = T;
-    Cp_av = 1.0775+1.1347*10**(-4)*(T2+T)/2;
-  } // 4.end
-}// 3.end
+module.exports = {
+  convSection
+};

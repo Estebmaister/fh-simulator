@@ -4,6 +4,7 @@ window.onload = function(){
         var scriptElement = document.createElement('script');
         scriptElement.type = 'text/javascript';
         scriptElement.src = "../js/bundle.js";
+        document.getElementById("output-combustion").textContent = 'Is this taking too long? check the console log for debugging.';
         document.head.appendChild(scriptElement);
-    }, 2000);
+    }, 1000);
 };
