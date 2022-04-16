@@ -20,7 +20,8 @@ const {
   roundDict,
   initSystem,
   normalize,
-  flueViscosity
+  flueViscosity,
+  flueThermalCond
 } = require('./utils');
 const data = require('../data/data.json');
 const dryAirN2Percentage = 79.05;
@@ -279,7 +280,7 @@ const combPerFuelCompound = (compounds, products, normalFuel) => {
 *  in every function call with the combustion data
 */
 const combSection = (airExcess, fuels, params) => {
-  logger.debug(`{"airExcess in call": ${airExcess}}`);
+  logger.debug(`"airExcess", "value": ${airExcess}`);
   const units = initSystem(params.unitSystem);
   const debug_data = {
     err: "",
@@ -390,7 +391,8 @@ const combSection = (airExcess, fuels, params) => {
   params.Cp_air  = Cp_multicomp(air);
   params.Cp_fuel = Cp_multicomp(normalFuel);
 
-  params.flueViscosity = flueViscosity(data, products);
+  params.miu_flue = flueViscosity(data, products);
+  params.kw_flue = flueThermalCond(data, products);
 
   roundDict(products); roundDict(flows); roundDict(debug_data);
   if (debug_data.err == "") delete debug_data.err;
