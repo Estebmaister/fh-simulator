@@ -103,7 +103,7 @@ const newtonRaphson = (f, fp, x0, nrOptions, name) => {
 
     // Check for convergence:
     if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
-      logger.debug(`{"Newton-Raphson":"${name}", "var converged to":${x1}, "iterations":${iter}}`);
+      logger.debug(`"Newton-Raphson", "func":"${name}", "var converged to":${x1}, "iterations":${iter}`);
       return x1;
     }
 
@@ -144,23 +144,24 @@ const viscosityApprox = ({t1,t2,v1,v2}) => {
 }
 
 
-/** (Tref1, Tref2, T1, co-current) Returns a function of temperature (T2) 
- * with the other three values of temp as constants.
- * counter-current by default, for co-current set the four argument as true.
+/** (Tref1, Tref2, T1, T2, co-current) Returns the value of the
+ * Logarithmic mean temperature difference.
+ * 
+ * counter-current by default, for co-current set the five argument as true.
  * */
-const LMTD = (t_cold_in, t_cold_out, t_hot_in, co_current) => {
+const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
   
   let // counter-current (default)
     delta_t1 = t_hot_in - t_cold_out,
-    delta_t2 = (t_hot_out) => t_hot_out - t_cold_in;
+    delta_t2 = t_hot_out - t_cold_in;
     
-    if (co_current) { // co-current
-      delta_t1 = t_hot_in - t_cold_out;
-      delta_t2 = (t_hot_out) => t_hot_out - t_cold_in;
-    }
+  if (co_current) { // co-current
+    delta_t1 = t_hot_out - t_cold_in;
+    delta_t2 = t_hot_in - t_cold_out;
+  }
     
-  // (tg_sh) => ( (tg_r - tf_out) - (tg_sh - tf_in) ) / ln( (tg_r - tf_out) / (tg_sh-tf_in) )
-  return (t) => delta_t1 - delta_t2(t) / Math.log( delta_t1 / delta_t2(t) );
+  // ( (t_hot_in - t_cold_out) - (t_hot_out - t_cold_in) ) / ln( (t_hot_in - t_cold_out) / (t_hot_out-t_cold_in) )
+  return (delta_t1 - delta_t2) /Math.log( delta_t1 / delta_t2 );
 };
 
 const 
@@ -182,17 +183,20 @@ const unitConv = {
   kJtoBTU: (n) => n/1.05506,
   BTUtokJ: (n) => n*1.05506,
 
-  fttom: (n) => n/3.28084,
-  mtoft: (n) => n*3.28084,
-  intom: (n) => n/39.3701,
-  mtoin: (n) => n*39.3701,
+  fttom:  (n) => n/3.28084,
+  ft2tom2:(n) => n/(3.28084**2),
+  mtoft:  (n) => n*3.28084,
+  m2toft2:(n) => n*(3.28084**2),
+  intom:  (n) => n/39.3701,
+  //mtoin:  (n) => n*39.3701,
 
-  CpENtoCpSI: (n) => n*1.05506/(5/9)*2.20462,
-  kwENtokwSI: (n) => n*1.05506/(5/9)*3.28084,
+  CpENtoCpSI: (n) => n*1.05506/(5/9)*2.20462,    // (kJ/kg-C)
+  kwENtokwSI: (n) => n*1.05506/(5/9)*3.28084,    // (kJ/h-m-C)
+  hcENtohcSI: (n) => n*1.05506/(5/9)*3.28084**2, // (kJ/h-m2-C)
   BtuHtoW: (n) => n/3.4121416331,
 };
 
-/** Example call from terminal: node . false SI 26.6667 50 0 20 1.01325e5 */ 
+/** Example call from terminal: node . false ENGLISH 26.6667 50 0 20 1.01325e5 */ 
 const getOptions = () => {
   const optObject = {
     // constants
@@ -234,9 +238,9 @@ const getOptions = () => {
   return optObject;
 };
 const options = getOptions();
-if (options.verbose) logger.debug(`${JSON.stringify(options, null, 2)}`);
+if (options.verbose) logger.debug(`"options","args":${JSON.stringify(options, null, 2)}`);
 
-const round = (number) => (Math.round(number*1e3)/1e3).toFixed(3);
+const round = (number, dec = 3) => (Math.round(number*10**dec)/10**dec).toFixed(dec);
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
     if(!isNaN(value) && value !== "") object[key] = round(value);
@@ -251,14 +255,45 @@ const normalize = (fuels, name) => {
     normalFuel[fuel] = normalFuel[fuel]/total;
   }
   if (options.verbose) 
-    logger.debug(`{"Normalizing": "${name}", "total": ${total}}`);
+    logger.debug(`"normalize", "name": "${name}", "total": ${total}`);
   return normalFuel;
+};
+
+/** Thermal Cond equation func(temp [K]) for certain substance in data */
+const kw = ({k0, k1, k2, Substance}) => {
+  // Thermal Cond equation from NIST data with polynomial approx. R2=1
+  // k2*T^2 + k1*T + k0  (valid from 300K to 1350K)* SO2 only to 500K
+  if (k0 == 0 || k0 == "-") {
+    if (options.verbose) 
+      logger.debug(`"Thermal Cond func called for '${Substance}' without coffs"`);
+    return () => 0;
+  }
+  const cnv_fact = 3_600 * 1e-3; // Therm. Cond. (W/m*K) -> (kJ/h*m*K)
+  return (temp) => (k0 + k1* temp + k2* temp**2)*cnv_fact;
+};
+
+/** returns a Thermal Cond function of temp for certain flue composition.
+ * 
+ * Should be called in the combustion section after flue composition 
+ * is determined.
+*/
+const flueThermalCond = (data, flue) => {
+  const 
+    normalFlue = normalize(flue, "flueThermalCond"),
+    so2_kw = kw(data[34]),
+    h2o_kw = kw(data[31]),
+    co2_kw = kw(data[6] ),
+    n2_kw  = kw(data[3] ),
+    o2_kw  = kw(data[2] );
+
+  return (t) => normalFlue.CO2*co2_kw(t) + normalFlue.SO2*so2_kw(t)
+  + normalFlue.H2O*h2o_kw(t) + normalFlue.O2*o2_kw(t) + normalFlue.N2*n2_kw(t);
 };
 
 /** Viscosity equation func(temp [K]) for certain substance in data */
 const miu = ({u0, u1, u2, Substance}) => {
-  // Viscosity equation from NIST data with polynomial approx. R2=1
-  // u2*T^2 + u1*T + u0  (valid from 300K to 1200K)
+  // Viscosity equation from NIST data with polynomial approx. R2=0.99998
+  // u2*T^2 + u1*T + u0  (valid from 300K to 1350K)* SO2 only to 500K
   if (u0 == 0 || u0 == "-") {
     if (options.verbose) 
       logger.debug(`"Viscosity func called for '${Substance}' without coffs"`);
@@ -277,18 +312,32 @@ const flueViscosity = (data, flue) => {
     normalFlue = normalize(flue, "flueViscosity"),
     so2_v = miu(data[34]),
     h2o_v = miu(data[31]),
-    co2_v = miu(data[6]),
-    n2_v = miu(data[3]),
-    o2_v = miu(data[2]);
+    co2_v = miu(data[6] ),
+    n2_v  = miu(data[3] ),
+    o2_v  = miu(data[2] );
 
   return (t) => normalFlue.CO2*co2_v(t) + normalFlue.SO2*so2_v(t)
   + normalFlue.H2O*h2o_v(t) + normalFlue.O2*o2_v(t) + normalFlue.N2*n2_v(t);
 };
 
+/** returns a Thermal conductivity function of temp for tubes A312‐TP321 
+ * temp should be used in Kelvin, value returned in (kJ/h-m-C)
+*/
+const kw_tubes_A312_TP321 = (t) => {
+  const 
+    temp = t - tempToK, // transforms temp from Kelvin to Celsius
+    conv_factor = 3_600 * 1e-3, // (J/s -> kJ/h)
+    c0 = 14.643,
+    c1 = 1.64e-2,
+    c2 = -2e-6;
+
+  return (c0 + c1*temp + c2*temp**2)*conv_factor;
+};
+
 const englishSystem = { //(US Customary)
   "energy/mol":   (n) => round(unitConv.kJtoBTU(n)) + " Btu/mol",
   "mass/mol":     (n) => round(n * 2.2046244202) + " lb/lb-mol",
-  heat_flow :     (n) => round(unitConv.kJtoBTU(n)*1e-6) + " MMBtu/h",
+  heat_flow :     (n) => round(unitConv.kJtoBTU(n)*1e-6) + " MBtu/h",
   heat_flux:      (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**2) + " Btu/h-ft2",
   fouling_factor: (n) => round(n * 10.763910417*1.8/0.94781712) + " h-ft2-°F/Btu",
   "energy/mass":  (n) => round(unitConv.kJtoBTU(n)/unitConv.kgtolb(1)) + " Btu/lb",
@@ -350,6 +399,8 @@ const initSystem = (unitSystem) => {
       return siSystem;
     case "english":
       return englishSystem;
+    case "en":
+      return englishSystem;
     default:
       logger.warn(unitSystem.toLowerCase() + 
       ' - invalid unit system, using default SI')
@@ -369,5 +420,7 @@ module.exports = {
   initSystem,
   normalize,
   flueViscosity,
+  flueThermalCond,
+  kw_tubes_A312_TP321,
   LMTD
 };
