@@ -1,5 +1,6 @@
 
 const {logger} = require('./utils');
+const {stringRadResult, stringShldResult, stringConvResult} = require('./resultsToString');
 
 // Extracts the data from the URL
 const extractURIdata = (argumentsArray) => {
@@ -20,7 +21,7 @@ const extractURIdata = (argumentsArray) => {
 }
 
 // Logic to modified default options with data from browser
-const optionsModifier = (browserData, options) => {
+const optionsModifier = (key, browserData, options) => {
   const
     maxHumidity = 100,
     maxPatm = 1e3,
@@ -76,7 +77,7 @@ const optionsModifier = (browserData, options) => {
       
       break;
     case "unit_system":
-      logger.debug(`${key}: ${browserData[key]}`)
+      logger.debug(`"${key}", "value":"${browserData[key]}"`)
       options.unitSystem = browserData[key];
       break;
     default:
@@ -100,20 +101,20 @@ const insertBrowserData = (browserData, fuels, data, options) => {
 			}
 		} else if (browserData[key] !== "" && browserData[key] !== undefined) {
       // Case when the key is not empty and isn't a fuel either
-			optionsModifier(browserData, options);
+			optionsModifier(key, browserData, options);
 		}
 	}
 
 	if (Object.keys(browserFuels).length !== 0) fuels = browserFuels;
 }
 
-const outputData = (result, browserData, lang) => {
-	logger.info(JSON.stringify(result, null, 2))
-  logger.debug(JSON.stringify(browserData, null, 2))
+const outputData = (result, browserData, lang, unitSystem) => {
+	// logger.info(JSON.stringify(result, null, 2))
+  // logger.debug(JSON.stringify(browserData, null, 2))
 
   let outputString = ''
   if (lang == 'es') {
-    outputString = `
+    outputString += `
 Datos de entrada
   (en caso de no haber sido introducidos, tomará el predeterminado)
 
@@ -164,7 +165,7 @@ Moles de gases de combustión total y porcentajes por cada mol de combustible
   Cp(t_amb) de los gases de combustión: ${result.flows["flue_Cp_Tamb"]}
 `;
   } else {
-    outputString = `
+    outputString += `
 Input Data 
   (in case of no input, default values will be taken)
 
@@ -217,7 +218,10 @@ Total flue gas moles and percentage (per fuel mol)
   }
   
   document.getElementById("loader-wrapper").remove();
-  document.getElementById("output-data").textContent = outputString;
+  document.getElementById("output-combustion").textContent = outputString;
+  document.getElementById("output-radiant").textContent = stringRadResult(lang, result.rad_result, unitSystem);
+  document.getElementById("output-shield").textContent = stringShldResult(lang, result.shld_result, unitSystem);
+  document.getElementById("output-convective").textContent = stringConvResult(lang, result.conv_result, unitSystem);
 };
 
 // Process the data and start the combustion algorithm
@@ -232,7 +236,7 @@ const browserProcess = (fuels, data, options, combustion) => {
   if (browserData !== {}) insertBrowserData(browserData, fuels, data, options);
   
   const result = combustion(fuels, options);
-	outputData(result, browserData, lang);
+	outputData(result, browserData, lang, options.unitSystem);
 };
 
 module.exports = {
