@@ -37,29 +37,30 @@ const convSection = (params) => {
   const // Parameters
     Rfo = params.Rfo, // (h-m2-C/kJ) external fouling factor
     Rfi = params.Rfi, // (h-m2-C/kJ) internal fouling factor
-    N  = params.N_conv, // - number of conv tubes
     L  = params.L_conv, // (m) effective tube length
     Do = params.Do_conv,// (m) external diameter conv section 
     Di = params.Do_conv - params.Sch_sh_cnv*2,// (m) int diameter conv sect
-    S_tube = params.Pitch_sh_cnv, // (m) Tube spacing, NPS
-    Nr = params.N_conv/ params.Tpr_conv, // (-) Number of tube rows //TODO: implement
-    
-    Acp = N * S_tube * L,    // (m2) Cold plane area of shld tube bank //TODO: use convective equation
-    At = N *Math.PI *Do *L,  // (m2) Area of tubes in bank, total outside surface area, m2/m
+    S_tube = params.Pitch_sh_cnv, // (m) Tube spacing, 2*NPS
+    N  = params.N_conv,     // (-) number of tubes convective sect
+    Nt = params.Tpr_sh_cnv, // (-) Number of tube wide
+    Nf = params.Nf,         // (1/m) Fin's number per meter
+    Lf = params.Lf,         // (m) Fin's height
+    Tf = params.Tf,         // (m) Fin's thickness
+    Ad = Nt*S_tube*L,     // Cross sectional area of box
+    Ac = Do + 2*Lf*Tf*Nf, // Fin tube cross sectional area/ft, ft2/ft
+    An = Ad - Ac*L*Nt,             // Free area for flue flow
+    // An = (Nt*(S_tube - Do) + S_tube/2)*L, // Free area for flue flow at shld sect //TODO: needs to consider fins
+    Ao  = Math.PI*Do*(1-Nf*Tf) + Math.PI*Nf*(2*Lf*(Do + Lf) + Tf*(Do + 2*Lf)),
+    Apo = Math.PI*Do*(1-Nf*Tf), // (m2) Outside prime tube surface area, m2/m
+    Afo = Ao - Apo,             // (m2) Fin outside surface area, m2/m
+    At = N*Ao*L,//N *Math.PI *Do *L,  // (m2) Area of tubes in bank, total outside surface area, m2/m
     Ai = Math.PI *(Di**2) /2,// (m2) Inside tube surface area, m2/m
-    An = ((N/Nr)*(S_tube - Do) + S_tube/2)*L , // Free area for flue flow at shld sect
     
-    Afo = 1,  // (m2) Fin outside surface area, m2/m // TODO: implement
-    Apo = At, // (m2) Outside tube surface area, m2/m
-    Ef  = 1,  // (-) Fin efficiency
-
     /** (ft) Mean Beam Length, dim ratio 1-2-1 to 1-2-4*/
     MBL = 2/3 * (params.Width_rad*params.Length_rad*params.Height_rad) **(1/3), //TODO: implement
     PL = (params.Ph2o + params.Pco2) * MBL, // PP*MBL
     
     cnv_fact = 3_600 * 1e-3; // (g/s -> kg/h) secondsToHours * 1/k
-
-  logger.warn(`Acp_conv: ${ round( unitConv.m2toft2(Acp) ) } ft`);
 
   const // Process Functions
     prandtl = (t) => miu_fluid(t)*cnv_fact *Cp_fluid(t)/kw_fluid(t),// (-) miu*Cp/kw
@@ -69,29 +70,38 @@ const convSection = (params) => {
     // Gn it's the mass speed based on the free area for the gas flow (the space between the tubes across the heater).
     Gn = (m_flue/cnv_fact) /An,
     reynolds_flue = (t) => Gn * Do/miu_flue(t), // (-) G*Di/miu
-
-    j = (tG_b) => colburnFactor(reynolds_flue, Tw, params)(tG_b),
-    gr = (_tB, _tW) => 3.5*cnv_fact, // (Btu/hr-ft2-F) Outside radiation factor //TODO: implement and convert
-
     /** (kJ/m²h-°C) internal heat transfer coff */
-    hi = (tB, tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *
-      prandtl(tB)**(1/3) *(miu_fluid(tB)/miu_fluid(tW))**.14,
-    /** (kJ/m²h-°C) effective radiative coff wall tube */
-    hr = (tG_b, tW) => 2.2 *gr(tG_b, tW) *(PL)**.50 *(Apo/At)**.75,
-    /** (kJ/m²h-°C) * film heat transfer coff */
-    hc = (tG_b) => j(tG_b) *Gn *Cp_flue(tG_b) *prandtl_flue(tG_b)**(-.67), // hc =.33*(kt_g_b /Do) * (prandtl(t_g_b))**(1/3) * (reynolds(t_g_b) )**.6
-    /** (kJ/m²h-°C) external heat transfer coff */
-    ho = (tG_b, tW) => 1/( 1/(hc(tG_b) +hr(tG_b,tW)) +Rfo ),
-    he = (tG_b, tW) => ho(tG_b, tW) *(Ef*Afo + Apo) / At; //TODO: check fin area calc
-
+    hi = (tB, tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *prandtl(tB)**(1/3) *(miu_fluid(tB)/miu_fluid(tW))**.14;
     
   /** Q_fluid = M *Cp *deltaT */
   const Q_fluid = (tIn, tOut = t_out) => m_fluid *Cp_fluid(tIn, tOut) *(tOut -tIn);
-  const duty_conv = (tIn) => Q_fluid(tIn);
+  const duty_conv = (tIn) => Q_fluid(tIn);  // Duty in convective sect used for Tw calc
 
   /** Tw = Average tube wall temperature in Kelvin degrees */
   const Tw = (tB = Tb(t_out, t_in) , tW = tB, tIn = t_in) => (duty_conv(tIn) /At) * 
     (Do/Di) *( Rfi +1/hi(tB,tW) +( Di *Math.log(Do/Di) /(2*kw_tube(tW) )) ) +tB;
+  
+  const
+    gr = (_tB, _tW) => 3.5*0.29307107*cnv_fact, // (Btu/hr-ft2-F) Outside radiation factor //TODO: implement
+    
+    hr = (tG_b, tW) => 2.2 *gr(tG_b, tW) *(PL)**.50 *(Apo/Ao)**.75; // (kJ/m²h-°C) effective radiative coff wall tube
+
+  let hc = (tG_b) => .33 *(kw_flue(tG_b) /Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
+
+  const
+    ho = (tG_b, tW) => 1/( 1/(hc(tG_b) +hr(tG_b,tW)) +Rfo ), // (kJ/m²h-°C) external heat transfer coff
+    /** Fin's Efficiency */
+    Kf = kw_tube(Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))),
+    B = Lf + (Tf /2),
+    m = (ho(Tb(tg_in,tg_out), Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))) / (6 * Kf * Tf))**0.5,
+    x = Math.tanh(m * B) / (m * B),
+    y = x * (0.7 + 0.3 * x),
+    Df = Do + 2*Lf,
+    Ef  = y * (0.45 * Math.log(Df / Do) * (y - 1) + 1),    // (-) Fin efficiency
+    he = (tG_b, tW) => ho(tG_b, tW) *(Ef*Afo + Apo) / Ao,  // (kJ/m²h-°C)
+    j = (tG_b) => colburnFactor(reynolds_flue, Tw, params, m, B)(tG_b);   // Colburn factor
+  
+  hc = (tG_b) => j(tG_b) *Gn *Cp_flue(tG_b) *prandtl_flue(tG_b)**(-.67); // (kJ/m²h-°C) film heat transfer coff
 
   /** LMTD counter-current */
   const LMTD_Tin = (tIn) => LMTD(tIn, t_out, tg_in, tg_out);
@@ -183,6 +193,10 @@ const convSection = (params) => {
     "At":         At,
     "Ai":         Ai,
     "An":         An,
+    Ao  :         Ao,
+    Apo :         Apo,
+    Afo :         Afo,
+    Ef  :         Ef,
 
     "hi":         hi( Tb(t_in) ) ,
     "hi_tw":      hi( Tb(t_in),         Tw(Tb(t_in), Tw(Tb(t_in))) ),
@@ -199,7 +213,7 @@ const convSection = (params) => {
 
     TUBING: {
       Material:        'A-312 TP321',
-      "No Tubes Wide": params.Tpr_conv,
+      "No Tubes Wide": params.Tpr_sh_cnv,
       "No Tubes":      N,
       "Wall Thickness":unitSystem.length(params.Sch_sh_cnv),
       "Outside Di":    unitSystem.length(Do),
@@ -226,24 +240,24 @@ const convSection = (params) => {
   return conv_result;
 }
 
-const colburnFactor = (reynoldsFlue, tW, parm) => {
+const colburnFactor = (reynoldsFlue, tW, parm, m, B) => {
   const
     C1 = (tB_g) => .25 *reynoldsFlue(tB_g)**(-.35), // Reynolds number correction
 
     Lf = parm.Lf,                         // (m) Fins height
-    Sf = 1/parm.Nf -parm.Tf,              // (m) Fin spacing 
+    Sf = 1/parm.Nf - parm.Tf,             // (m) Fin spacing 
     C3 = .35 +.65 * Math.exp(-.25*Lf/Sf), // Geometry correction (Solid, staggered pattern)
 
-    Pl = parm.Pitch_sh_cnv,     // (m) Longitudinal tube pitch
-    Pt = parm.Pitch_sh_cnv,     // (m) Transverse tube pitch
-    Nr = parm.N_conv/ parm.Tpr_conv, // (-) Tube row's number
+    Pl = parm.Pitch_sh_cnv,            // (m) Longitudinal tube pitch
+    Pt = parm.Pitch_sh_cnv,            // (m) Transverse tube pitch
+    Nr = parm.N_conv/ parm.Tpr_sh_cnv, // (-) Tube row's number
     C5 = .7 + (.7 -.8 *Math.exp(-.15*Nr**2)) *Math.exp(-Pl/Pt), // Non-equilateral & row correction
     
     Df_Do = (2*parm.Lf + parm.Do_conv) / (parm.Do_conv), // (m) Ratio fin's Do per tube's Do
     
-    Ts = () => tW();// (K) Average fin temperature  //TODO: implement
+    Ts = (tB_g) => tB_g + (tW() - tB_g) / ( ( Math.exp(1.4142*m*B) + Math.exp(-1.4142*m*B) )/2 );// (K) Average fin temperature
   
-  return (tB_g) => C1(tB_g) *C3 *C5 *(Df_Do)**.5 *(tB_g/Ts())**.25; // .0055
+  return (tB_g) => C1(tB_g) *C3 *C5 *(Df_Do)**.5 *(tB_g/Ts(tB_g))**.25;
 };
 
 module.exports = {

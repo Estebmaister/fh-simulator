@@ -56,7 +56,7 @@ const shieldSection = (params) => {
     Acp = N * S_tube * L,    // (m2) Cold plane area of shld tube bank.
     At = N *Math.PI *Do *L,  // (m2) Area of tubes in bank, total outside surface area, m2/m.
     Ai = Math.PI *(Di**2) /2,// (m2) Inside tube surface area, m2/m.
-    An = ((N/2)*(S_tube - Do) + S_tube/2)*L, // Free area for flue flow at shld sect.
+    An = ((N/2)*(S_tube - Do) + S_tube/2)*L, // Free area for flue flow at shld sect. //TODO: check no extra half pitch
     //unitConv.ft2tom2(params.Width_rad*params.Length_rad) - Acp/2
     
     cnv_fact = 3_600 * 1e-3; // (g/s -> kg/h) secondsToHours * 1/k.
@@ -196,7 +196,7 @@ const shieldSection = (params) => {
 
     TUBING: {
       Material:        'A-312 TP321',
-      "No Tubes Wide": params.Tpr_conv,
+      "No Tubes Wide": params.Tpr_sh_cnv,
       "No Tubes":      N,
       "Wall Thickness":unitSystem.length(params.Sch_sh_cnv),
       "Outside Di":    unitSystem.length(Do),

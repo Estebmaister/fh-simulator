@@ -105,9 +105,9 @@ const createParams = (opts) => {
     
     Pitch_sh_cnv: unitConv.intom(2*6),// (m) NPS * 2
     Sch_sh_cnv:unitConv.intom(0.28),  // (m) Schedule thickness
+    Tpr_sh_cnv: 8,                    // - number of tubes per row
 
     N_conv: 40,                   // - number of tubes 
-    Tpr_conv: 8,                  // - number of tubes per row
     L_conv: unitConv.fttom(60),   // (m) effective tube length
     Do_conv:unitConv.intom(6.625),// (m) external diameter 
 
