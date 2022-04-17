@@ -188,7 +188,7 @@ const unitConv = {
   mtoft:  (n) => n*3.28084,
   m2toft2:(n) => n*(3.28084**2),
   intom:  (n) => n/39.3701,
-  //mtoin:  (n) => n*39.3701,
+  mtoin:  (n) => n*39.3701,
 
   CpENtoCpSI: (n) => n*1.05506/(5/9)*2.20462,    // (kJ/kg-C)
   kwENtokwSI: (n) => n*1.05506/(5/9)*3.28084,    // (kJ/h-m-C)
@@ -345,6 +345,7 @@ const englishSystem = { //(US Customary)
 
   area:     (n) => round(n * 10.763910417)    + " ft2",
   length:   (n) => round(unitConv.mtoft(n))   + " ft",
+  lengthC:  (n) => round(unitConv.mtoin(n))   + " in",
   temp:     (n) => round(unitConv.KtoR(n))    + " °R",
   tempC:    (n) => round(unitConv.CtoF(n-tempToK)) + " °F",
   pressure: (n) => round(n * 0.0001450377)    + " psi",
@@ -373,6 +374,7 @@ const siSystem = {
   "energy/vol":   (n) => round(n * 1) + " kJ/m3",
   area:     (n) => round(n * 1)    + " m2",
   length:   (n) => round(n * 1)    + " m",
+  lengthC:  (n) => round(n * 1e2)  + " cm",
   tempC:    (n) => round(n * 1-tempToK) + " °C",
   temp:     (n) => round(n * 1)    + " K",
   pressure: (n) => round(n * 1e-3) + " kPa",

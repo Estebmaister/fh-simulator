@@ -39,33 +39,32 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   Acp_sh:    ${unit.area(result_obj.Acp_sh)}
 
   hi:       ${unit.convect(result_obj.hi)}
-  hi_tw:    ${unit.convect(result_obj.hi_tw)}
-  hi_twf:   ${unit.convect(result_obj.hi_tww)}
   h_conv:   ${unit.convect(result_obj.h_conv)}
   duty:      ${unit.heat_flow(result_obj.duty)}
   duty_flux: ${unit.heat_flux(result_obj.duty_flux)}
   duty_rad:  ${unit.heat_flow(result_obj.duty_rad)}
 
-
   Alpha:    ${result_obj.Alpha}
-  MBL:      ${result_obj.MBL}
+  MBL:      ${result_obj.MBL} ft
   Pco2:     ${result_obj.Pco2}
   Ph2o:     ${result_obj.Ph2o}
   PL:       ${result_obj.PL}
-  F:        ${result_obj.F} vs ${result_obj.F_desired}
+  F:        ${result_obj.F} vs .635
 
-  kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
   kw_tube:  ${unit.thermal( result_obj.kw_tube )}
-  kw_flue:  ${unit.thermal( result_obj.kw_flue )}
-  Cp_fluid: ${unit.cp(result_obj.Cp_fluid)}
-  Cp_flue:  ${unit.cp( result_obj.Cp_flue )}
+  kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
+  
   miu_fluid:${unit.viscosity( result_obj.miu_fluid )}
   miu_flue: ${unit.viscosity( result_obj.miu_flue )}
+  kw_flue:  ${unit.thermal( result_obj.kw_flue )}
+
+  Cp_fluid: ${unit.cp(result_obj.Cp_fluid)}
+  Cp_flue:  ${unit.cp( result_obj.Cp_flue )}
   
-  Pr_fluid: ${result_obj.Prandtl}
-  Re_fluid: ${result_obj.Reynolds}
   Cp_fuel:  ${unit.cp( result_obj.Cp_fuel )}
   Cp_air:   ${unit.cp( result_obj.Cp_air )}
+  Pr_fluid: ${result_obj.Prandtl}
+  Re_fluid: ${result_obj.Reynolds}
 
   TUBING: ${TUBING}
   FINING: ${JSON.stringify(result_obj.FINING, null, 2)}
@@ -96,8 +95,8 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   LMTD:     ${unit.temp(result_obj.LMTD)}
   DeltaA:     ${unit.temp(result_obj.DeltaA)}
   DeltaB:     ${unit.temp(result_obj.DeltaB)}
-  Log(A/B):   ${round(Math.log(result_obj.DeltaA/result_obj.DeltaB))}
   DeltaA-B:   ${unit.temp(result_obj.DeltaA - result_obj.DeltaB)}
+  Log(A/B):   ${round(Math.log(result_obj.DeltaA/result_obj.DeltaB))}
 
   Q_flue:   ${unit.heat_flow( result_obj.Q_flue )}
   Q_R:      ${unit.heat_flow( result_obj.Q_R )}
@@ -111,7 +110,6 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   Acp:      ${unit.area(result_obj.Acp)}
 
   hi:       ${unit.convect(result_obj.hi)}
-  hi_tw:    ${unit.convect(result_obj.hi_tw)}
   hr:       ${unit.convect(result_obj.hr)}
   ho:       ${unit.convect(result_obj.ho)}
   hc:       ${unit.convect(result_obj.hc)}
@@ -121,18 +119,24 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   R_tube:   ${round(result_obj.R_tube, 6)}
   R_ext:    ${round(result_obj.R_ext, 6)}
 
-  kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
+
+
+
+
   kw_tube:  ${unit.thermal( result_obj.kw_tube )}
-  kw_flue:  ${unit.thermal( result_obj.kw_flue )}
-  Cp_fluid: ${unit.cp(result_obj.Cp_fluid)}
-  Cp_flue:  ${unit.cp( result_obj.Cp_flue )}
+  kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
+  
   miu_fluid:${unit.viscosity( result_obj.miu_fluid )}
   miu_flue: ${unit.viscosity( result_obj.miu_flue )}
+  kw_flue:  ${unit.thermal( result_obj.kw_flue )}
 
-  Pr_fluid: ${result_obj.Prandtl}
-  Re_fluid: ${result_obj.Reynolds}
+  Cp_fluid: ${unit.cp(result_obj.Cp_fluid)}
+  Cp_flue:  ${unit.cp( result_obj.Cp_flue )}
+
   Pr_flue:  ${result_obj.PrandtlFlue}
   Re_flue:  ${result_obj.ReynoldsFlue}
+  Pr_fluid: ${result_obj.Prandtl}
+  Re_fluid: ${result_obj.Reynolds}
 
   TUBING: ${TUBING}
   FINING: ${JSON.stringify(result_obj.FINING, null, 2)}
@@ -164,8 +168,8 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   LMTD:     ${unit.temp(result_obj.LMTD)}
   DeltaA:     ${unit.temp(result_obj.DeltaA)}
   DeltaB:     ${unit.temp(result_obj.DeltaB)}
-  Log(A/B):   ${round(Math.log(result_obj.DeltaA/result_obj.DeltaB))}
   DeltaA-B:   ${unit.temp(result_obj.DeltaA - result_obj.DeltaB)}
+  Log(A/B):   ${round(Math.log(result_obj.DeltaA/result_obj.DeltaB))}
 
   Q_flue:   ${unit.heat_flow( result_obj.Q_flue )}
   Q_conv:   ${unit.heat_flow( result_obj.Q_conv )}
@@ -189,20 +193,23 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   R_int:    ${round(result_obj.R_int, 6)}
   R_tube:   ${round(result_obj.R_tube, 6)}
   R_ext:    ${round(result_obj.R_ext, 6)}
+
   j:        ${round(result_obj.j, 6)} vs .0055
 
-  kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
   kw_tube:  ${unit.thermal( result_obj.kw_tube )}
+  kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
   kw_flue:  ${unit.thermal( result_obj.kw_flue )}
-  Cp_fluid: ${unit.cp(result_obj.Cp_fluid)}
-  Cp_flue:  ${unit.cp( result_obj.Cp_flue )}
+  
   miu_fluid:${unit.viscosity( result_obj.miu_fluid )}
   miu_flue: ${unit.viscosity( result_obj.miu_flue )}
 
-  Pr_fluid: ${result_obj.Prandtl}
-  Re_fluid: ${result_obj.Reynolds}
+  Cp_fluid: ${unit.cp(result_obj.Cp_fluid)}
+  Cp_flue:  ${unit.cp( result_obj.Cp_flue )}
+
   Pr_flue:  ${result_obj.PrandtlFlue}
   Re_flue:  ${result_obj.ReynoldsFlue}
+  Pr_fluid: ${result_obj.Prandtl}
+  Re_fluid: ${result_obj.Reynolds}
 
   TUBING: ${TUBING}
   FINING: ${JSON.stringify(result_obj.FINING, null, 2)}

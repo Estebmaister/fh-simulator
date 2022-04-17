@@ -89,17 +89,12 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     h_conv = params.h_conv || 30.66, // (kJ/h-m2-C) Film convective heat transfer coff
 
     /** (ft) Mean Beam Length, dim ratio 1-2-1 to 1-2-4*/
-    MBL = 2/3 * (params.Width_rad*params.Length_rad*params.Height_rad) **(1/3),
-    /** (-) Ratio pitch/external_diameter of tubes */
-    ratio_pitch_do_rad = params.Pass_number *S_tube /params.Do_rad,
-    
+    MBL = 2/3 *(params.Width_rad*params.Length_rad*params.Height_rad)**(1/3),
     PL = (params.Ph2o + params.Pco2) * MBL,
-
+    ratio_pitch_do_rad = params.Pass_number *S_tube /params.Do_rad, // (-) Tube's Ratio pitch/ext_diameter
     /** - alpha radiant factor */
-    alpha = 1 + .49* ratio_pitch_do_rad /6 - 
-      .09275* ratio_pitch_do_rad**2 + 
-      .065  * ratio_pitch_do_rad**3 /6 + 
-      .00025* ratio_pitch_do_rad**4,
+    alpha = 1 + .49*ratio_pitch_do_rad /6 - .09275*ratio_pitch_do_rad**2+
+      .065 *ratio_pitch_do_rad**3 /6      + .00025*ratio_pitch_do_rad**4,
     alpha_shld =  1, // (-) alpha shield factor
     
     Ar = Ar_calc(params.Width_rad, params.Length_rad, params.Height_rad), // (m2) Total refractory area
@@ -130,8 +125,6 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     kw_tube  = (temp) => params.kw_tube(temp), // (kJ/h-m-C - J/s-m-C-3.6) tube thermal conductivity
     miu_fluid= (temp) =>params.miu_fluid(temp);//(cP - g/m-s) fluid Viscosity
   
-  /** (kJ/h) Duty in the radiant section */
-  let duty_rad = 0;
   const 
     /** Emissive (effectivity) factor as function of temp */
     F = (temp) => effectivity(PL, alpha, Acp, alpha_shld, Acp_shld, Ar)(unitConv.KtoF(temp)),
@@ -139,13 +132,16 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     prandtl = (t) => miu_fluid(t)* Cp_fluid(t)*  cnv_fact/kw_fluid(t), // (miu*Cp/kw)
     G = (m_fluid/cnv_fact) /Ai, // Fluid mass speed inside radiant tubes
     reynolds = (t) => G * Di/miu_fluid(t); // (-) G*Di/miu
-
-  /** (kJ/h-m2-C) internal heat transfer coff */
-  const hi = (tB,tW = tB) => .023 * (kw_fluid(tB) / Di) * 
-    reynolds(tB)**.8 * prandtl(tB)**(1/3) * (miu_fluid(tB)/miu_fluid(tW))**.14;
-  /** Tw = Average tube wall temperature in Kelvin degrees */
-  const Tw = (tB, tW = tB, dutyRad = duty_rad) => (dutyRad/At) * 
-  (Do/Di) * (Rfi + 1/hi(tB,tW) + (Di*Math.log(Do/Di)/(2*kw_tube(tW))) ) + tB;
+  
+  /** (kJ/h) Duty in the radiant section */
+  let duty_rad = 0;
+  const 
+    /** (kJ/h-m2-C) internal heat transfer coff */
+    hi = (tB,tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *
+      prandtl(tB)**(1/3) *(miu_fluid(tB)/miu_fluid(tW))**.14,
+    /** Average tube wall temp (K) */
+    Tw = (tB, tW = tB, dutyRad = duty_rad) => (dutyRad/At) *(Do/Di)* 
+      (Rfi +1/hi(tB,tW) +(Di*Math.log(Do/Di)/(2*kw_tube(tW))) ) +tB;
 
   // ******* Heat input to the radiant section ********
   //
@@ -312,48 +308,46 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "Q_R":      Q_R(tg_out),
     "Q_fluid":  Q_fluid(),
 
-    "kw_fluid": kw_fluid(Tb(t_in)),
-    "kw_tube":  kw_tube(Tw(Tb(t_in))),
-    "kw_flue":  params.kw_flue(tg_out),
-
-    "Cp_fluid": Cp_fluid(t_in,t_out),
-    "Cp_fuel":  Cp_fuel,
-    "Cp_air":   Cp_air,
-    "Cp_flue":  Cp_flue(tg_out,t_amb),
-
     "At":       At,
     "Ar":       Ar,
     "Ai":       Ai,
     "Acp":      Acp,
     "Acp_sh":   Acp_shld,
 
+    "hi":       hi( Tb(t_out), Tw(Tb(t_out) ) ),
+    "h_conv":   h_conv,
     "duty":     duty,
     "duty_rad": duty_rad,
     "duty_flux":duty_rad/At,
-    
-    "hi":       hi( Tb(t_out) ),
-    "hi_tw":    hi( Tb(t_out), Tw(Tb(t_out) ) ),
-    "hi_tww":   hi( Tb(t_out), Tw(Tb(t_out), Tw(Tb(t_out))) ),
-    "h_conv":   h_conv,
 
-    "Prandtl":  round(prandtl(Tb(t_out))),
-    "Reynolds": round(reynolds(Tb(t_out))),
     "Alpha":    round(alpha),
     "MBL":      round(MBL),
     "Pco2":     round(params.Pco2),
     "Ph2o":     round(params.Ph2o),
     "PL":       round(PL),
     "F":        round(F(tg_out)),
-    "F_desired":0.635,
+
+
+    "kw_tube":  kw_tube(Tw(Tb(t_in))),
+    "kw_fluid": kw_fluid(Tb(t_in)),
+    "kw_flue":  params.kw_flue(tg_out),
+
+    "Cp_fluid": Cp_fluid(t_in,t_out),
+    "Cp_flue":  Cp_flue(tg_out,t_amb),
+    "Cp_fuel":  Cp_fuel,
+    "Cp_air":   Cp_air,
+
+    "Prandtl":  round(prandtl(Tb(t_out))),
+    "Reynolds": round(reynolds(Tb(t_out))),
 
     TUBING: {
       Material:        'A-312 TP321',
       "No Tubes Wide": 2,
       "No Tubes":      N,
-      OD:              unitSystem.length(Do),
-      "Wall Thickness":unitSystem.length(params.Sch_rad),
-      Length:          unitSystem.length(L),
-      "Tube Spacing":  unitSystem.length(S_tube),
+      "Wall Thickness":unitSystem.lengthC(params.Sch_rad),
+      "Outside Di":    unitSystem.lengthC(Do),
+      "Ef. Length":    unitSystem.length(L),
+      Pitch:           unitSystem.lengthC(S_tube),
     },
     FINING: "None"
   }

@@ -153,7 +153,7 @@ const convSection = (params) => {
 
     // Forced break of loop
     iterations++;
-    if (iterations > 10) {
+    if (iterations > 20) {
       logger.info(`diff vs error: ${normalized_error}-${normalized_diff(t_in_calc)}`)
       logger.error("Max iterations reached for inlet temp calc at convective sect");
       break;
@@ -215,17 +215,17 @@ const convSection = (params) => {
       Material:        'A-312 TP321',
       "No Tubes Wide": params.Tpr_sh_cnv,
       "No Tubes":      N,
-      "Wall Thickness":unitSystem.length(params.Sch_sh_cnv),
-      "Outside Di":    unitSystem.length(Do),
+      "Wall Thickness":unitSystem.lengthC(params.Sch_sh_cnv),
+      "Outside Di":    unitSystem.lengthC(Do),
       "Ef. Length":    unitSystem.length(L),
-      "Tran Pitch":    unitSystem.length(S_tube),
-      "Long Pitch":    unitSystem.length(S_tube)
+      "Tran Pitch":    unitSystem.lengthC(S_tube),
+      "Long Pitch":    unitSystem.lengthC(S_tube)
     },
     FINING: {
       Material:    '11.5-13.5Cr',
       Type:        'Solid',
-      "Height":    unitSystem.length(params.Lf),
-      "Thickness": unitSystem.length(params.Tf),
+      "Height":    unitSystem.lengthC(params.Lf),
+      "Thickness": unitSystem.lengthC(params.Tf),
       Dens:        params.Nf + " 1/m",
       Arrange:     "Staggered Pitch" 
     }
