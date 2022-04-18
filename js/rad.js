@@ -249,7 +249,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "Q_rad":    Q_rad( tg_out, Tw(Tb(t_out,t_in), Tw(Tb(t_out,t_in))) ),
 
     "Q_R":      Q_R(tg_out, Tw(Tb(t_out,t_in),Tw(Tb(t_out,t_in)))),
-    "Q_fluid":  Q_fluid(),
+    "Q_fluid":  Q_fluid(t_out,t_in),
 
     "At":       At,
     "Ar":       Ar,
