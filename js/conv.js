@@ -86,10 +86,10 @@ const convSection = (params) => {
     
     hr = (tG_b, tW) => 2.2 *gr(tG_b, tW) *(PL)**.50 *(Apo/Ao)**.75; // (kJ/m²h-°C) effective radiative coff wall tube
 
-  let hc = (tG_b) => .33 *(kw_flue(tG_b) /Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
+  let hc = (tG_b, _tW) => .33 *(kw_flue(tG_b) /Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
 
   const
-    ho = (tG_b, tW) => 1/( 1/(hc(tG_b) +hr(tG_b,tW)) +Rfo ), // (kJ/m²h-°C) external heat transfer coff
+    ho = (tG_b, tW) => 1/( 1/(hc(tG_b, tW) +hr(tG_b,tW)) +Rfo ), // (kJ/m²h-°C) external heat transfer coff
     /** Fin's Efficiency */
     Kf = kw_tube(Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))),
     B = Lf + (Tf /2),
@@ -99,9 +99,9 @@ const convSection = (params) => {
     Df = Do + 2*Lf,
     Ef  = y * (0.45 * Math.log(Df / Do) * (y - 1) + 1),    // (-) Fin efficiency
     he = (tG_b, tW) => ho(tG_b, tW) *(Ef*Afo + Apo) / Ao,  // (kJ/m²h-°C)
-    j = (tG_b) => colburnFactor(reynolds_flue, Tw, params, m, B)(tG_b);   // Colburn factor
+    j = (tG_b, tW) => colburnFactor(reynolds_flue, params, m, B)(tG_b, tW);   // Colburn factor
   
-  hc = (tG_b) => j(tG_b) *Gn *Cp_flue(tG_b) *prandtl_flue(tG_b)**(-.67); // (kJ/m²h-°C) film heat transfer coff
+  hc = (tG_b, tW) => j(tG_b, tW) *Gn *Cp_flue(tG_b) *prandtl_flue(tG_b)**(-.67); // (kJ/m²h-°C) film heat transfer coff
 
   /** LMTD counter-current */
   const LMTD_Tin = (tIn) => LMTD(tIn, t_out, tg_in, tg_out);
@@ -153,7 +153,7 @@ const convSection = (params) => {
 
     // Forced break of loop
     iterations++;
-    if (iterations > 10) {
+    if (iterations > 20) {
       logger.info(`diff vs error: ${normalized_error}-${normalized_diff(t_in_calc)}`)
       logger.error("Max iterations reached for inlet temp calc at convective sect");
       break;
@@ -161,6 +161,7 @@ const convSection = (params) => {
   }
 
   const conv_result = {
+    "t_fin":    params.Ts( Tb(t_in), Tw( Tb(t_in), Tw(Tb(t_in)) )),
     "t_in_given":params.t_in_conv,
     "t_in":     t_in,
     "t_out":    t_out,
@@ -169,6 +170,7 @@ const convSection = (params) => {
     "tg_out":   tg_out,
     "tg_in":    tg_in,
     "Tb_g":     Tb(tg_in, tg_out),
+
     "LMTD":     LMTD_Tin(t_in),
     "DeltaA":   (tg_in - t_out),
     "DeltaB":   (tg_out - t_in),
@@ -198,13 +200,12 @@ const convSection = (params) => {
     Afo :         Afo,
     Ef  :         Ef,
 
-    "hi":         hi( Tb(t_in) ) ,
-    "hi_tw":      hi( Tb(t_in),         Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    "hi":         hi( Tb(t_in),         Tw(Tb(t_in), Tw(Tb(t_in))) ),
     "hr":         hr( Tb(tg_out,tg_in), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "hc":         hc( Tb(tg_in, tg_out) ),
     "ho":         ho( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    "hc":         hc( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
     "he":         he( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "j":          j( Tb(tg_out,tg_in) ) ,
+    "j":          j( Tb(tg_out,tg_in),  Tw(Tb(t_in), Tw(Tb(t_in))) ) ,
 
     "Uo":         Uo( Tb(tg_in, tg_out), Tb(t_in), Tw(Tb(t_in)) ),
     "R_int":      R_int(                 Tb(t_in), Tw(Tb(t_in))),
@@ -212,22 +213,21 @@ const convSection = (params) => {
     "R_ext":      R_ext(Tb(tg_in, tg_out),         Tw(Tb(t_in))),
 
     TUBING: {
-      Material:        'A-312 TP321',
-      "No Tubes Wide": params.Tpr_sh_cnv,
-      "No Tubes":      N,
-      "Wall Thickness":unitSystem.length(params.Sch_sh_cnv),
-      "Outside Di":    unitSystem.length(Do),
-      "Ef. Length":    unitSystem.length(L),
-      "Tran Pitch":    unitSystem.length(S_tube),
-      "Long Pitch":    unitSystem.length(S_tube)
+      Material: params.Material,
+      Nt:       Nt,
+      N:        N,
+      Sch:      params.Sch_sh_cnv,
+      Do:       Do,
+      L:        L,
+      S_tube:   S_tube
     },
     FINING: {
-      Material:    '11.5-13.5Cr',
-      Type:        'Solid',
-      "Height":    unitSystem.length(params.Lf),
-      "Thickness": unitSystem.length(params.Tf),
-      Dens:        params.Nf + " 1/m",
-      Arrange:     "Staggered Pitch" 
+      Material:    params.FinMaterial,
+      Type:        params.FinType,
+      Height:      params.Lf,
+      Thickness:   params.Tf,
+      Dens:        params.Nf,
+      Arrange:     params.FinArrange
     }
   };
   conv_result.miu_flue = miu_flue(tg_out);
@@ -240,7 +240,7 @@ const convSection = (params) => {
   return conv_result;
 }
 
-const colburnFactor = (reynoldsFlue, tW, parm, m, B) => {
+const colburnFactor = (reynoldsFlue, parm, m, B) => {
   const
     C1 = (tB_g) => .25 *reynoldsFlue(tB_g)**(-.35), // Reynolds number correction
 
@@ -255,9 +255,9 @@ const colburnFactor = (reynoldsFlue, tW, parm, m, B) => {
     
     Df_Do = (2*parm.Lf + parm.Do_conv) / (parm.Do_conv), // (m) Ratio fin's Do per tube's Do
     
-    Ts = (tB_g) => tB_g + (tW() - tB_g) / ( ( Math.exp(1.4142*m*B) + Math.exp(-1.4142*m*B) )/2 );// (K) Average fin temperature
-  
-  return (tB_g) => C1(tB_g) *C3 *C5 *(Df_Do)**.5 *(tB_g/Ts(tB_g))**.25;
+    Ts = (tB_g, tW) => tB_g + (tW - tB_g) / ( ( Math.exp(1.4142*m*B) + Math.exp(-1.4142*m*B) )/2 );// (K) Average fin temp
+  parm.Ts = Ts;
+  return (tB_g, tW) => C1(tB_g) *C3 *C5 *(Df_Do)**.5 *(tB_g/Ts(tB_g, tW))**.25;
 };
 
 module.exports = {

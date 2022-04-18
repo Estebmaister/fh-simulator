@@ -28,8 +28,6 @@ const shieldSection = (params) => {
     t_in = (params.t_in_rad + params.t_in_conv)*0.5, // (K) Inlet fluid temp.
     t_in_calc = 0;  // (K) Recalculation for Inlet shld fluid temp.
 
-  const duty_sh = (tIn) => m_fluid * Cp_fluid(tIn, t_out) * (t_out - tIn);
-
   /** (K) bulk temp func (second arg default to shld outlet fluid temp) */
   const Tb = (tIn, tOut = t_out) => 0.5*(tIn + tOut);
 
@@ -72,18 +70,20 @@ const shieldSection = (params) => {
     reynolds_flue = (t) => Gn * Do/miu_flue(t), // (-) Gn*Do/miu_flue.
       
     /** (kJ/m²h-°C) internal heat transfer coff */
-    hi = (tB, tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *prandtl(tB)**(1/3)*
-      (miu_fluid(tB)/miu_fluid(tW))**.14,
+    hi = (tB, tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *
+      prandtl(tB)**(1/3)*(miu_fluid(tB)/miu_fluid(tW))**.14,
     /** (kJ/m²h-°C) effective radiative coff wall tube */
     hr = (tG) => .092 * tG - 34,
     /** (kJ/m²h-°C) * film heat transfer coff */
     hc = (tG_b) => .33 *(kw_flue(tG_b) /Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6,
     /** (kJ/m²h-°C) external heat transfer coff */
-    ho = (tG_out, tG = tg_in) => 1/( 1/( hc(Tb(tG_out, tG)) + hr(tG) ) + Rfo );
+    ho = (tG_out, tG =tg_in) => 1/(1/(hc(Tb(tG_out, tG)) + hr(tG)) +Rfo);
   
-  /** Tw = Average tube wall temperature in Kelvin degrees */
-  const Tw = (tB, tW = tB, tIn = t_in) => (duty_sh(tIn)/At) * 
-    (Do/Di) * (Rfi + 1/hi(tB,tW) + (Di * Math.log(Do/Di) / (2*kw_tube(tW))) ) + tB;
+  const
+    duty_sh = (tIn) => m_fluid *Cp_fluid(tIn) *(t_out -tIn),
+    /** Average tube wall temp (K) */
+    Tw = (tB, tW = tB, tIn = t_in) => (duty_sh(tIn)/At) *(Do/Di)*
+      (Rfi +1/hi(tB,tW) +(Di *Math.log(Do/Di) /(2*kw_tube(tW))) ) +tB;
 
   const // Thermal Resistances (hr-ft2-F/Btu)
     R_int = (tB, tW) => Do / (Di * hi(tB,tW)) + (Do/Di)*Rfi, // Inside
@@ -195,15 +195,15 @@ const shieldSection = (params) => {
     "R_ext":      R_ext(tg_out, tg_in),
 
     TUBING: {
-      Material:        'A-312 TP321',
-      "No Tubes Wide": params.Tpr_sh_cnv,
-      "No Tubes":      N,
-      "Wall Thickness":unitSystem.length(params.Sch_sh_cnv),
-      "Outside Di":    unitSystem.length(Do),
-      "Ef. Length":    unitSystem.length(L),
-      "Tran Pitch":    unitSystem.length(S_tube),
-      "Long Pitch":    unitSystem.length(S_tube)
+      Material: params.Material,
+      Nt:       params.Tpr_sh_cnv,
+      N:        N,
+      Sch:      params.Sch_sh_cnv,
+      Do:       Do,
+      L:        L,
+      S_tube:   S_tube
     },
+    
     FINING: "None"
   };
   shld_result.miu_flue = miu_flue(tg_out);

@@ -34,13 +34,13 @@ const optionsModifier = (key, browserData, options) => {
       // TODO: not set yet
       break;
     case "project_n":
-      // TODO: not set yet
+
       break;
     case "revision_n":
-      // TODO: not set yet
+
       break;
     case "date":
-      // TODO: not set yet
+      
       break;
     case "t_amb":
       optValue = parseFloat(browserData[key])
@@ -109,8 +109,8 @@ const insertBrowserData = (browserData, fuels, data, options) => {
 }
 
 const outputData = (result, browserData, lang, unitSystem) => {
-	// logger.info(JSON.stringify(result, null, 2))
-  // logger.debug(JSON.stringify(browserData, null, 2))
+	// log logger.info(JSON.stringify(result, null, 2))
+  logger.debug(JSON.stringify(browserData, null, 2))
 
   let outputString = ''
   if (lang == 'es') {
