@@ -195,15 +195,15 @@ const shieldSection = (params) => {
     "R_ext":      R_ext(tg_out, tg_in),
 
     TUBING: {
-      Material:        'A-312 TP321',
-      "No Tubes Wide": params.Tpr_sh_cnv,
-      "No Tubes":      N,
-      "Wall Thickness":unitSystem.lengthC(params.Sch_sh_cnv),
-      "Outside Di":    unitSystem.lengthC(Do),
-      "Ef. Length":    unitSystem.length(L),
-      "Tran Pitch":    unitSystem.lengthC(S_tube),
-      "Long Pitch":    unitSystem.lengthC(S_tube)
+      Material: params.Material,
+      Nt:       params.Tpr_sh_cnv,
+      N:        N,
+      Sch:      params.Sch_sh_cnv,
+      Do:       Do,
+      L:        L,
+      S_tube:   S_tube
     },
+    
     FINING: "None"
   };
   shld_result.miu_flue = miu_flue(tg_out);

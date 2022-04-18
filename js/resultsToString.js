@@ -8,11 +8,10 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   } else {
     string = `Radiant section results:`
   }
-  let TUBING = '\n';
-  Object.entries(result_obj.TUBING).forEach( ([key, value]) => TUBING += `\t${key}: ${value}\n` )
+  
   string += `\n
   m_fuel:   ${unit.mass_flow( result_obj.m_fuel )}
-
+  m_fluid:  ${unit.mass_flow( result_obj.m_fluid )}
   t_in:     ${unit.tempC( result_obj.t_in )}
   t_out:    ${unit.tempC( result_obj.t_out )}
   Tw:       ${unit.tempC( result_obj.Tw )}
@@ -66,8 +65,16 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   Pr_fluid: ${result_obj.Prandtl}
   Re_fluid: ${result_obj.Reynolds}
 
-  TUBING: ${TUBING}
-  FINING: ${JSON.stringify(result_obj.FINING, null, 2)}
+  TUBING:
+    Material:       ${result_obj.TUBING.Material}
+    No Tubes Wide:  ${result_obj.TUBING.Nt}
+    No Tubes:       ${result_obj.TUBING.N}
+    Wall Thickness: ${unit.lengthC(result_obj.TUBING.Sch)}
+    Outside Di:     ${unit.lengthC(result_obj.TUBING.Do)}
+    Pitch:          ${unit.lengthC(result_obj.TUBING.S_tube)}
+    Ef. Length:     ${unit.length(result_obj.TUBING.L)}
+    
+  FINING: No
   `;
   return `\n` + string;
 }
@@ -80,8 +87,7 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   } else {
     string = `Shield section results:`
   }
-  let TUBING = '\n';
-  Object.entries(result_obj.TUBING).forEach( ([key, value]) => TUBING += `\t${key}: ${value}\n` )
+  
   string += `\n
   m_flue:   ${unit.mass_flow( result_obj.m_flue )}
   t_in_sup: ${unit.tempC( result_obj.t_in_sup )}
@@ -138,8 +144,17 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   Pr_fluid: ${result_obj.Prandtl}
   Re_fluid: ${result_obj.Reynolds}
 
-  TUBING: ${TUBING}
-  FINING: ${JSON.stringify(result_obj.FINING, null, 2)}
+  TUBING:
+    Material:       ${result_obj.TUBING.Material}
+    No Tubes Wide:  ${result_obj.TUBING.Nt}
+    No Tubes:       ${result_obj.TUBING.N}
+    Wall Thickness: ${unit.lengthC(result_obj.TUBING.Sch)}
+    Outside Di:     ${unit.lengthC(result_obj.TUBING.Do)}
+    Tran Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
+    Long Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
+    Ef. Length:     ${unit.length(result_obj.TUBING.L)}
+
+  FINING: No
   `;
   return `\n` + string;
 }
@@ -153,10 +168,8 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
     string = `Convective section results:`
   }
 
-  let TUBING = '\n';
-  Object.entries(result_obj.TUBING).forEach( ([key, value]) => TUBING += `\t${key}: ${value}\n` )
   string += `\n
-
+  t_fin:    ${unit.tempC( result_obj.t_fin )}
   t_in_data:${unit.tempC( result_obj.t_in_given )}
   t_in:     ${unit.tempC( result_obj.t_in )}
   t_out:    ${unit.tempC( result_obj.t_out )}
@@ -211,8 +224,23 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   Pr_fluid: ${result_obj.Prandtl}
   Re_fluid: ${result_obj.Reynolds}
 
-  TUBING: ${TUBING}
-  FINING: ${JSON.stringify(result_obj.FINING, null, 2)}
+  TUBING:
+    Material:       ${result_obj.TUBING.Material}
+    No Tubes Wide:  ${result_obj.TUBING.Nt}
+    No Tubes:       ${result_obj.TUBING.N}
+    Wall Thickness: ${unit.lengthC(result_obj.TUBING.Sch)}
+    Outside Di:     ${unit.lengthC(result_obj.TUBING.Do)}
+    Tran Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
+    Long Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
+    Ef. Length:     ${unit.length(result_obj.TUBING.L)}
+
+  FINING: 
+    Material:       ${result_obj.FINING.Material}
+    Type:           ${result_obj.FINING.Type}
+    Height:         ${unit.lengthC(result_obj.FINING.Height)}
+    Thickness:      ${unit.lengthC(result_obj.FINING.Thickness)}
+    Dens:           ${unit.lengthInv(result_obj.FINING.Dens)},
+    Arrange:        ${result_obj.FINING.Arrange}
   `;
   return `\n` + string;
 }

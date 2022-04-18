@@ -82,6 +82,7 @@ const createParams = (opts) => {
     //*/
     
     /** Mechanic variables for heater */
+    Material: 'A-312 TP321',
     h_conv: unitConv.hcENtohcSI(1.5),// (kJ/h-m2-C)
     kw_tube: kw_tubes_A312_TP321,    // (kJ/h-m-C)
     Pass_number: 2,          // - number of tube passes
@@ -114,6 +115,9 @@ const createParams = (opts) => {
     Lf:unitConv.fttom(0.08), // (m) Fin's height
 
     /** Miscellaneous */
+    FinType: 'Solid',
+    FinMaterial: '11.5-13.5Cr',
+    FinArrange: 'Staggered Pitch',
     verbose: opts.verbose,       // True or False
     unitSystem: opts.unitSystem, // SI or English
     lang: opts.lang,             // EN or ES
