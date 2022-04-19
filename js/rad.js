@@ -90,16 +90,15 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
 
     /** (ft) Mean Beam Length, dim ratio 1-2-1 to 1-2-4*/
     MBL = 2/3 *(params.Width_rad*params.Length_rad*params.Height_rad)**(1/3),
-    PL = (params.Ph2o + params.Pco2) * MBL,
-    ratio_pitch_do_rad = params.Pass_number *S_tube /params.Do_rad, // (-) Tube's Ratio pitch/ext_diameter
+    PL = (params.Ph2o + params.Pco2) * MBL, // atm-ft
     /** - alpha radiant factor */
-    alpha = 1 + .49*ratio_pitch_do_rad /6 - .09275*ratio_pitch_do_rad**2+
-      .065 *ratio_pitch_do_rad**3 /6      + .00025*ratio_pitch_do_rad**4,
+    alpha = 1 + .49*(S_tube/Do)/6 - .09275*(S_tube/Do)**2+
+      .065 *(S_tube/Do)**3 /6     + .00025*(S_tube/Do)**4,
     alpha_shld =  1, // (-) alpha shield factor
     
     Ar = Ar_calc(params.Width_rad, params.Length_rad, params.Height_rad), // (m2) Total refractory area
-    Acp_shld = N_shld * S_tube_shld * L_shld, // (m2) Cold plane area of shield tube bank
-    Acp = N * 2 * S_tube * L, // (m2) Cold plane area of tube bank
+    Acp_shld = N_shld *S_tube_shld *L_shld, // (m2) Cold plane area of shield tube bank
+    Acp = N * S_tube * L,   // (m2) Cold plane area of tube bank
     At = N *Math.PI *Do *L, // (m2) Bank tube's external surface area
     Ai = Math.PI*(Di**2)/2, // (m2) Tube's inside flux area x2
 
@@ -330,13 +329,13 @@ const Ar_calc = (width, length, height) => {
     base = length * width,
     wall_width  = height * width,
     wall_length = height * length;
-  
+  //TODO: use steem eq
   const Ar2 = 2*(22.7+5.3+1)*width + 2*wall_length + base;
   const Ar = 2*wall_width + 2*wall_length + 1.234*base;
 
   logger.warn(`{"Ar prev (ft)": ${Ar2},"Ar calc (ft)": ${Ar}}`);
 
-  return unitConv.fttom(Ar)*unitConv.fttom(1);
+  return unitConv.ft2tom2(Ar);
 };
 
 /** returns effectivity(temp) function of temperature to use as F */

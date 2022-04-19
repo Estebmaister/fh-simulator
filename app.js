@@ -87,11 +87,11 @@ const createParams = (opts) => {
     kw_tube: kw_tubes_A312_TP321,    // (kJ/h-m-C)
     Pass_number: 2,          // - number of tube passes
     
-    Pitch_rad: unitConv.intom(2*8), // (m) NPS * 2
-    N_rad:  42,                   // - number of tubes 
-    L_rad:  unitConv.fttom(62.00),// (m) tube effective length
-    Do_rad: unitConv.intom(8.625),// (m) tube external diameter
-    Sch_rad:unitConv.intom(0.322),// (m) Schedule thickness
+    Pitch_rad: unitConv.intom(2*8),// (m) NPS * 2
+    N_rad:  42,                    // - number of tubes 
+    L_rad:  unitConv.fttom(62.094),// (m) tube effective length
+    Do_rad: unitConv.intom(8.625), // (m) tube external diameter
+    Sch_rad:unitConv.intom(0.322), // (m) Schedule thickness
 
     Width_rad:  17.50,            // (ft) width in rad sect
     Length_rad: 64.55,            // (ft) length in rad sect
