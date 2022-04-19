@@ -166,7 +166,7 @@ const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
 
 const 
   tempToK = 273.15,
-  tempAmbRef = tempToK + 25; // 298.15 K
+  tempAmbRef = tempToK + 15.56; // 288.7 K
 
 const unitConv = {
   RtoK: (n) => n*(5/9),
@@ -206,6 +206,11 @@ const getOptions = () => {
     // Entry default arguments
     verbose:    true,       // boolean
     tAmb:       tempAmbRef, // K
+    tAir:       tempAmbRef, // K
+    tFuel:      tempAmbRef, // K
+    tIn:        678,        // F
+    tOut:       772,        // F
+    mFluid:     1_103_600,  // lb/h
     humidity:   0,          // %
     o2Excess:   .01 * 0,    // fr
     airExcess:  .01 * 0,    // fr
@@ -336,7 +341,7 @@ const kw_tubes_A312_TP321 = (t) => {
 
 const englishSystem = { //(US Customary)
   "energy/mol":   (n) => round(unitConv.kJtoBTU(n)) + " Btu/mol",
-  "mass/mol":     (n) => round(n * 2.2046244202) + " lb/lb-mol",
+  "mass/mol":     (n) => round(n) + " lb/lb-mol",
   heat_flow :     (n) => round(unitConv.kJtoBTU(n)*1e-6) + " MBtu/h",
   heat_flux:      (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**2) + " Btu/h-ft2",
   fouling_factor: (n) => round(n * 10.763910417*1.8/0.94781712) + " h-ft2-°F/Btu",
@@ -353,13 +358,14 @@ const englishSystem = { //(US Customary)
   mass:     (n) => round(n * 2.2046244202e-3) + " lb",
   mass_flow:(n) => round(unitConv.kgtolb(n))  + " lb/h",
   vol_flow: (n) => round(unitConv.mtoft(n)**3)+ " f3/h",
-  cp:       (n) => round(n * 0.238845896627)  + " Btu/lb-mol °F",
+  cp:       (n) => round(n * 0.238845896627)  + " Btu/lb-°F",
+  cp_mol:   (n) => round(n * 0.238845896627)  + " Btu/lb-mol-°F",
   power:    (n) => round(n * 3.4121416331)    + " Btu/h",
   moist:    (n) => round(n * 1e3)             + "x10^(-3) lb-H2O/lb",
   thermal:  (n) => round( unitConv.kJtoBTU(n) /
-    unitConv.KtoR(1)/unitConv.mtoft(1) )      + " BTU/h-ft-F",
+    unitConv.KtoR(1)/unitConv.mtoft(1) )      + " BTU/h-ft-°F",
   convect:  (n) => round( unitConv.kJtoBTU(n) /
-    unitConv.KtoR(1)/(unitConv.mtoft(1)**2) ) + " BTU/h-ft2-F",
+    unitConv.KtoR(1)/(unitConv.mtoft(1)**2) ) + " BTU/h-ft2-°F",
   viscosity:(n) => round(n * 1)    + " cP",
   system:   {en: "English", es: "Inglés"}
 };
@@ -383,7 +389,8 @@ const siSystem = {
   mass:     (n) => round(n * 1e-3) + " kg",
   mass_flow:(n) => round(n * 1)    + " kg/h",
   vol_flow: (n) => round(n * 1)    + " m3/h",
-  cp:       (n) => round(n * 1)    + " kJ/kmol K",
+  cp:       (n) => round(n * 1)    + " kJ/kg-K",
+  cp_mol:   (n) => round(n * 1)    + " kJ/kmol-K",
   power:    (n) => round(n * 1)    + " W",
   moist:    (n) => round(n * 1e3)  + " g-H2O/kg",
   thermal:  (n) => round(n * 1)    + " kJ/h-m-C",

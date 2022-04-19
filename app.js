@@ -31,36 +31,38 @@ const {shieldSection} = require('./js/shield');
 const {combSection} = require('./js/combustion');
 const {browserProcess} = require('./js/browser');
 
-const
-  t_in = unitConv.FtoK(678), // (K)
-  t_out= unitConv.FtoK(772), // (K)
-  miu_fluid_in = 1.45, // (cp)
-  miu_fluid_out= 0.96, // (cp)
-  cp_fluid_in = unitConv.CpENtoCpSI(0.676), // (kJ/kg-C)
-  cp_fluid_out= unitConv.CpENtoCpSI(0.703), // (kJ/kg-C) 
-  kw_fluid_in = unitConv.kwENtokwSI(0.038), // (kJ/h-m-C)
-  kw_fluid_out= unitConv.kwENtokwSI(0.035), // (kJ/h-m-C)
-  kw_tube     = unitConv.kwENtokwSI(11.508);// (kJ/h-m-C)
-
 const createParams = (opts) => {
+  const
+    m_fluid = unitConv.lbtokg(opts.mFluid), // kg/h
+    t_in = unitConv.FtoK(opts.tIn), // (K)
+    t_out= unitConv.FtoK(opts.tOut), // (K)
+    miu_fluid_in = 1.45, // (cp)
+    miu_fluid_out= 0.96, // (cp)
+    cp_fluid_in = unitConv.CpENtoCpSI(0.676), // (kJ/kg-C)
+    cp_fluid_out= unitConv.CpENtoCpSI(0.702), // (kJ/kg-C) 
+    kw_fluid_in = unitConv.kwENtokwSI(0.038), // (kJ/h-m-C)
+    kw_fluid_out= unitConv.kwENtokwSI(0.035); // (kJ/h-m-C)
+
   return {
     /** Inlet Amb Variables */
-    p_atm: opts.pAtm,          // (Pa) 
-    t_air: opts.tAmb,          // (K) amb 
-    t_fuel: opts.tAmb,         // (K) amb 
-    t_amb: opts.tAmb,          // (K) amb
-    humidity: opts.humidity,   // (%) 
+    p_atm:  opts.pAtm,         // (Pa) 
+    t_fuel: opts.tFuel,        // (K) 
+    t_air:  opts.tAir,         // (K)
+    t_amb:  opts.tAmb,         // (K) ref
+    humidity:  opts.humidity,  // (%) 
     airExcess: opts.airExcess, // (% *.01) 
-    o2Excess: opts.o2Excess,   // (% *.01) 
+    o2Excess:  opts.o2Excess,  // (% *.01) 
     
     /** Process Variables */
-    max_duty: unitConv.BTUtokJ(71.5276*1e3),// (kJ/h)
+    t_in_conv:  t_in,       // (K) global process inlet
+    t_out:      t_out,      // (K) global process outlet
+    m_fluid:    m_fluid,    // (kg/h) 
+    efficiency:        .8,  // (-)
     Rfi:                0,  // (h-m2-C/kJ) int. fouling factor
     Rfo:                0,  // (h-m2-C/kJ) ext. fouling factor
     duty_rad_dist:     .7,  // (-)
-    efficiency:        .8,  // (-)
     heat_loss_percent: .015,// (% *.01)
-    m_fluid: 500_590,       // (kg/h) 
+    max_duty: unitConv.BTUtokJ(71.5276*1e3),// (kJ/h)
     miu_fluid: viscosityApprox({
       t1: t_in , v1: miu_fluid_in,
       t2: t_out, v2: miu_fluid_out
@@ -74,8 +76,6 @@ const createParams = (opts) => {
       x2: t_out, y2: kw_fluid_out
     }),                     // (kJ/h-m-C)
 
-    t_in_conv: t_in, // (K) global process inlet
-    t_out:    t_out, // (K) global process outlet
     /* 
     m_fuel: 100,     // (kg/h)
     t_out: undefined,// (K) global process out

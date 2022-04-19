@@ -42,10 +42,30 @@ const optionsModifier = (key, browserData, options) => {
     case "date":
       
       break;
+    case "m_fluid":
+      optValue = parseFloat(browserData[key])
+      if (optValue > 0) 
+        options.mFluid = optValue*1e3;
+      break;
+    case "t_in":
+      optValue = parseFloat(browserData[key])
+      if (optValue > 0 && optValue < maxTamb) 
+        options.tIn = unitConv.FtoK(optValue);
+      break;
+    case "t_out":
+      optValue = parseFloat(browserData[key])
+      if (optValue > 0 && optValue < maxTamb) 
+        options.tOut = unitConv.FtoK(optValue);
+      break;
+    case "t_fuel":
+      optValue = parseFloat(browserData[key])
+      if (optValue > -maxTamb && optValue < maxTamb) 
+        options.tFuel = optValue +options.tempToK;
+      break;
     case "t_amb":
       optValue = parseFloat(browserData[key])
-      if (optValue > -options.tempToK && optValue < maxTamb) 
-        options.tAmb = optValue +options.tempToK;
+      if (optValue > -maxTamb && optValue < maxTamb) 
+        options.tAir = optValue +options.tempToK;
       break;
     case "humidity":
       optValue = parseFloat(browserData[key])
@@ -68,9 +88,6 @@ const optionsModifier = (key, browserData, options) => {
         options.o2Excess = optValue * .01;
       break;
     case "o2_basis":
-      
-      break;
-    case "t_fuel":
       
       break;
     case "fuel_percent":
@@ -118,16 +135,20 @@ const outputData = (result, browserData, lang, unitSystem) => {
 Datos de entrada
   (en caso de no haber sido introducidos, tomará el predeterminado)
 
-  Sistema de unidades:   ${result.debug_data["unitSystem"]}
-  Presión atmosférica:   ${result.debug_data["atmPressure"]}
-  Temperatura ambiente:  ${result.debug_data["ambTemperature"]}
-  Humedad:               ${result.debug_data["humidity_%"]} %
-  N2 en aire seco:       ${result.debug_data["dryAirN2_%"]} %
-  O2 en aire seco:       ${result.debug_data["dryAirO2_%"]} %
+  Sistema de unidades:      ${result.debug_data["unitSystem"]}
+  Presión atmosférica:      ${result.debug_data["atmPressure"]}
+  Temperatura ref:          ${result.debug_data["ambTemperature"]}
+  Temperatura aire:         ${result.debug_data["airTemperature"]}
+  Temperatura comb:         ${result.debug_data["fuelTemperature"]}
+
+  Humedad:                  ${result.debug_data["humidity_%"]} %
+  N2 en aire seco:          ${result.debug_data["dryAirN2_%"]} %
+  O2 en aire seco:          ${result.debug_data["dryAirO2_%"]} %
 
   Presión de aire seco:     ${result.debug_data["dryAirPressure"]}
   Presión de vapor de agua: ${result.debug_data["waterPressure"]}
-  Presión parcial de H2O:   ${result.debug_data["H2OPressure_%"]} 10^(-2)
+
+  Presión parcial de H2O:    ${result.debug_data["H2OPressure_%"]} 10^(-2)
   Presión parcial de N2:    ${result.debug_data["N2Pressure_%"]} 10^(-2)
   Presión parcial de O2:    ${result.debug_data["O2Pressure_%"]} 10^(-2)
   Contenido húmedo (w):     ${result.debug_data["moisture"]}-AireSeco
@@ -158,7 +179,7 @@ Moles de gases de combustión total y porcentajes por cada mol de combustible
   Relación A/C másica (aire húmedo, teórica): ${result.flows["AC_mass_theor_moistAir"]}
 
   Peso molecular del combustible: ${result.flows["fuel_MW"]}
-  Cp(t_entrada) del combustible:  ${result.flows["fuel_Cp"]}
+  Cp(t_comb) del combustible:  ${result.flows["fuel_Cp"]}
   NCV: ${result.flows["NCV"]}
 
   Peso molecular de los gases de combustión: ${result.flows["flue_MW"]}
@@ -171,13 +192,17 @@ Input Data
 
   Unit System:          ${result.debug_data["unitSystem"]}
   Atmospheric Pressure: ${result.debug_data["atmPressure"]}
-  Ambient Temperature:  ${result.debug_data["ambTemperature"]}
+  Ref Temperature:      ${result.debug_data["ambTemperature"]}
+  Air Temperature:      ${result.debug_data["airTemperature"]}
+  Fuel Temperature:     ${result.debug_data["fuelTemperature"]}
+
   Humidity:             ${result.debug_data["humidity_%"]} %
   N2 en aire seco:      ${result.debug_data["dryAirN2_%"]} %
   O2 en aire seco:      ${result.debug_data["dryAirO2_%"]} %
 
   Dry Air Pressure:     ${result.debug_data["dryAirPressure"]}
   Water Vapor Pressure: ${result.debug_data["waterPressure"]}
+
   Partial Pressure H2O: ${result.debug_data["H2OPressure_%"]} 10^(-2)
   Partial Pressure N2 : ${result.debug_data["N2Pressure_%"]} 10^(-2)
   Partial Pressure O2 : ${result.debug_data["O2Pressure_%"]} 10^(-2)
@@ -208,9 +233,9 @@ Total flue gas moles and percentage (per fuel mol)
   A/C molar relation (dry air, theoretical):   ${result.flows["AC_theor_dryAir"]}
   A/C mass relation (moist air, theoretical):  ${result.flows["AC_mass_theor_moistAir"]}
 
-  Fuel mol weight:    ${result.flows["fuel_MW"]}
-  Fuel Cp(t_fuel_in):	${result.flows["fuel_Cp"]}
-  NCV: ${result.flows["NCV"]}
+  Fuel mol weight: ${result.flows["fuel_MW"]}
+  Fuel Cp(t_fuel): ${result.flows["fuel_Cp"]}
+  NCV:             ${result.flows["NCV"]}
 
   Flue gas mol weight: ${result.flows["flue_MW"]}
   Flue gas Cp(t_amb):  ${result.flows["flue_Cp_Tamb"]}
