@@ -58,22 +58,79 @@
       <h2>Datos operacionales básicos</h2>
 
       <div class="form-div">
+        <div class="form-div">
+          <p class="project-info">
+            Nombre:      <input name="project_title" value="fire_heater_sim" required> <span class="validity"></span>
+          </p>
+          <p class="project-info">
+            N° proyecto: <input name="project_n" type="number" min="0" value="1">
+          </p>
+        </div>
+        <div class="form-div">
+          <p class="project-info">
+            N° Revisión: <input name="revision_n" type="number" min="0" max="5" value="0">
+          </p>
+          <p class="project-info">
+            Fecha:       <input name="date" id="date" type="date">
+            <script>
+              const date = new Date(new Date().toLocaleDateString()).toISOString().substring(0, 10)
+              document.getElementById("date").value = date;
+            </script>
+          </p>
+        </div>
+      </div>
+
+      <hr>
+      <h3>Fluido de Proceso</h3>
+      <div class="form-div">
         <p class="project-info">
-          Nombre:      <input name="project_title" value="fire_heater_sim" required> <span class="validity"></span>
+          Flujo Másico M<sub>fluido</sub> <input step="0.1" min="0" name="m_fluid" type="number" value="1103.6"> x10<sup>3</sup> lb/h 
         </p>
-        <p class="project-info">
-          N° proyecto: <input name="project_n" type="number" min="0" value="1">
-        </p>
-        <p class="project-info">
-          N° Revisión: <input name="revision_n" type="number" min="0" max="5" value="0">
-        </p>
-        <p class="project-info">
-          Fecha:       <input name="date" id="date" type="date">
-          <script>
-            const date = new Date(new Date().toLocaleDateString()).toISOString().substring(0, 10)
-            document.getElementById("date").value = date;
-          </script>
-        </p>
+      </div>
+      <div class="form-div">
+        <div class="form-block">
+          <div class="form-div"> 
+            <div class="form-block flex-evenly"> 
+              <p class="project-info">
+                Temperatura de entrada T<sub>in</sub> <input step="0.01" min="0" name="t_in" type="number" value="678"> °F
+              </p>
+              <p class="project-info">
+                Temperatura de salida T<sub>out</sub> <input step="0.01" min="0" name="t_out" type="number" value="772"> °F
+              </p>
+            </div>
+            <div class="form-block flex-evenly"> 
+              <p class="project-info">
+                Capacidad calorífica Cp<sub>in</sub> <input step="0.001" min="0" name="cp_in" type="number" value="0.676"> 
+                <sub>Btu/lb-°F</sub>
+              </p>
+              <p class="project-info">
+                Capacidad calorífica Cp<sub>out</sub> <input step="0.001" min="0" name="cp_out" type="number" value="0.676"> 
+                <sub>Btu/lb-°F</sub>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="form-block">
+          <div class="form-div">
+            <div class="form-block flex-evenly"> 
+              <p class="project-info">
+                Viscosidad μ<sub>in</sub> <input step="0.001" min="0" name="miu_fluid_in" type="number" value="1.45"> cp
+              <p class="project-info">
+                Viscosidad μ<sub>out</sub> <input step="0.001" min="0" name="miu_fluid_out" type="number" value="0.96"> cp
+              </p>
+            </div>
+            <div class="form-block flex-evenly">
+              <p class="project-info">
+                Cond. térmica kw<sub>in</sub> <input step="0.001" min="0" name="kw_fluid_in" type="number" value="0.038">
+              <sub>BTU/h-ft-°F</sub>
+              </p>
+              <p class="project-info">
+                Cond. térmica kw<sub>out</sub> <input step="0.001" min="0" name="kw_fluid_out" type="number" value="0.035">
+              <sub>BTU/h-ft-°F</sub>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="form-div">
@@ -83,18 +140,18 @@
   
           <div class="form-div"> 
             <p class="project-info">
-              Temperatura Ambiente T<sub>a</sub> <input step="0.001" name="t_amb" type="number" placeholder="25.0">
+              Temperatura Ambiente T<sub>a</sub> <input step="0.001" min="0" name="t_amb" type="number" value="25.0">
             </span> °C</span>
             </p> 
             <p class="project-info">
-              Humedad Relativa RH <input step="0.001" name="humidity" type="number" placeholder="0.0"> %
+              Humedad Relativa RH <input step="0.001" min="0" name="humidity" type="number" value="50.0"> %
             </p>
             <p class="project-info">
-              Presión Atmosférica <input step="0.001" name="p_atm" type="number" placeholder="0.0">
+              Presión Atmosférica <input step="0.001" min="0" name="p_atm" type="number" placeholder="101.3">
             </span> kPa</span>
             </p>
             <p class="project-info">
-              Exceso de Aire <input step="0.001" name="air_excess" type="number" placeholder="0.0"> %
+              Exceso de Aire <input step="0.001" min="0" name="air_excess" type="number" value="20.0"> %
             </p>
           </div>
         </div>
@@ -102,7 +159,7 @@
         <div class="form-block">
           <hr>
           <h3>Gases de Combustión (GC) 
-            <br> <span><i><sub>(Para una combustión adecuada de combustible gaseoso, se recomienda alcanzar 3% de O2 en GC a base seca.)</sub> </i></span>
+            <br> <span><em><sub>(Para una combustión adecuada de combustible gaseoso, se recomienda alcanzar 3% de O2 en GC a base seca.)</sub> </em></span>
           </h3>
   
           <div class="form-div"> 
@@ -118,15 +175,15 @@
       <hr>
       <h3>Combustible</h3>
 
-      <div class="form-div"> 
-        <!-- <p class="project-info">Combustible especificado como <select name="fuel_percent">
+      <!-- <div class="form-div"> 
+        <p class="project-info">Combustible especificado como <select name="fuel_percent">
           <option value="mole_percent">porcentaje molar</option> 
           <option value="mass_percent">mass percent</option>
-        </select></p> -->
-      </div> 
+        </select></p> 
+      </div> -->
       
       <div class="form-div comp"> 
-        <p class="project-info">Temperatura T<sub>f</sub> <input name="t_fuel" placeholder="25.0" step="0.001" type="number"> °C </p>
+        <p class="project-info">Temperatura T<sub>f</sub> <input name="t_fuel" value="25.0" step="0.001" type="number"> °C </p>
         <p class="project-info">Composición</p>
         <p class="project-info">Total <span id="total" style="font-weight: bold;"> 0 </span></p>
       </div> 

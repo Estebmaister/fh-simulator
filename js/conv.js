@@ -205,7 +205,8 @@ const convSection = (params) => {
     "ho":         ho( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
     "hc":         hc( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
     "he":         he( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "j":          j( Tb(tg_out,tg_in),  Tw(Tb(t_in), Tw(Tb(t_in))) ) ,
+    "j":          j(  Tb(tg_out,tg_in), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    "gr":         gr( Tb(tg_out,tg_in), Tw(Tb(t_in), Tw(Tb(t_in))) ),
 
     "Uo":         Uo( Tb(tg_in, tg_out), Tb(t_in), Tw(Tb(t_in)) ),
     "R_int":      R_int(                 Tb(t_in), Tw(Tb(t_in))),

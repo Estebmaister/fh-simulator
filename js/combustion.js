@@ -89,7 +89,7 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
 * second argument set to true.
 */
 const Cp_multicomp = (fuels, molResult) => {
-  if (fuels.length === 0) return (t) => 0
+  if (fuels.length === 0) return (_t) => 0
   // making a deep copy and normalize if needed
   let normalFuel = JSON.parse(JSON.stringify(fuels));
   if (!checkObjectFraction(fuels)) 
@@ -103,14 +103,14 @@ const Cp_multicomp = (fuels, molResult) => {
     i++;
   }
   
-  return cps.reduce((acc, val) => ((t) => acc(t) + val(t)), (t) => 0);
+  return cps.reduce((acc, val) => ((t) => acc(t) + val(t)), (_t) => 0);
 };
 
 /** (kg/kmol) argument needs to be a fuel object,
 * ie: { CH4: 0.323, ... }
 */
 const MW_multicomp = (fuels) => {
-  if (fuels.length === 0) return (t) => 0;
+  if (fuels.length === 0) return (_t) => 0;
   // making a deep copy and normalize if needed
   let normalFuel = JSON.parse(JSON.stringify(fuels));
   if (!checkObjectFraction(fuels)) 
@@ -284,24 +284,24 @@ const combSection = (airExcess, fuels, params) => {
   const units = initSystem(params.unitSystem);
   const debug_data = {
     err: "",
-    atmPressure: units.pressure(params.p_atm),
-    ambTemperature: units.tempC(params.t_amb),
-    "humidity_%":  round(params.humidity),
+    atmPressure:     units.pressure(params.p_atm),
+    fuelTemperature: units.tempC(params.t_fuel),
+    ambTemperature:  units.tempC(params.t_amb),
+    airTemperature:  units.tempC(params.t_air),
+    "humidity_%": round(params.humidity),
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
-    moisture: units.moist(moistAirWeightRatio(params.t_amb, params.humidity)),
+    moisture:   units.moist(moistAirWeightRatio(params.t_amb, params.humidity)),
     unitSystem: units.system[params.lang]
   };
-  const compounds = data.filter((elem, i, arr) => elem.Formula in fuels)
+  const compounds = data.filter((elem, _i, _arr) => elem.Formula in fuels)
 
   let normalFuel = {...fuels};
   if (!checkObjectFraction(fuels, debug_data)) normalFuel = normalize(fuels, "combSection");
   checkFuelData(normalFuel, compounds, debug_data);
 
-  const products = {
-    O2:  0, N2:  0, H2O: 0,
-    CO2: 0, SO2: 0,  };
-  const air = {...dryAir};
+  const products = {O2:0, N2:0, H2O:0, CO2:0, SO2:0}, air = {...dryAir};
+
   // filling products object with stoichiometric ratio
   combPerFuelCompound(compounds, products, normalFuel);
 
@@ -374,9 +374,9 @@ const combSection = (airExcess, fuels, params) => {
                       MW_multicomp(air)/MW_multicomp(normalFuel),
 
     fuel_MW: units["mass/mol"](MW_multicomp(normalFuel)),
-    fuel_Cp: units.cp(Cp_multicomp(normalFuel, true)(params.t_fuel)),
+    fuel_Cp: units.cp_mol(Cp_multicomp(normalFuel, true)(params.t_fuel)),
     flue_MW: units["mass/mol"](MW_multicomp(products)),
-    flue_Cp_Tamb: units.cp(Cp_multicomp(products, true)(params.t_amb)),
+    flue_Cp_Tamb: units.cp_mol(Cp_multicomp(products, true)(params.t_amb)),
     NCV: units["energy/mass"](params.NCV)
   };
 
