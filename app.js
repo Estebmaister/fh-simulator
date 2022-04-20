@@ -57,11 +57,11 @@ const createParams = (opts) => {
     t_in_conv:  t_in,       // (K) global process inlet
     t_out:      t_out,      // (K) global process outlet
     m_fluid:    m_fluid,    // (kg/h) 
-    efficiency:        .8,  // (-)
     Rfi:                0,  // (h-m2-C/kJ) int. fouling factor
     Rfo:                0,  // (h-m2-C/kJ) ext. fouling factor
-    duty_rad_dist:     .7,  // (-)
-    heat_loss_percent: .015,// (% *.01)
+    efficiency: opts.effcy,         // (% *.01)
+    duty_rad_dist: opts.radDist,    // (% *.01)
+    heat_loss_percent: opts.hLoss,  // (% *.01)
     max_duty: unitConv.BTUtokJ(71.5276*1e3),// (kJ/h)
     miu_fluid: viscosityApprox({
       t1: t_in , v1: miu_fluid_in,

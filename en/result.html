@@ -27,24 +27,17 @@
 	<meta name="twitter:card" content="summary_large_image" />
 
 	<link rel="stylesheet" href="../css/style.css" />
-	<link rel="stylesheet" href="../css/loader.css" />
+	<link rel="stylesheet" href="../css/loaderForms.css" />
   <script src="../js/resultCall.js" defer></script>
 </head>
 <body>
   <header id="header">
-    <a class="logo" href="#"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" /></a>
-
+    <a class="logo"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" onclick="history.back()"/></a>
     <nav id="navbar">
       <ul id="nav-list">
-        <li class="nav-sec">
-          <a class="nav-link" href="./">Data</a>
-        </li>
-        <li class="nav-sec">
-          <a class="nav-link" href="">Result</a>
-        </li>
-        <li class="nav-sec">
-          <a class="nav-link" href="https://github.com/estebmaister/" target="_blank">Projects</a>
-        </li>
+        <li class="nav-sec"> <a class="nav-link" href="./">Data</a> </li>
+        <li class="nav-sec"> <a class="nav-link" href="">Result</a> </li>
+        <li class="nav-sec"> <a class="nav-link" href="https://github.com/estebmaister/" target="_blank">Projects</a> </li>
       </ul>
     </nav>
   </header>
@@ -55,28 +48,11 @@
     </section>
     <section id="output-sect">
       <div id="loader-wrapper">
-        <!-- Floating Loader -->
-        <div class="loader"></div>
-        <div class="shadow"></div>
-        <!-- <div class="loader">
-            <svg viewBox="0 0 80 80">
-                <circle id="test" cx="40" cy="40" r="32"></circle>
-            </svg>
-        </div>
-        
-        <div class="loader triangle">
-            <svg viewBox="0 0 86 80">
-                <polygon points="43 8 79 72 7 72"></polygon>
-            </svg>
-        </div>
-        
-        <div class="loader">
-            <svg viewBox="0 0 80 80">
-                <rect x="8" y="8" width="64" height="64"></rect>
-            </svg>
-        </div> -->
-        <!-- <div class="loader loader1"></div>
-        <div class="loader loader2"></div> -->
+        <!-- Floating Loader <div class="loader"></div> <div class="shadow"></div> <!---->
+        <!-- loaderForms .css -->
+        <div class="loader"> <svg viewBox="0 0 80 80"> <circle id="test" cx="40" cy="40" r="32"></circle> </svg> </div>
+        <div class="loader triangle"> <svg viewBox="0 0 86 80"> <polygon points="43 8 79 72 7 72"></polygon> </svg> </div>
+        <div class="loader"> <svg viewBox="0 0 80 80"> <rect x="8" y="8" width="64" height="64"></rect> </svg> </div> <!-- -->
       </div>
       <pre>
         <code id="output-combustion"></code>

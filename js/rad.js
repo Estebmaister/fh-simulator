@@ -62,9 +62,9 @@ const radSection = (params) => {
 
 const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   let 
-    tg_out   = 0, // (K) Leaving/effective gas temp
-    t_in  = 0, // (K) Inlet fluid temp
-    t_out = params.t_out, // (K) Outlet fluid temp
+    tg_out = 0, // (K) Leaving/effective gas temp
+    t_in   = 0, // (K) Inlet fluid temp
+    t_out  = params.t_out, // (K) Outlet fluid temp
     /** (kg/h) */
     m_fuel = m_fuel_seed || params.m_fuel;
   
@@ -89,23 +89,21 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     h_conv = params.h_conv || 30.66, // (kJ/h-m2-C) Film convective heat transfer coff
 
     /** (ft) Mean Beam Length, dim ratio 1-2-1 to 1-2-4*/
-    MBL = 2/3 *(params.Width_rad*params.Length_rad*params.Height_rad)**(1/3),
-    PL = (params.Ph2o + params.Pco2) * MBL, // atm-ft
-    /** - alpha radiant factor */
-    alpha = 1 + .49*(S_tube/Do)/6 - .09275*(S_tube/Do)**2+
-      .065 *(S_tube/Do)**3 /6     + .00025*(S_tube/Do)**4,
+    MBL = (2/3)*(params.Width_rad*params.Length_rad*params.Height_rad)**(1/3),
+    PL  = (params.Ph2o + params.Pco2) * MBL, // atm-ft
+    alpha = 1 +.49*(S_tube/Do)/6 -.09275*(S_tube/Do)**2 +.065*(S_tube/Do)**3/6 +.00025*(S_tube/Do)**4,
     alpha_shld =  1, // (-) alpha shield factor
     
-    Ar = Ar_calc(params.Width_rad, params.Length_rad, params.Height_rad), // (m2) Total refractory area
-    Acp_shld = N_shld *S_tube_shld *L_shld, // (m2) Cold plane area of shield tube bank
+    Ar = Ar_calc(params), // (m2) Total refractory area
+    Acp_shld = N_shld *S_tube_shld *L_shld / 2, // (m2) Cold plane area of shield tube bank
     Acp = N * S_tube * L,   // (m2) Cold plane area of tube bank
     At = N *Math.PI *Do *L, // (m2) Bank tube's external surface area
     Ai = Math.PI*(Di**2)/2, // (m2) Tube's inside flux area x2
 
-    sigma = 2.041e-7, // (kJ/h-m^2-K^4) -> 5.67e-11 (W/m^2-K^4)
-    cnv_fact = 3_600 * 1e-3; // (g/s -> kg/h) secondsToHours * 1/k
-
-  // checking alfa logger.warn(`Alpha: ${round(alpha)}, Alpha_sh: ${round(alpha_shld)}`);
+    cnv_fact = 3_600 *1e-3, // (g/s -> kg/h) secondsToHours * 1/k
+    sigma = 5.670374e-8 *cnv_fact, // (W/m2-K4) -> (kJ/h-m2-K4)
+    F = (temp) => effectivity(PL, alpha, Acp, alpha_shld, Acp_shld, Ar)(unitConv.KtoF(temp));// (-)
+    
   logger.warn(`Acp: ${round(unitConv.m2toft2(Acp))} ft, Acp_shld: ${round(unitConv.m2toft2(Acp_shld))} ft`);
   
   const // Process Variables
@@ -125,15 +123,11 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     miu_fluid= (temp) =>params.miu_fluid(temp);//(cP - g/m-s) fluid Viscosity
   
   const 
-    /** Emissive (effectivity) factor as function of temp */
-    F = (temp) => effectivity(PL, alpha, Acp, alpha_shld, Acp_shld, Ar)(unitConv.KtoF(temp)),
-    //F = effectivity(PL, alpha, Acp, alpha_shld, Acp_shld, Ar),
-    prandtl = (t) => miu_fluid(t)* Cp_fluid(t)*  cnv_fact/kw_fluid(t), // (miu*Cp/kw)
+    prandtl = (t) => miu_fluid(t)*Cp_fluid(t)*cnv_fact/kw_fluid(t), // (miu*Cp/kw)
     G = (m_fluid/cnv_fact) /Ai, // Fluid mass speed inside radiant tubes
     reynolds = (t) => G * Di/miu_fluid(t); // (-) G*Di/miu
   
-  /** (kJ/h) Duty in the radiant section */
-  let duty_rad = 0;
+  let duty_rad = 0; // (kJ/h) Duty in the radiant section
   const 
     /** (kJ/h-m2-C) internal heat transfer coff */
     hi = (tB,tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *
@@ -147,21 +141,18 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     Q_fuel  = (mFuel) => mFuel * Cp_fuel*(t_fuel -t_amb), // Sensible heat of fuel
     Q_rls   = (mFuel) => mFuel * NCV, // Combustion heat of fuel
     Q_in    = (mFuel) => Q_rls(mFuel) + Q_air(mFuel) + Q_fuel(mFuel); // Heat input
-
   
   const // ******* Heat taken out of radiant section ********
-    /** Sensible heat of fluid */
-    Q_fluid = (tOut, tIn) => m_fluid*Cp_fluid(tIn,tOut)*(tOut -tIn),
-    Q_flue = (tG, mFuel) => m_flue(mFuel)*Cp_flue(tG,t_amb)*(tG-t_amb), // Sensible heat of flue gases
+    Q_flue = (tG, mFuel) => m_flue(mFuel)*Cp_flue(tG,t_amb)*(tG-t_amb), // Flue gases's sensible heat 
     Q_losses = (mFuel) => Q_rls(mFuel) *heat_loss_percent,    // Heat losses through setting
     Q_conv = (tG, tW) => h_conv * At * (tG - tW),             // Convective heat transfer
     Q_rad  = (tG, tW) => F(tG)*sigma*alpha*Acp*(tG**4-tW**4), // Radiant heat transfer
     Q_shld = (tG, tW) => F(tG)*sigma*alpha_shld*Acp_shld*(tG**4-tW**4), // Shld_rad heat transfer
-    Q_R = (tG, tW) => Q_rad(tG,tW) + Q_conv(tG,tW); // Heat absorbed by radiant tubes
-  
-  /** Q_out = Q_R + Q_shld + Q_losses + Q_flue */
-  const Q_out = (tG, mFuel=m_fuel, tW = Tw(Tb(t_out,t_in), Tw(Tb(t_out,t_in)))) => 
+    Q_R = (tG, tW) => Q_rad(tG,tW) + Q_conv(tG,tW), // Heat absorbed by radiant tubes
+    Q_out = (tG, mFuel=m_fuel, tW = Tw(Tb(t_out,t_in), Tw(Tb(t_out,t_in)))) => 
     Q_R(tG, tW) + Q_shld(tG, tW) + Q_losses(mFuel) + Q_flue(tG, mFuel);
+
+  const Q_fluid = (tOut, tIn) => m_fluid*Cp_fluid(tIn,tOut)*(tOut -tIn); // Fluid's sensible heat
 
   // **************************************************
 
@@ -173,7 +164,6 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   if (t_out_seed !== undefined) { // Given temp_out
     duty = Q_fluid(t_out,t_in_conv); // Duty effective from t_out
     duty_rad = duty * duty_rad_dist; // Calculate Tw with seed from 30-70 duty distribution
-
     // Approximating t_in_rad with assumption from duty distribution
     t_in = t_in_conv + duty*(1 -duty_rad_dist)/(m_fluid*Cp_fluid(t_in_conv,t_out));
 
@@ -183,7 +173,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     if (flame) tg_out = flame;
 
     // Calculating fuel mass
-    const m_fuel_func = (mFuel) => Q_in(mFuel) - Q_out(tg_out,mFuel,Tw(Tb(t_out,t_in),Tw(Tb(t_out,t_in))));
+    const m_fuel_func = (mFuel) => Q_in(mFuel) -Q_out(tg_out,mFuel,Tw(Tb(t_out,t_in),Tw(Tb(t_out,t_in))));
 
     const mass_fuel_seed = Q_fluid(t_out,t_in_conv) /(NCV*efficiency);
     m_fuel = newtonRaphson(m_fuel_func, mass_fuel_seed, params.NROptions, "M-fuel_Tout-seed_radiative");
@@ -268,6 +258,7 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     "Ph2o":     round(params.Ph2o),
     "PL":       round(PL),
     "F":        round(F(tg_out)),
+    "emiss":    round(emissivity(PL)(tg_out)),
 
     "kw_tube":  kw_tube(Tw(Tb(t_in))),
     "kw_fluid": kw_fluid(Tb(t_in)),
@@ -324,18 +315,20 @@ const emissivity = (pl) => {
 };
 
 /** (m2) parameters must be in ft */
-const Ar_calc = (width, length, height) => {
-  const 
-    base = length * width,
-    wall_width  = height * width,
-    wall_length = height * length;
-  //TODO: use steem eq
-  const Ar2 = 2*(22.7+5.3+1)*width + 2*wall_length + base;
+const Ar_calc = (prams) => {
+  const
+    exitArea = unitConv.m2toft2(prams.Pitch_sh_cnv*prams.Tpr_sh_cnv*prams.L_shld),
+    base = prams.Length_rad * prams.Width_rad,
+    wall_width  = prams.Height_rad * prams.Width_rad,
+    wall_length = prams.Height_rad * prams.Length_rad;
+
+  const Ar_esteem = 2*wall_width + 2*wall_length + 2*base - exitArea;
+  const Ar2 = 2*(22.7+5.3+1)*prams.Width_rad + 2*wall_length + base;
   const Ar = 2*wall_width + 2*wall_length + 1.234*base;
 
-  logger.warn(`{"Ar prev (ft)": ${Ar2},"Ar calc (ft)": ${Ar}}`);
+  logger.warn(`{"Ar prev (ft)": ${Ar2},"Ar calc (ft)": ${Ar}, "Ar esteem (ft)": ${Ar_esteem}}`);
 
-  return unitConv.ft2tom2(Ar);
+  return unitConv.ft2tom2(Ar_esteem);
 };
 
 /** returns effectivity(temp) function of temperature to use as F */
@@ -344,6 +337,7 @@ const effectivity = (pl, alpha, Acp, a_shld, Acp_shld, Ar) => {
   const Aw = Ar - Total_Acp; // Effective refractory area
   const Aw_aAcp = Aw / Total_Acp;
   const emiss = emissivity(pl);
+  // debug logger.warn(`{"Aw (ft)": ${unitConv.m2toft2(Aw)},"Aw_aAcp (-)": ${Aw_aAcp}}`);
 
   // constants to calculate effectivity(temp) from Aw/aAcp
   const constants = {
