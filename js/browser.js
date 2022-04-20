@@ -123,6 +123,21 @@ const optionsModifier = (key, browserData, options) => {
       break;
     case "fuel_percent":
       break;
+    case "heat_loss":
+      optValue = parseFloat(browserData[key])
+      if (optValue <= 15) 
+        options.hLoss = optValue*1e-2
+      break;
+    case "efficiency":
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 50) 
+        options.effcy = optValue*1e-2
+      break;
+    case "rad_dist":
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 50) 
+        options.radDist = optValue*1e-2
+      break;
     case "t_fuel":
       optValue = parseFloat(browserData[key])
       if (optValue >= 0 && optValue) 

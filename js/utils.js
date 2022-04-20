@@ -210,12 +210,15 @@ const getOptions = () => {
     tAmb:       tempAmbRef, // K
     tAir:       tempAmbRef, // K
     tFuel:      tempAmbRef, // K
-    tIn:        678,        // F
-    tOut:       772,        // F
-    mFluid:     1_103_600,  // lb/h
     humidity:   0,          // %
     o2Excess:   .01 * 0,    // fr
     airExcess:  .01 * 0,    // fr
+    radDist:    .01 * 70,   // % *.01
+    hLoss:      .01 * 1.5,  // % *.01
+    effcy:      .01 * 80,   // % *.01
+    tIn:        678,        // F
+    tOut:       772,        // F
+    mFluid:     1_103_600,  // lb/h
     pAtm:       pAtmRef,    // Pa
     unitSystem: "SI",       // string
     lang:       "en",       // string
