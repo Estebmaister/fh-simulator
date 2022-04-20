@@ -210,6 +210,9 @@ h1 {
   width: 50%;
 }
 @media screen and (max-width: 585px) {
+  .hidden {
+    display: none;
+  }
   .form-block {
     width: 100%;
   }
@@ -239,7 +242,7 @@ h3 span {
 .project-info {
   margin: 0;
   display: inline-block;
-  padding-right: 1em;
+  padding-right: 0.4em;
   padding-bottom: 1em;
   align-self: center;
   text-align: center;

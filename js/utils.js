@@ -166,6 +166,7 @@ const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
 
 const 
   tempToK = 273.15,
+  pAtmRef = 101_325,
   tempAmbRef = tempToK + 15.56; // 288.7 K
 
 const unitConv = {
@@ -202,6 +203,7 @@ const getOptions = () => {
     // constants
     tempToK,
     tempAmbRef,
+    pAtmRef,
 
     // Entry default arguments
     verbose:    true,       // boolean
@@ -214,7 +216,7 @@ const getOptions = () => {
     humidity:   0,          // %
     o2Excess:   .01 * 0,    // fr
     airExcess:  .01 * 0,    // fr
-    pAtm:       101_325,    // Pa
+    pAtm:       pAtmRef,    // Pa
     unitSystem: "SI",       // string
     lang:       "en",       // string
   

@@ -84,7 +84,11 @@
       <h3>Fluido de Proceso</h3>
       <div class="form-div">
         <p class="project-info">
-          Flujo Másico M<sub>fluido</sub> <input step="0.1" min="0" name="m_fluid" type="number" value="1103.6"> x10<sup>3</sup> lb/h 
+          Flujo másico M<sub>fluido</sub> <input step="0.1" min="0" name="m_fluid" type="number" value="1103.6"> x10<sup>3</sup> lb/h 
+        </p>
+        <br class="hidden">
+        <p class="project-info">
+          Grav. esp. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled> <em>@Tin</em>
         </p>
       </div>
       <div class="form-div">
@@ -92,19 +96,19 @@
           <div class="form-div"> 
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Temperatura de entrada T<sub>in</sub> <input step="0.01" min="0" name="t_in" type="number" value="678"> °F
+                Temp. entrada T<sub>in</sub> <input step="1" min="0" name="t_in" type="number" value="678.0"> °F
               </p>
               <p class="project-info">
-                Temperatura de salida T<sub>out</sub> <input step="0.01" min="0" name="t_out" type="number" value="772"> °F
+                Temp. salida T<sub>out</sub> <input step="1" min="0" name="t_out" type="number" value="772.0"> °F
               </p>
             </div>
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Capacidad calorífica Cp<sub>in</sub> <input step="0.001" min="0" name="cp_in" type="number" value="0.676"> 
+                CAP. calorífica Cp<sub>in</sub> <input step="0.001" min="0" name="cp_in" type="number" disabled value="0.676"> 
                 <sub>Btu/lb-°F</sub>
               </p>
               <p class="project-info">
-                Capacidad calorífica Cp<sub>out</sub> <input step="0.001" min="0" name="cp_out" type="number" value="0.703"> 
+                CAP. calorífica Cp<sub>out</sub> <input step="0.001" min="0" name="cp_out" type="number" disabled value="0.703"> 
                 <sub>Btu/lb-°F</sub>
               </p>
             </div>
@@ -114,18 +118,18 @@
           <div class="form-div">
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Viscosidad μ<sub>in</sub> <input step="0.001" min="0" name="miu_fluid_in" type="number" value="1.45"> cp
+                Viscosidad μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" disabled value="1.45"> cp
               <p class="project-info">
-                Viscosidad μ<sub>out</sub> <input step="0.001" min="0" name="miu_fluid_out" type="number" value="0.96"> cp
+                Viscosidad μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" disabled value="0.96"> cp
               </p>
             </div>
             <div class="form-block flex-evenly">
               <p class="project-info">
-                Cond. térmica kw<sub>in</sub> <input step="0.001" min="0" name="kw_fluid_in" type="number" value="0.038">
+                Cond. térmica kw<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" disabled value="0.038">
               <sub>BTU/h-ft-°F</sub>
               </p>
               <p class="project-info">
-                Cond. térmica kw<sub>out</sub> <input step="0.001" min="0" name="kw_fluid_out" type="number" value="0.035">
+                Cond. térmica kw<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" disabled value="0.035">
               <sub>BTU/h-ft-°F</sub>
               </p>
             </div>
@@ -140,18 +144,16 @@
   
           <div class="form-div"> 
             <p class="project-info">
-              Temperatura Ambiente T<sub>a</sub> <input step="0.001" min="0" name="t_amb" type="number" value="25.0">
-            </span> °C</span>
+              Temp. ambiente T<sub>a</sub> <input step="1" min="0" name="t_amb" type="number" value="77.0"> °F
             </p> 
             <p class="project-info">
-              Humedad Relativa RH <input step="0.001" min="0" name="humidity" type="number" value="50.0"> %
+              Humedad relativa RH <input step="0.1" min="0" name="humidity" type="number" value="50.0"> %
             </p>
             <p class="project-info">
-              Presión Atmosférica <input step="0.001" min="0" name="p_atm" type="number" placeholder="101.3">
-            </span> kPa</span>
+              Presión atmosférica <input step="0.01" min="0" name="p_atm" type="number" placeholder="1.00"> atm
             </p>
             <p class="project-info">
-              Exceso de Aire <input step="0.001" min="0" name="air_excess" type="number" value="20.0"> %
+              Exceso de aire <input step="0.1" min="0" name="air_excess" type="number" value="20.0"> %
             </p>
           </div>
         </div>
@@ -163,7 +165,7 @@
           </h3>
   
           <div class="form-div"> 
-            <p class="project-info">Exceso de O<sub>2</sub> en GC <input name="o2_excess" type="number" min="0" max="30" step="0.001" placeholder="0.0"> %</p>
+            <p class="project-info">Exceso de O<sub>2</sub> en GC <input name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %</p>
             <p class="project-info">Base de muestreo de O2 <select name="o2_basis">
               <option value="wet">base húmeda</option>
               <!-- <option value="dry">base seca</option> -->
@@ -183,7 +185,7 @@
       </div> -->
       
       <div class="form-div comp"> 
-        <p class="project-info">Temperatura T<sub>f</sub> <input name="t_fuel" value="25.0" step="0.001" type="number"> °C </p>
+        <p class="project-info">Temp. ingreso comb. T<sub>f</sub> <input name="t_fuel" value="77.0" step="1" type="number"> °F</p>
         <p class="project-info">Composición</p>
         <p class="project-info">Total <span id="total" style="font-weight: bold;"> 0 </span></p>
       </div> 
@@ -289,39 +291,11 @@
       <div class="form-div"> 
         <div class="toggle">
           <span>Sistema de Unidades en Resultados </span> 
-          <input class="tgl" id="unit_system" name="unit_system" type="checkbox" value="english"/>
+          <input class="tgl" id="unit_system" name="unit_system" type="checkbox" value="english" checked/>
           <label class="tgl-btn" data-tg-off="SI" data-tg-on="Inglés" for="unit_system"></label>
         </div>
         <button>Calcular</button>
       </div>
-      <!----> 
-      <!-- Form first version -->
-      <!-- <section id="capturer-sect">
-      <h2 >Results</h2>
-        <div class="form-input">
-
-          <input type="number" name="t-amb" id="t-amb" required autocomplete value=""
-            onkeyup="this.setAttribute('value', this.value);" onchange="this.setAttribute('value', this.value);"/>
-          <label class="label-input" id="t-amb-label" for="t-amb">
-            <span class="content-label">T amb. (°C)</span>
-          </label>
-        </div>
-        <div class="rowTab">
-          <div class="labels">
-            <label id="email-label" for="email">*Email: </label>
-          </div>
-          <div class="rightTab">
-            <input
-              type="email"
-              name="email"
-              id="email"
-              class="input-field"
-              required=""
-              placeholder="Enter your Email"
-            />
-          </div>
-        </div>
-      </section> -->
     </form>
 
   </main>
@@ -332,7 +306,7 @@
 			</a>
 		</p>
     <p>
-      <i> - Calculos realizados en el motor del navegador, registros disponibles en la consola</i>
+      <em> - Calculos realizados en el motor del navegador, registros disponibles en la consola</em>
     </p>
 	</footer>
 </body>

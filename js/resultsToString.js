@@ -51,13 +51,14 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   Ph2o:     ${result_obj.Ph2o} atm
   PL:       ${result_obj.PL} atm-ft
   F:        ${result_obj.F} vs .635
+  Emissivity: ${result_obj.emiss}
 
   kw_tube:  ${unit.thermal( result_obj.kw_tube )}
   kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
+  kw_flue:  ${unit.thermal( result_obj.kw_flue )}
   
   miu_fluid:${unit.viscosity( result_obj.miu_fluid )}
   miu_flue: ${unit.viscosity( result_obj.miu_flue )}
-  kw_flue:  ${unit.thermal( result_obj.kw_flue )}
 
   Cp_fluid: ${unit.cp(result_obj.Cp_fluid)}
   Cp_flue:  ${unit.cp( result_obj.Cp_flue )}
@@ -135,10 +136,10 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
 
   kw_tube:  ${unit.thermal( result_obj.kw_tube )}
   kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
+  kw_flue:  ${unit.thermal( result_obj.kw_flue )}
   
   miu_fluid:${unit.viscosity( result_obj.miu_fluid )}
   miu_flue: ${unit.viscosity( result_obj.miu_flue )}
-  kw_flue:  ${unit.thermal( result_obj.kw_flue )}
 
   Cp_fluid: ${unit.cp(result_obj.Cp_fluid)}
   Cp_flue:  ${unit.cp( result_obj.Cp_flue )}

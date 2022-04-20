@@ -19,29 +19,10 @@ const extractURIdata = (argumentsArray) => {
   }
 	return resultObject;
 }
-
-// Logic to modified default options with data from browser
-const optionsModifier = (key, browserData, options) => {
-  const
-    maxHumidity = 100,
-    maxPatm = 1e3,
-    maxAirExcess = 300,
-    maxO2Excess = 30,
-    maxTamb = 100;
+// Logic to modified default options for process fluid with data from browser
+const optionsModifierFluid = (key, browserData, options) => {
   let optValue;
   switch (key) {
-    case "project_title":
-      // TODO: not set yet
-      break;
-    case "project_n":
-
-      break;
-    case "revision_n":
-
-      break;
-    case "date":
-      
-      break;
     case "m_fluid":
       optValue = parseFloat(browserData[key])
       if (optValue > 0) 
@@ -49,22 +30,54 @@ const optionsModifier = (key, browserData, options) => {
       break;
     case "t_in":
       optValue = parseFloat(browserData[key])
-      if (optValue > 0 && optValue < maxTamb) 
-        options.tIn = unitConv.FtoK(optValue);
+      if (optValue > 0) 
+        options.tIn = optValue;
       break;
     case "t_out":
       optValue = parseFloat(browserData[key])
-      if (optValue > 0 && optValue < maxTamb) 
-        options.tOut = unitConv.FtoK(optValue);
+      if (optValue > 0) 
+        options.tOut = optValue;
       break;
-    case "t_fuel":
-      optValue = parseFloat(browserData[key])
-      if (optValue > -maxTamb && optValue < maxTamb) 
-        options.tFuel = optValue +options.tempToK;
+    case "sp":
+      
       break;
+    case "miu_in":
+      
+      break;
+    case "miu_out":
+      
+      break;
+    case "kw_in":
+      
+      break;
+    case "kw_out":
+    
+      break;
+    case "cp_in":
+      
+      break;
+    case "cp_out":
+    
+      break;
+    default:
+      break;
+  }
+}
+
+
+// Logic to modified default options with data from browser
+const optionsModifierAmbient = (key, browserData, options) => {
+  const
+    maxAirExcess = 300,
+    maxHumidity = 100,
+    maxO2Excess = 30,
+    maxTamb = 1e2,
+    maxPatm = 2;
+  let optValue;
+  switch (key) {
     case "t_amb":
       optValue = parseFloat(browserData[key])
-      if (optValue > -maxTamb && optValue < maxTamb) 
+      if (optValue < maxTamb) 
         options.tAir = optValue +options.tempToK;
       break;
     case "humidity":
@@ -75,7 +88,7 @@ const optionsModifier = (key, browserData, options) => {
     case "p_atm":
       optValue = parseFloat(browserData[key])
       if (optValue > 1e-3 && optValue < maxPatm) 
-        options.pAtm = optValue *1e3;
+        options.pAtm = optValue *options.pAtmRef;
       break;
     case "air_excess":
       optValue = parseFloat(browserData[key])
@@ -90,14 +103,38 @@ const optionsModifier = (key, browserData, options) => {
     case "o2_basis":
       
       break;
+    default:
+      break;
+  }
+}
+
+// Logic to modified default options with data from browser
+const optionsModifier = (key, browserData, options) => {
+  let optValue;
+  switch (key) {
+    case "project_title":
+      // TODO: not set yet
+      break;
+    case "project_n":
+      break;
+    case "revision_n":
+      break;
+    case "date":
+      break;
     case "fuel_percent":
-      
+      break;
+    case "t_fuel":
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0 && optValue) 
+        options.tFuel = optValue +options.tempToK;
       break;
     case "unit_system":
       logger.debug(`"${key}", "value":"${browserData[key]}"`)
       options.unitSystem = browserData[key];
       break;
     default:
+      optionsModifierFluid(key, browserData, options);
+      optionsModifierAmbient(key, browserData, options);
       break;
   }
 }
