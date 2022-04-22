@@ -15,6 +15,7 @@
  *
  *****************************************************************/
 const {
+  round,
   logger, 
   options, 
   unitConv, 
@@ -34,8 +35,8 @@ const {browserProcess} = require('./js/browser');
 const createParams = (opts) => {
   const
     m_fluid = unitConv.lbtokg(opts.mFluid), // kg/h
-    t_in = unitConv.FtoK(opts.tIn), // (K)
-    t_out= unitConv.FtoK(opts.tOut), // (K)
+    t_in  = unitConv.FtoK(opts.tIn), // (K)
+    t_out = unitConv.FtoK(opts.tOut), // (K)
     miu_fluid_in = 1.45, // (cp)
     miu_fluid_out= 0.96, // (cp)
     cp_fluid_in = unitConv.CpENtoCpSI(0.676), // (kJ/kg-C)
@@ -57,8 +58,8 @@ const createParams = (opts) => {
     t_in_conv:  t_in,       // (K) global process inlet
     t_out:      t_out,      // (K) global process outlet
     m_fluid:    m_fluid,    // (kg/h) 
-    Rfi:                0,  // (h-m2-C/kJ) int. fouling factor
-    Rfo:                0,  // (h-m2-C/kJ) ext. fouling factor
+    Rfi:        0.000,      // (h-m2-C/kJ) int. fouling factor
+    Rfo:        0.000,      // (h-m2-C/kJ) ext. fouling factor
     efficiency: opts.effcy,         // (% *.01)
     duty_rad_dist: opts.radDist,    // (% *.01)
     heat_loss_percent: opts.hLoss,  // (% *.01)
@@ -76,10 +77,7 @@ const createParams = (opts) => {
       x2: t_out, y2: kw_fluid_out
     }),                     // (kJ/h-m-C)
 
-    /* 
-    m_fuel: 100,     // (kg/h)
-    t_out: undefined,// (K) global process out
-    //*/
+    // m_fuel: 100,         // (kg/h)
     
     /** Mechanic variables for heater */
     Material: 'A-312 TP321',
@@ -102,8 +100,8 @@ const createParams = (opts) => {
     Do_shld:unitConv.intom(6.625),// (m) external diameter 
     
     Pitch_sh_cnv: unitConv.intom(2*6),// (m) NPS * 2
-    Sch_sh_cnv:unitConv.intom(0.28),  // (m) Schedule thickness
-    Tpr_sh_cnv: 8,                    // - number of tubes per row
+    Sch_sh_cnv:  unitConv.intom(0.28),// (m) Schedule thickness
+    Tpr_sh_cnv:  8,                   // - number of tubes per row
 
     N_conv: 40,                   // - number of tubes 
     L_conv: unitConv.fttom(60),   // (m) effective tube length
@@ -137,22 +135,48 @@ const heaterFunc = (fuels, opts) => {
         " vs O2excess: " + params.o2Excess * 100)
       return combO2.flows['O2_%'] / 100 - params.o2Excess
     }
-    const airExcess = newtonRaphson(comb_o2, .5, 
-      params.NROptions, "o2_excess_to_air")
+    const airExcess = newtonRaphson(comb_o2,.5,
+      params.NROptions, "o2_excess_to_air");
     if (airExcess) params.airExcess = airExcess;
   } else {
     params.airExcess = opts.airExcess
   }
 
-  const comb_result = combSection(params.airExcess, fuels, params)
+  const comb_result = combSection(params.airExcess, fuels, params);
+
+  const runDistCycle = true;
+  if (runDistCycle) externalCycle(params);
+
   comb_result.rad_result = radSection(params)
   comb_result.shld_result = shieldSection(params)
   comb_result.conv_result = convSection(params)
-  /* calls to logs
-  logger.info("Rad sect Tg: " + params.units.tempC(rad_result.t_g))
-  logger.info("Fuel mass:   " + params.units.mass_flow(rad_result.m_fuel))
-  //*/
   return comb_result
+}
+
+const externalCycle = (params) => {
+  let cycle = 0, noLog = true;
+  const rad_dist = (radDist) => {
+    cycle++;
+    params.duty_rad_dist = radDist;
+    const int_results = {
+      rad:  radSection(   params, noLog),
+      shld: shieldSection(params, noLog),
+      conv: convSection(  params, noLog)
+    }
+    const error = params.duty - int_results.rad.duty - 
+    int_results.shld.duty - int_results.conv.duty;
+    return error / (int_results.rad.duty + 
+    int_results.shld.duty + int_results.conv.duty); //*/
+  };
+  const rad_dist_final = newtonRaphson(rad_dist, 
+    params.duty_rad_dist, params.NROptions, "rad_dist_final")
+  if (rad_dist_final) {
+    params.duty_rad_dist = rad_dist_final;
+  } else {
+    logger.error("external cycle broken, error in rad_dist estimation, using: "+
+    params.duty_rad_dist);
+  }
+  logger.info(`duty_rad_dist: ${round(100*rad_dist_final,2)}, ext_iterations: ${cycle}`);
 }
 
 let fuelsObject = { 
@@ -166,14 +190,9 @@ let fuelsObject = {
 //   // H2: .7, O2: .2, N2: .1
 // }
 
+/** App entry point */
 if (typeof window !== 'undefined') {
   browserProcess(fuelsObject, data, options, heaterFunc)
 } else {
-  /** 
-  const result = heaterFunc(fuelsObject, options)
-  logger.info(JSON.stringify(fuelsObject))
-  logger.info(JSON.stringify(options))
-  logger.debug(JSON.stringify(result, null, 2))
-  */
   heaterFunc(fuelsObject, options)
 }

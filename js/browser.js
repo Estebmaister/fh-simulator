@@ -1,5 +1,5 @@
 
-const {logger} = require('./utils');
+const {logger, unitConv} = require('./utils');
 const {stringRadResult, stringShldResult, stringConvResult} = require('./resultsToString');
 
 // Extracts the data from the URL
@@ -78,7 +78,7 @@ const optionsModifierAmbient = (key, browserData, options) => {
     case "t_amb":
       optValue = parseFloat(browserData[key])
       if (optValue < maxTamb) 
-        options.tAir = optValue +options.tempToK;
+        options.tAir = unitConv.FtoK(optValue);
       break;
     case "humidity":
       optValue = parseFloat(browserData[key])
@@ -141,7 +141,7 @@ const optionsModifier = (key, browserData, options) => {
     case "t_fuel":
       optValue = parseFloat(browserData[key])
       if (optValue >= 0 && optValue) 
-        options.tFuel = optValue +options.tempToK;
+        options.tFuel = unitConv.FtoK(optValue);
       break;
     case "unit_system":
       logger.debug(`"${key}", "value":"${browserData[key]}"`)
@@ -198,11 +198,11 @@ Datos de entrada
   O2 en aire seco:          ${result.debug_data["dryAirO2_%"]} %
 
   Presión de aire seco:     ${result.debug_data["dryAirPressure"]}
-  Presión de vapor de agua: ${result.debug_data["waterPressure"]}
+  Presión de vapor de agua:  ${result.debug_data["waterPressure"]}
 
-  Presión parcial de H2O:    ${result.debug_data["H2OPressure_%"]} 10^(-2)
-  Presión parcial de N2:    ${result.debug_data["N2Pressure_%"]} 10^(-2)
-  Presión parcial de O2:    ${result.debug_data["O2Pressure_%"]} 10^(-2)
+  Presión parcial de H2O:    ${result.debug_data["H2OPressure_%"]} ÷10²
+  Presión parcial de N2:    ${result.debug_data["N2Pressure_%"]} ÷10²
+  Presión parcial de O2:    ${result.debug_data["O2Pressure_%"]} ÷10²
   Contenido húmedo (w):     ${result.debug_data["moisture"]}-AireSeco
 
 Moles de gases de combustión total y porcentajes por cada mol de combustible
@@ -253,12 +253,12 @@ Input Data
   O2 en aire seco:      ${result.debug_data["dryAirO2_%"]} %
 
   Dry Air Pressure:     ${result.debug_data["dryAirPressure"]}
-  Water Vapor Pressure: ${result.debug_data["waterPressure"]}
+  Water Vapor Pressure:  ${result.debug_data["waterPressure"]}
 
-  Partial Pressure H2O: ${result.debug_data["H2OPressure_%"]} 10^(-2)
-  Partial Pressure N2 : ${result.debug_data["N2Pressure_%"]} 10^(-2)
-  Partial Pressure O2 : ${result.debug_data["O2Pressure_%"]} 10^(-2)
-  Moisture content (w): ${result.debug_data["moisture"]}-dryAir
+  Partial Pressure H2O:  ${result.debug_data["H2OPressure_%"]} ÷10²
+  Partial Pressure N2 : ${result.debug_data["N2Pressure_%"]} ÷10²
+  Partial Pressure O2 : ${result.debug_data["O2Pressure_%"]} ÷10²
+  Moisture content (w):  ${result.debug_data["moisture"]}-dryAir
 
 Total flue gas moles and percentage (per fuel mol)
 
