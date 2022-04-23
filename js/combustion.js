@@ -64,14 +64,14 @@ const checkFuelData = (fuels, compounds, result = {}) => {
   * if you want a result in (kJ/kmol K) units, multiply the
   * result by MW or call this with second argument set to true.
  */
-const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
+const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult, noLog) => {
   // Cp equation from table A.6 Van Wylen
   // Teta = T(Kelvin)
   return (teta) => {
     // Approximate equation valid from 250 K to 1200 K.
-    if (teta < 250) logger.debug(`"Cp0", "temp": ${round(teta)},`+
+    if (teta < 250 && !noLog) logger.debug(`"Cp0", "temp": ${round(teta)},`+
       `"Msg": "${Substance} bellow range for Cp0 formula"`);
-    if (teta > 1200 && options.verbose) logger.debug(`"Cp0", "temp": ${round(teta)},`+
+    if (teta > 1200&& !noLog) logger.debug(`"Cp0", "temp": ${round(teta)},`+
       `"Msg": "${Substance} above range for Cp0 formula"`);
     if (c0 === "-") {
       logger.debug(`"Cp0", "Msg": "Wrong use, called for compound `+
@@ -88,18 +88,19 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult) => {
 * if you want a result in (kJ/kmol K) units, call it with 
 * second argument set to true.
 */
-const Cp_multicomp = (fuels, molResult) => {
+const Cp_multicomp = (fuels, molResult, noLog) => {
   if (fuels.length === 0) return (_t) => 0
   // making a deep copy and normalize if needed
   let normalFuel = JSON.parse(JSON.stringify(fuels));
   if (!checkObjectFraction(fuels)) 
-    normalFuel = normalize(normalFuel, "Cp_multicomp");
+    normalFuel = normalize(normalFuel, "Cp_multicomp", noLog);
   const fuelComps = data.filter(elem => elem.Formula in normalFuel);
   const cps = [];
   let i = 0;
   for (const fuel in normalFuel) {
     cps[i] = (t) => normalFuel[fuel] * Cp0(
-      fuelComps.filter(elem => elem.Formula == fuel)[0], molResult)(t);
+      fuelComps.filter(elem => elem.Formula == fuel)[0], molResult
+    )(t);
     i++;
   }
   
@@ -109,12 +110,12 @@ const Cp_multicomp = (fuels, molResult) => {
 /** (kg/kmol) argument needs to be a fuel object,
 * ie: { CH4: 0.323, ... }
 */
-const MW_multicomp = (fuels) => {
+const MW_multicomp = (fuels, noLog) => {
   if (fuels.length === 0) return (_t) => 0;
   // making a deep copy and normalize if needed
   let normalFuel = JSON.parse(JSON.stringify(fuels));
   if (!checkObjectFraction(fuels)) 
-    normalFuel = normalize(normalFuel, "MW_multicomp");
+    normalFuel = normalize(normalFuel, "MW_multicomp", noLog);
   const fuelComps = data.filter(elem => elem.Formula in normalFuel);
   let MWs = 0;
   for (const fuel in normalFuel) {
@@ -156,7 +157,7 @@ const moistAirWeightRatio = (temperature, relativeHumidity) => {
 const deltaH = (compound, t) => {
   if (compound.Cp0 === '-') {
     if (compound.h0 === '-') {
-      if (options.verbose)  logger.warn(`wrong use of deltaH func,`+
+      logger.warn(`wrong use of deltaH func,`+
         ` called for compound ${compound.Substance} without data`);
       if (t === undefined) return () => 0;
       return 0;
@@ -165,11 +166,11 @@ const deltaH = (compound, t) => {
     return compound.h0;
   }
   // hf0 + deltaH(tempAmbRef -> t)
-  if (t === undefined) return (tempParam) => compound.h0 + compound.MW * 
-    Cp0(compound)((options.tempAmbRef+tempParam)/2) * (tempParam-options.tempAmbRef);
+  if (t === undefined) return (temp) => compound.h0 +(temp-options.tempAmbRef)*
+    Cp0(compound,true, true)((options.tempAmbRef+temp)/2);
 
-  return compound.h0 + compound.MW * 
-    Cp0(compound)((options.tempAmbRef+t)/2) * (t-options.tempAmbRef);
+  return compound.h0 + (t-options.tempAmbRef)*
+    Cp0(compound,true, true)((options.tempAmbRef+t)/2);
 };
 
 /** (kJ/kmol), Enthalpy of combustion for a certain compound 
@@ -179,30 +180,31 @@ const combustionH = (compound, t, tIni, liquidWater) => {
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
 
   const 
-    co2_H = deltaH(data[6]),
-    so2_H = deltaH(data[34]),
-    o2_H = deltaH(data[2]);
+    co2_H = deltaH( data[6]  ),
+    so2_H = deltaH( data[34] ),
+    o2_H  = deltaH( data[2]  );
   let h2o_H = deltaH(data[31]); // gas lower heating value 
   // higher heating value
   if (liquidWater === true) h2o_H = deltaH(data[32]); // liq
   // making tIni equal to t_amb if not specified
   if (tIni === undefined) tIni = options.tAmb;
 
-  if (t === undefined) return (tempParam) => compound.CO2*co2_H(tempParam) + compound.SO2*so2_H(tempParam)
-    + compound.H2O*h2o_H(tempParam) - deltaH(compound)(tIni) - compound.O2*o2_H(tIni);
+  if (t === undefined) return (tempParam) => compound.CO2*co2_H(tempParam) 
+    + compound.SO2*so2_H(tempParam) +compound.H2O*h2o_H(tempParam)
+    - deltaH(compound)(tIni) - compound.O2*o2_H(tIni);
   
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
-  return ( compound.CO2*co2_H(t) + compound.SO2*so2_H(t) + compound.H2O*h2o_H(t)
+  return ( compound.CO2*co2_H(t) +compound.SO2*so2_H(t) +compound.H2O*h2o_H(t)
     - deltaH(compound)(tIni) - compound.O2*o2_H(tIni) );
 };
 
-/** (kJ/kmol) Enthalpy of combustion for a certain fuel mix */
+/** (kJ/kg) Enthalpy of combustion for a certain fuel mix */
 const ncv = (fuels, products, compounds, tAmb) => {
   let value = 0;
   for (const fuel in fuels) {
     if (fuel in products) continue;
     const compound = compounds.filter(elem => elem.Formula == fuel)[0]
-    value += fuels[fuel]*combustionH(compound)(tAmb);
+    value += fuels[fuel]*combustionH(compound)(tAmb)/compound.MW;
     //logger.info(`H of combustion for ${fuel}: ` +
     // `${combustionH(compound)(tAmb)/compound.MW} KJ/Kg` )
   }
@@ -279,8 +281,8 @@ const combPerFuelCompound = (compounds, products, normalFuel) => {
 /** In this process the params object will be updated
 *  in every function call with the combustion data
 */
-const combSection = (airExcess, fuels, params) => {
-  logger.debug(`"airExcess", "value": ${airExcess}`);
+const combSection = (airExcess, fuels, params, onlyO2) => {
+  if (!onlyO2) logger.debug(`"airExcess", "value": ${airExcess}`);
   const units = initSystem(params.unitSystem);
   const debug_data = {
     err: "",
@@ -291,13 +293,15 @@ const combSection = (airExcess, fuels, params) => {
     "humidity_%": round(params.humidity),
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
-    moisture:   units.moist(moistAirWeightRatio(params.t_amb, params.humidity)),
+    moisture:   units.moist(moistAirWeightRatio(
+      params.t_amb, params.humidity)),
     unitSystem: units.system[params.lang]
   };
   const compounds = data.filter((elem, _i, _arr) => elem.Formula in fuels)
 
   let normalFuel = {...fuels};
-  if (!checkObjectFraction(fuels, debug_data)) normalFuel = normalize(fuels, "combSection");
+  if (!checkObjectFraction(fuels, debug_data)) 
+    normalFuel = normalize(fuels, "combSection");
   checkFuelData(normalFuel, compounds, debug_data);
 
   const products = {O2:0, N2:0, H2O:0, CO2:0, SO2:0}, air = {...dryAir};
@@ -313,8 +317,8 @@ const combSection = (airExcess, fuels, params) => {
   let o2excess = o2required * (1 + airExcess);
   // If O2 requirements are negative 
   if (products['O2'] <= 0 || products['N2'] < 0) {
-    logger.error(`airExcess set to 0, O2 in fuel is greater than or equal to needed.`+
-    ` Products O2:${products['O2']}, N2:${products['N2']}`);
+    logger.error(`airExcess set to 0, O2 in fuel >= O2 needed.`+
+    ` Products: {O2:${products['O2']}, N2:${products['N2']}}`);
     o2excess   = 0;
     o2required = 0;
     products['N2'] = normalFuel['N2'];
@@ -333,19 +337,10 @@ const combSection = (airExcess, fuels, params) => {
     debug_data["N2Pressure_%"]  = round(100 * air.N2);
     debug_data["O2Pressure_%"]  = round(100 *air.O2);
 
-    products['O2'] = o2excess - products['O2']; // Subtracting the O2 used in combustion
-    products['N2']  += products['O2']* (air.N2/air.O2);
-    products['H2O'] += products['N2']* (waterPressure/(air.N2*params.p_atm));
+    products['O2'] = o2excess -products['O2']; // Subs O2 used in combustion
+    products['N2']  += products['O2']*(air.N2/air.O2);
+    products['H2O'] += products['N2']*(waterPressure/(air.N2*params.p_atm));
   }
-
-
-  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb) /
-    MW_multicomp(normalFuel); // kJ/kg
-  params.adFlame = newtonRaphson(
-    adFlame(normalFuel, products, params.t_amb, o2excess),
-    2000, params.NROptions, "fuel_adFlame");
-  logger.info( `Adiabatic flame temp: [${round(params.adFlame)} K]`+
-    ` ${units.tempC(params.adFlame)}`);
 
   let totalPerMol = 0, totalPerM_Dry = 0;
   for (const product in products) {
@@ -369,30 +364,44 @@ const combSection = (airExcess, fuels, params) => {
     AC:               o2excess / air.O2,
     AC_theor_dryAir:  o2required / (.01 * dryAirO2Percentage),
     AC_mass:          o2excess / air.O2 * 
-                      MW_multicomp(air)/MW_multicomp(normalFuel),
+      MW_multicomp(air)/MW_multicomp(normalFuel),
     AC_mass_theor_moistAir: o2required / air.O2 * 
-                      MW_multicomp(air)/MW_multicomp(normalFuel),
+      MW_multicomp(air)/MW_multicomp(normalFuel),
 
     fuel_MW: units["mass/mol"](MW_multicomp(normalFuel)),
-    fuel_Cp: units.cp_mol(Cp_multicomp(normalFuel, true)(params.t_fuel)),
-    flue_MW: units["mass/mol"](MW_multicomp(products)),
-    flue_Cp_Tamb: units.cp_mol(Cp_multicomp(products, true)(params.t_amb)),
-    NCV: units["energy/mass"](params.NCV)
+    Cp_fuel: units.cp(Cp_multicomp(normalFuel)(params.t_fuel)),
+
+    flue_MW: MW_multicomp(products,onlyO2),
+    Cp_flue: Cp_multicomp(products,false,onlyO2)
   };
+
+  if (onlyO2) return {flows, products, debug_data};
+
+  /** Adding results in parameters to be used in following sections */
+
+  params.m_flue_ratio = totalPerMol * flows.flue_MW/MW_multicomp(normalFuel);  // kg/h
+  params.m_air_ratio  = o2excess / air.O2 * MW_multicomp(air)/MW_multicomp(normalFuel); // kg/h
 
   params.Pco2 = products['CO2']/totalPerMol; // fraction
   params.Ph2o = products['H2O']/totalPerMol; // fraction
 
-  params.m_flue_ratio = totalPerMol * MW_multicomp(products)/MW_multicomp(normalFuel);  // kg/h
-  params.m_air_ratio  = o2excess / air.O2 * MW_multicomp(air)/MW_multicomp(normalFuel); // kg/h
-
-  /** Functions of temp (kJ/kg-K) */
-  params.Cp_flue = Cp_multicomp(products);
+  // Functions of temp (kJ/kg-K)
   params.Cp_air  = Cp_multicomp(air);
   params.Cp_fuel = Cp_multicomp(normalFuel);
-
-  params.miu_flue = flueViscosity(data, products);
+  params.Cp_flue = flows.Cp_flue;
+  params.miu_flue= flueViscosity( data, products );
   params.kw_flue = flueThermalCond(data, products);
+  flows.Cp_flue  = units.cp(flows.Cp_flue(params.t_amb));
+  flows.flue_MW  = units["mass/mol"](flows.flue_MW);
+
+  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb); // kJ/kg
+  flows.NCV = units["energy/mass"](params.NCV);
+
+  params.adFlame = newtonRaphson(
+    adFlame(normalFuel, products, params.t_amb, o2excess),
+    2000, params.NROptions, "fuel_adFlame");
+  logger.info( `Adiabatic flame temp: [${round(params.adFlame)} K]`+
+    ` ${units.tempC(params.adFlame)}`);
 
   roundDict(products); roundDict(flows); roundDict(debug_data);
   if (debug_data.err == "") delete debug_data.err;

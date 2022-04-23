@@ -102,8 +102,8 @@ const shieldSection = (params, noLog) => {
   const Tin_sh_func = (tIn) => Q_fluid(tIn) - Q_R(tIn, tg_in, tg_out, Tb(tIn), Tw( Tb(tIn),Tw(Tb(tIn)) ));
   
   // -------- 1st estimation of tg_out   #.#.#.#.#
-  tg_out = newtonRaphson(tg_out_func, (tg_in - 200), params.NROptions, "Tg_out_shield-1");
-  t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-1");
+  tg_out = newtonRaphson(tg_out_func, (tg_in - 200), params.NROptions, "Tg_out_shield-1",noLog);
+  t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-1",noLog);
 
   const 
     normalized_error = 1e-6, // 0.0001%
@@ -118,8 +118,8 @@ const shieldSection = (params, noLog) => {
       break;
     }
     
-    t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-2");
-    tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_shield-2");
+    t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-2",noLog);
+    tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_shield-2",noLog);
 
     // Forced break of loop
     iterations++;
@@ -129,11 +129,14 @@ const shieldSection = (params, noLog) => {
       break;
     }
   }
+  
+  if (!noLog) logger.default(`SHLD, T_in_calc: ${params.units.tempC(t_in)}, `+
+    `Tg_out: ${params.units.tempC(tg_out)}`)
 
   params.t_in_sh = t_in;
   params.tg_sh = tg_out;
 
-  const shld_result = {
+  return {
     m_flue:   m_flue,
     t_in_sup: (params.t_in_rad + params.t_in_conv)*0.5,
     t_in:     t_in,
@@ -153,9 +156,10 @@ const shieldSection = (params, noLog) => {
     Q_rad:    Q_rad,
     Q_conv:   Q_conv( t_in, tg_in, tg_out, Tb(t_in), Tw(Tb(t_in)) ),
 
-    Cp_fluid:  Cp_fluid(t_in,t_out),
-    Cp_flue:   Cp_flue(tg_in,tg_out),
+    Cp_fluid:   Cp_fluid(t_in,t_out),
+    Cp_flue:    Cp_flue(tg_in,tg_out),
     miu_fluid:  miu_fluid(Tw(Tb(t_in))),
+    miu_flue:   miu_flue(tg_out),
 
     duty:       duty_sh(t_in),
     "%":        round(100*duty_sh(t_in)/params.duty,2),
@@ -198,11 +202,6 @@ const shieldSection = (params, noLog) => {
     
     FINING: "None"
   };
-  shld_result.miu_flue = miu_flue(tg_out);
-  
-  if (!noLog) logger.default(`T_in_sh: ${round(t_in)} K, Tg_sh: ${round(tg_out)} K`)
-
-  return shld_result
 }
 
 module.exports = {

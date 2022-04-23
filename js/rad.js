@@ -139,14 +139,16 @@ const radSection = (params, noLog) => {
 
     // Calculating tg_out (effective gas temp)
     const tg_out_func = (tG) => Q_fluid(t_out,t_in) -Q_R(tG,Tw(Tb(t_out),Tw(Tb(t_out))));
-    const flame = newtonRaphson(tg_out_func, 1000, params.NROptions, "Tg_Tout-seed_radiant");
+    const flame = newtonRaphson(tg_out_func, 1000, 
+      params.NROptions, "Tg_Tout-seed_radiant", noLog);
     if (flame) tg_out = flame;
 
     // Calculating fuel mass
     const m_fuel_func = (mFuel) => Q_in(mFuel) -Q_out(tg_out,mFuel,Tw(Tb(t_out),Tw(Tb(t_out))));
     let mass_fuel_seed = Q_fluid(t_out,t_in_conv) /(NCV*efficiency);
     if (!noLog) logger.debug(`"mass_fuel_seed", "value": "${mass_fuel_seed}"`);
-    mass_fuel_seed = newtonRaphson(m_fuel_func, mass_fuel_seed, params.NROptions, "M-fuel_T-seed_radiant");
+    mass_fuel_seed = newtonRaphson(m_fuel_func, mass_fuel_seed,
+      params.NROptions, "M-fuel_T-seed_radiant", noLog);
     if (mass_fuel_seed) m_fuel = mass_fuel_seed;
 
   } else { // Given mass_fuel
@@ -158,13 +160,15 @@ const radSection = (params, noLog) => {
 
     // Calculating tg_out (effective gas temp) //TODO: t_out isn't set needs recalculate
     const tg_out_func = (tG) => Q_in(m_fuel) -Q_out(tG,m_fuel,Tw(Tb(t_out_seed),Tw(Tb(t_out_seed))));
-    const flame = newtonRaphson(tg_out_func, 1000, params.NROptions, "Tg_mFuel-seed_radiant");
+    const flame = newtonRaphson(tg_out_func, 1000, 
+      params.NROptions, "Tg_mFuel-seed_radiant", noLog);
     if (flame) tg_out = flame;
 
     // Calculating t_out 
     const t_out_func = (tOut) => Q_fluid(tOut,t_in) -Q_R(tg_out,Tw(Tb(tOut),Tw(Tb(tOut))));
 
-    t_out_seed = newtonRaphson(t_out_func, t_out_seed, params.NROptions, "Tout_mFuel-seed_radiant");
+    t_out_seed = newtonRaphson(t_out_func, t_out_seed, 
+      params.NROptions, "Tout_mFuel-seed_radiant", noLog);
     if (t_out_seed) t_out = t_out_seed;
 
     //TODO: recalculation let t_out_recall = t_in - t_out + (Q_rad(tg_out) + Q_conv(tg_out)) / (m_fluid*Cp_fluid(t_in,t_out))
@@ -176,6 +180,9 @@ const radSection = (params, noLog) => {
   }
 
   // **************************************************
+  if (!noLog) logger.default(`RADI, T_in_calc: ${params.units.tempC(t_in)},`+
+    ` M_fuel: ${params.units.mass(m_fuel)}, Tg_out: ${params.units.tempC(tg_out)}`);
+
   params.t_in_rad = t_in;
   params.t_out    = t_out;
   params.tg_rad   = tg_out;
@@ -183,7 +190,6 @@ const radSection = (params, noLog) => {
   params.m_flue   = m_flue(m_fuel);
   params.t_w_rad  = Tw(Tb(t_out), Tw(Tb(t_out)));
   params.q_rad_sh = Q_shld(tg_out, params.t_w_rad);
-  params.duty_rad = duty_rad; // TODO: use it or delete it
 
   const rad_result = {
     m_fuel:   m_fuel,
@@ -221,8 +227,9 @@ const radSection = (params, noLog) => {
     h_conv:   h_conv,
 
     duty_total:duty_total,
-    duty:     duty_rad,
-    "%":        round(100*duty_rad/duty_total,2),
+    duty:      duty_rad,
+    "%":       round(100*duty_rad/duty_total,2),
+    eff_total:round(100*duty_total/Q_rls(m_fuel),2),
     duty_flux:duty_rad/At,
 
     Alpha:    round(alpha),

@@ -126,17 +126,19 @@ const optionsModifier = (key, browserData, options) => {
     case "heat_loss":
       optValue = parseFloat(browserData[key])
       if (optValue <= 15) 
-        options.hLoss = optValue*1e-2
+        options.hLoss = optValue*1e-2;
       break;
     case "efficiency":
       optValue = parseFloat(browserData[key])
       if (optValue >= 50) 
-        options.effcy = optValue*1e-2
+        options.effcy = optValue*1e-2;
       break;
     case "rad_dist":
       optValue = parseFloat(browserData[key])
-      if (optValue >= 50) 
-        options.radDist = optValue*1e-2
+      if (optValue >= 50) {
+        options.radDist = optValue*1e-2;
+        options.runDistCycle = false;
+      }
       break;
     case "t_fuel":
       optValue = parseFloat(browserData[key])
@@ -185,7 +187,8 @@ const outputData = (result, browserData, lang, unitSystem) => {
   if (lang == 'es') {
     outputString += `
 Datos de entrada
-  (en caso de no haber sido introducidos, tomará el predeterminado)
+  (en caso de no haber sido introducidos, el 
+    simulador tomará los valores predeterminado)
 
   Sistema de unidades:      ${result.debug_data["unitSystem"]}
   Presión atmosférica:      ${result.debug_data["atmPressure"]}
@@ -200,47 +203,46 @@ Datos de entrada
   Presión de aire seco:     ${result.debug_data["dryAirPressure"]}
   Presión de vapor de agua:  ${result.debug_data["waterPressure"]}
 
-  Presión parcial de H2O:    ${result.debug_data["H2OPressure_%"]} ÷10²
-  Presión parcial de N2:    ${result.debug_data["N2Pressure_%"]} ÷10²
-  Presión parcial de O2:    ${result.debug_data["O2Pressure_%"]} ÷10²
-  Contenido húmedo (w):     ${result.debug_data["moisture"]}-AireSeco
+  Presión parcial de H2O: ${result.debug_data["H2OPressure_%"]} ÷10²
+  Presión parcial de N2: ${result.debug_data["N2Pressure_%"]} ÷10²
+  Presión parcial de O2: ${result.debug_data["O2Pressure_%"]} ÷10²
+  Contenido húmedo (w):   ${result.debug_data["moisture"]}-AireSeco
 
-Moles de gases de combustión total y porcentajes por cada mol de combustible
+Moles de gases de combustión total y porcentajes por 
+cada mol de combustible
 
   Flujo total: ${result.flows["total_flow"]}
   Flujo seco:  ${result.flows["dry_total_flow"]}
-
-  N2:  ${result.products["N2"]}
-  O2:  ${result.products["O2"]}
-  H2O: ${result.products["H2O"]}
-  CO2: ${result.products["CO2"]}
-  SO2: ${result.products["SO2"]}
-
-  Porcentajes en base húmeda
-    N2:  ${result.flows["N2_%"]} %
-    H2O: ${result.flows["H2O_%"]} %
-    CO2: ${result.flows["CO2_%"]} %
-    O2:  ${result.flows["O2_%"]} %
+      ${""               }                  Porcentajes en base húmeda
+  N2:  ${result.products["N2"]  }             N2:  ${result.flows["N2_%"] } %
+  O2:   ${result.products["O2"] }             O2:  ${result.flows["O2_%"] } %
+  H2O:  ${result.products["H2O"]}             H2O: ${result.flows["H2O_%"]} %
+  CO2:  ${result.products["CO2"]}             CO2: ${result.flows["CO2_%"]} %
+  SO2:  ${result.products["SO2"]}             SO2: ${result.flows["SO2"] || "0.000"} %
 
   Exceso de aire usado: ${result.flows["air_excess_%"]} %
-  Moles O2 requeridos/mol de combustible (teórico): ${result.flows["O2_mol_req_theor"]}
+  Moles O2 requeridos/mol de comb. (teórico): ${result.flows["O2_mol_req_theor"]}
 
   Relación A/C molar húmeda:  ${result.flows["AC"]}
   Relación A/C másica húmeda: ${result.flows["AC_mass"]}
   Relación A/C molar (aire seco, teórica):    ${result.flows["AC_theor_dryAir"]}
   Relación A/C másica (aire húmedo, teórica): ${result.flows["AC_mass_theor_moistAir"]}
 
-  Peso molecular del combustible: ${result.flows["fuel_MW"]}
-  Cp(t_comb) del combustible:  ${result.flows["fuel_Cp"]}
+  Peso molecular del comb. ${result.flows["fuel_MW"]}
+  Cp(t_comb) del comb.  ${result.flows["Cp_fuel"]}
   NCV: ${result.flows["NCV"]}
 
-  Peso molecular de los gases de combustión: ${result.flows["flue_MW"]}
-  Cp(t_amb) de los gases de combustión: ${result.flows["flue_Cp_Tamb"]}
+  Peso molecular de los gases de comb. ${result.flows["flue_MW"]}
+  Cp(t_amb) de los gases de comb. ${result.flows["Cp_flue"]}
+
+
+Eficiencia del horno: ${result.rad_result.eff_total}% [Q_rls/Q_fluid]
 `;
   } else {
     outputString += `
 Input Data 
-  (in case of no input, default values will be taken)
+  (in case of no input, 
+  default values will be taken)
 
   Unit System:          ${result.debug_data["unitSystem"]}
   Atmospheric Pressure: ${result.debug_data["atmPressure"]}
@@ -255,42 +257,39 @@ Input Data
   Dry Air Pressure:     ${result.debug_data["dryAirPressure"]}
   Water Vapor Pressure:  ${result.debug_data["waterPressure"]}
 
-  Partial Pressure H2O:  ${result.debug_data["H2OPressure_%"]} ÷10²
-  Partial Pressure N2 : ${result.debug_data["N2Pressure_%"]} ÷10²
-  Partial Pressure O2 : ${result.debug_data["O2Pressure_%"]} ÷10²
-  Moisture content (w):  ${result.debug_data["moisture"]}-dryAir
+  Partial Pressure H2O: ${result.debug_data["H2OPressure_%"]} ÷10²
+  Partial Pressure N2: ${result.debug_data["N2Pressure_%"]} ÷10²
+  Partial Pressure O2: ${result.debug_data["O2Pressure_%"]} ÷10²
+  Moisture content (w): ${result.debug_data["moisture"]}-dryAir
 
 Total flue gas moles and percentage (per fuel mol)
 
   Flow total: ${result.flows["total_flow"]}
   Dry total:  ${result.flows["dry_total_flow"]}
-
-  N2:  ${result.products["N2"]}
-  O2:  ${result.products["O2"]}
-  H2O: ${result.products["H2O"]}
-  CO2: ${result.products["CO2"]}
-  SO2: ${result.products["SO2"]}
-
-  Moist basis percentage
-    N2:  ${result.flows["N2_%"]} %
-    H2O: ${result.flows["H2O_%"]} %
-    CO2: ${result.flows["CO2_%"]} %
-    O2:  ${result.flows["O2_%"]} %
+  ${""               }                      Moist basis percentage
+  N2:  ${result.products["N2"]  }             N2:  ${result.flows["N2_%"]} %
+  O2:  ${result.products["O2"] }              O2:  ${result.flows["O2_%"]} %
+  H2O: ${result.products["H2O"]}              H2O: ${result.flows["H2O_%"]} %
+  CO2: ${result.products["CO2"]}              CO2: ${result.flows["CO2_%"]} %
+  SO2: ${result.products["SO2"]}              SO2: ${result.flows["SO2_%"] ||"0.000"} %
 
   Air excess used : ${result.flows["air_excess_%"]} %
-  Moles O2 required/fuel-mol (theoretical): ${result.flows["O2_mol_req_theor"]}
+  Moles O2 required/fuel-mol (theor): ${result.flows["O2_mol_req_theor"]}
 
   A/C molar moist relation:   ${result.flows["AC"]}
   A/C mass moist relation:    ${result.flows["AC_mass"]}
-  A/C molar relation (dry air, theoretical):   ${result.flows["AC_theor_dryAir"]}
-  A/C mass relation (moist air, theoretical):  ${result.flows["AC_mass_theor_moistAir"]}
+  A/C molar relation (dry air, theor):   ${result.flows["AC_theor_dryAir"]}
+  A/C mass relation (moist air, theor):  ${result.flows["AC_mass_theor_moistAir"]}
 
   Fuel mol weight: ${result.flows["fuel_MW"]}
-  Fuel Cp(t_fuel): ${result.flows["fuel_Cp"]}
+  Fuel Cp(t_fuel): ${result.flows["Cp_fuel"]}
   NCV:             ${result.flows["NCV"]}
 
   Flue gas mol weight: ${result.flows["flue_MW"]}
-  Flue gas Cp(t_amb):  ${result.flows["flue_Cp_Tamb"]}
+  Flue gas Cp(t_amb):  ${result.flows["Cp_flue"]}
+
+
+Heater Efficiency: ${result.rad_result.eff_total}% [Q_rls/Q_fluid]
 `;
   }
   

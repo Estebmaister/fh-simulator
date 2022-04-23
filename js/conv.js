@@ -62,19 +62,18 @@ const convSection = (params, noLog) => {
     hi = (tB, tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *prandtl(tB)**(1/3) *(miu_fluid(tB)/miu_fluid(tW))**.14;
     
   /** Q_fluid = M *Cp *deltaT */
-  const Q_fluid = (tIn, tOut = t_out) => m_fluid *Cp_fluid(tIn, tOut) *(tOut -tIn);
+  const Q_fluid = (tIn, tOut =t_out) => m_fluid *Cp_fluid(tIn, tOut) *(tOut -tIn);
   const duty_conv = (tIn) => Q_fluid(tIn);  // Duty in convective sect used for Tw calc
 
   /** Tw = Average tube wall temperature in Kelvin degrees */
   const Tw = (tB = Tb(t_out, t_in) , tW = tB, tIn = t_in) => (duty_conv(tIn) /At) * 
-    (Do/Di) *( Rfi +1/hi(tB,tW) +( Di *Math.log(Do/Di) /(2*kw_tube(tW) )) ) +tB;
+    (Do/Di) *( Rfi +1/hi(tB,tW) +( Di *Math.log(Do/Di) /(2*kw_tube(tW)) ) ) +tB;
   
   const
     gr = (_tB, _tW) => 3.5*(0.29307107*cnv_fact), // (Btu/hr-ft2-F) Outside radiation factor //TODO: implement
-    
     hr = (tG_b, tW) => 2.2 *gr(tG_b, tW) *(PL)**.50 *(Apo/Ao)**.75; // (kJ/m²h-°C) effective radiative coff wall tube
 
-  let hc = (tG_b, _tW) => .33 *(kw_flue(tG_b) /Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
+  let hc = (tG_b, _tW) => .33 *(kw_flue(tG_b)/Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
 
   const
     ho = (tG_b, tW) => 1/( 1/(hc(tG_b, tW) +hr(tG_b,tW)) +Rfo ), // (kJ/m²h-°C) external heat transfer coff
@@ -115,35 +114,43 @@ const convSection = (params, noLog) => {
   const Tin_conv_func = (tIn) => Q_fluid(tIn) - Q_conv(tIn, tg_in, tg_out);
 
   // -------- 1st estimation of tg_out   #.#.#.#.#
-  tg_out = newtonRaphson(tg_out_func, (tg_in - 100), params.NROptions, "Tg_out_convective-1");
-  t_in_calc = newtonRaphson(Tin_conv_func, t_in, params.NROptions, "T_in_convective-1");
+  tg_out = newtonRaphson(tg_out_func, (tg_in -100), params.NROptions, "Tg_out_convective-1",noLog);
+  t_in_calc = newtonRaphson(Tin_conv_func, t_in, params.NROptions, "T_in_convective-1",noLog);
+
+  if (!noLog) logger.debug(`"Tin_convective", "t_in_cnv_calc": ${round(unitConv.KtoF(t_in_calc))},`+
+    ` "tg_stack": ${round(unitConv.KtoF(tg_out))}`);
   
+  /// Cycle to improve result:
   // const
-  //   normalized_error = 1e-5, // .001%
-  //   normalized_diff = (tIn_calc, tIn = t_in) => Math.abs(tIn_calc - tIn) /tIn;
-  // let iterations = 0;
+  //   normalized_error = 1e-3, // .001%
+  //   // normalized_diff = (tIn_calc, tIn = t_in) => Math.abs(tIn_calc - tIn) /tIn;
+  //   normalized_diff = (tIn_calc, tIn = t_in) => Math.abs(Q_flue(tg_in, tg_out) -Q_fluid(tIn) /Q_flue(tg_in, tg_out));
+  // let iter = 0;
+  // logger.debug(`"Tin_convective", "t_in_cnv_calc": ${unitConv.KtoF(t_in_calc)}, "t_in_cnv_sup": ${unitConv.KtoF(t_in)}`);
   // while (normalized_diff(t_in_calc) > normalized_error) {
-  //   if (!noLog) logger.debug(`"Tin_convective", "t_in_cnv_calc": ${t_in_calc}, "t_in_cnv_sup": ${t_in}`)
-  //   if (t_in_calc) {
-  //     t_in = t_in_calc;
-  //   } else {
-  //     break;
-  //   }
-    
-  //   tg_out = newtonRaphson(tg_out_func, tg_out, params.NROptions, "Tg_out_convective-2");
-  //   t_in_calc = newtonRaphson(Tin_conv_func, t_in, params.NROptions, "T_in_convective-2");
+  //   if (t_in_calc) { t_in = t_in_calc }
+  //   iter++;
+  //   const tg_stack = newtonRaphson(tg_out_func, tg_out, params.NROptions, "Tg_out_convective-2");
+  //   if (tg_stack >t_in) {tg_out = tg_stack } else {logger.error(`error in tg_stack: ${tg_stack}, t_in: ${t_in}, iter: ${iter}`);}
+  //   t_in_calc = newtonRaphson(Tin_conv_func, t_in +100, params.NROptions, "T_in_convective-2");
 
   //   // Forced break of loop
-  //   iterations++;
-  //   if (iterations > 50) {
-  //     logger.info(`diff vs error: ${normalized_error}-${normalized_diff(t_in_calc)}`)
+  //   iter++;
+  //   if (iter > 20) {
+  //     logger.info(`error vs diff: ${normalized_error}-${round(normalized_diff(t_in_calc),5)}`)
   //     logger.error("Max iterations reached for inlet temp calc at convective sect");
   //     break;
   //   }
   // }
   if (t_in_calc) t_in = t_in_calc;
 
-  const conv_result = {
+  if (!noLog) logger.default(`CONV, T_in_calc: ${params.units.tempC(t_in_calc)}, ` +
+    `T_in_given: ${params.units.tempC(params.t_in_conv)}, Tg_stack: ${params.units.tempC(tg_out)}`);
+
+  params.t_in_conv_calc = t_in;
+  params.tg_conv = tg_out;
+
+  return {
     t_fin:        params.Ts( Tb(t_in), Tw( Tb(t_in), Tw(Tb(t_in)) )),
     t_in_given:   params.t_in_conv,
     t_in:         t_in,
@@ -221,12 +228,6 @@ const convSection = (params, noLog) => {
       Arrange:     params.FinArrange
     }
   };
-
-  if (!noLog) logger.default(`T_in_given: ${params.units.tempC(params.t_in_conv)}, T_in_calc: ${params.units.tempC(t_in_calc)}, Tg_out_conv: ${params.units.tempC(tg_out)}`);
-
-  params.t_in_conv_calc = t_in;
-  params.tg_conv = tg_out;
-  return conv_result;
 }
 
 const colburnFactor = (reynoldsFlue, parm, m, B) => {

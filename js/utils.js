@@ -56,11 +56,12 @@ const logger = {
 };
 
 /** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
-const newtonRaphson = (f, fp, x0, nrOptions, name) => {
+const newtonRaphson = (f, fp, x0, nrOptions, name, noLog) => {
   let x1, y, yp, iter, yph, ymh, yp2h, ym2h;
 
   // Interpret variadic forms:
   if (typeof fp !== 'function') {
+    noLog = name;
     name = nrOptions;
     nrOptions = x0;
     x0 = fp;
@@ -103,7 +104,8 @@ const newtonRaphson = (f, fp, x0, nrOptions, name) => {
 
     // Check for convergence:
     if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
-      logger.debug(`"Newton-Raphson", "func":"${name}", "var converged to":${x1}, "iterations":${iter}`);
+      if (!noLog) logger.debug(`"Newton-Raphson", "func":"${name}",`+
+        ` "var converged to":${x1}, "iterations":${iter}`);
       return x1;
     }
 
@@ -206,6 +208,7 @@ const getOptions = () => {
     pAtmRef,
 
     // Entry default arguments
+    runDistCycle: true,     // boolean
     verbose:    true,       // boolean
     tAmb:       tempAmbRef, // K
     tAir:       tempAmbRef, // K
@@ -258,13 +261,13 @@ const roundDict = (object = {}) => {
 };
 
 /** Normalize an object of fuels/products */
-const normalize = (fuels, name) => {
+const normalize = (fuels, name, noLog) => {
   const normalFuel = {...fuels};
   const total = Object.values(normalFuel).reduce((acc, value)=> acc + value);
   for (const fuel in normalFuel) {
     normalFuel[fuel] = normalFuel[fuel]/total;
   }
-  if (options.verbose) 
+  if (!noLog) 
     logger.debug(`"normalize", "name": "${name}", "total": ${total}`);
   return normalFuel;
 };
@@ -274,8 +277,7 @@ const kw = ({k0, k1, k2, Substance}) => {
   // Thermal Cond equation from NIST data with polynomial approx. R2=1
   // k2*T^2 + k1*T + k0  (valid from 300K to 1350K)* SO2 only to 500K
   if (k0 == 0 || k0 == "-") {
-    if (options.verbose) 
-      logger.debug(`"Thermal Cond func called for '${Substance}' without coffs"`);
+    logger.debug(`"Thermal Cond func called for '${Substance}' without coffs"`);
     return () => 0;
   }
   const cnv_fact = 3_600 * 1e-3; // Therm. Cond. (W/m*K) -> (kJ/h*m*K)
@@ -305,8 +307,7 @@ const miu = ({u0, u1, u2, Substance}) => {
   // Viscosity equation from NIST data with polynomial approx. R2=0.99998
   // u2*T^2 + u1*T + u0  (valid from 300K to 1350K)* SO2 only to 500K
   if (u0 == 0 || u0 == "-") {
-    if (options.verbose) 
-      logger.debug(`"Viscosity func called for '${Substance}' without coffs"`);
+    logger.debug(`"Viscosity func called for '${Substance}' without coffs"`);
     return () => 0;
   }
   return (temp) => u0 + u1* temp + u2* temp**2;

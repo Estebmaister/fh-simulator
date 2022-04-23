@@ -45,6 +45,7 @@ const createParams = (opts) => {
     kw_fluid_out= unitConv.kwENtokwSI(0.035); // (kJ/h-m-C)
 
   return {
+    runDistCycle: opts.runDistCycle,
     /** Inlet Amb Variables */
     p_atm:  opts.pAtm,         // (Pa) 
     t_fuel: opts.tFuel,        // (K) 
@@ -129,23 +130,26 @@ const heaterFunc = (fuels, opts) => {
   //TODO: create a function for this process
   // if params.o2Excess is set, start airExcess iteration
   if (params.o2Excess != 0) {
+    let cycle = 0, onlyO2 = true;
     const comb_o2 = (airExcessVal) => {
-      const combO2 = combSection(airExcessVal, fuels, params)
-      logger.info( "O2%: " + combO2.flows['O2_%'] +
-        " vs O2excess: " + params.o2Excess * 100)
-      return combO2.flows['O2_%'] / 100 - params.o2Excess
+      cycle++;
+      const combO2 = combSection(airExcessVal, fuels, params, onlyO2)
+      if (!onlyO2) logger.info( `"O2%_comb": ${combO2.flows['O2_%']}, `+
+        `O2excess: ${params.o2Excess *100}`)
+      return Math.round(combO2.flows['O2_%']*1e5 -params.o2Excess*1e7)
     }
     const airExcess = newtonRaphson(comb_o2,.5,
       params.NROptions, "o2_excess_to_air");
     if (airExcess) params.airExcess = airExcess;
+    logger.info(`"air_excess": ${round(100*airExcess,2)}, `+
+      `"comb_cycle_reps": ${cycle}`);
   } else {
     params.airExcess = opts.airExcess
   }
 
   const comb_result = combSection(params.airExcess, fuels, params);
 
-  const runDistCycle = true;
-  if (runDistCycle) externalCycle(params);
+  if (params.runDistCycle) externalCycle(params);
 
   comb_result.rad_result = radSection(params)
   comb_result.shld_result = shieldSection(params)
@@ -158,37 +162,37 @@ const externalCycle = (params) => {
   const rad_dist = (radDist) => {
     cycle++;
     params.duty_rad_dist = radDist;
-    const int_results = {
+    const int_rlt = {
       rad:  radSection(   params, noLog),
       shld: shieldSection(params, noLog),
       conv: convSection(  params, noLog)
-    }
-    const error = params.duty - int_results.rad.duty - 
-    int_results.shld.duty - int_results.conv.duty;
-    return error / (int_results.rad.duty + 
-    int_results.shld.duty + int_results.conv.duty); //*/
+    };
+    const error = params.duty - int_rlt.rad.duty - 
+    int_rlt.shld.duty - int_rlt.conv.duty;
+    return error /* (int_rlt.rad.duty + 
+    int_rlt.shld.duty + int_rlt.conv.duty); //*/
   };
   const rad_dist_final = newtonRaphson(rad_dist, 
-    params.duty_rad_dist, params.NROptions, "rad_dist_final")
+    params.duty_rad_dist, params.NROptions, "rad_dist_final");
   if (rad_dist_final) {
     params.duty_rad_dist = rad_dist_final;
   } else {
     logger.error("external cycle broken, error in rad_dist estimation, using: "+
     params.duty_rad_dist);
   }
-  logger.info(`duty_rad_dist: ${round(100*rad_dist_final,2)}, ext_iterations: ${cycle}`);
+  logger.info(`duty_rad_dist: ${round(100*rad_dist_final,2)}, ext_cycle_reps: ${cycle}`);
 }
 
 let fuelsObject = { 
   H2:     .1142, N2:   .0068, CO:   .0066, CO2: .0254, 
   CH4:    .5647, C2H6: .1515, C3H8: .0622, C4H10: .0176, 
   iC4H10: .0075, C2H4: .0158, C3H6: .0277,
-}
+};
 // Fuel for debugging purpose
 // fuelsObject ={
 //   CH4: 1,
 //   // H2: .7, O2: .2, N2: .1
-// }
+// };
 
 /** App entry point */
 if (typeof window !== 'undefined') {
