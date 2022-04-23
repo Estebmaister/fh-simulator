@@ -152,6 +152,7 @@ const externalCycle = (params) => {
       shld: shieldSection(params, noLog),
       conv: convSection(  params, noLog)
     };
+    if (int_rlt.conv.tg_out < int_rlt.conv.t_in) int_rlt.conv.duty*=2;
     const duty_calc = int_rlt.rad.duty + 
     int_rlt.shld.duty + int_rlt.conv.duty;
 
