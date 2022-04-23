@@ -127,25 +127,9 @@ const createParams = (opts) => {
 
 const heaterFunc = (fuels, opts) => {
   const params = createParams(opts);
-  //TODO: create a function for this process
+
   // if params.o2Excess is set, start airExcess iteration
-  if (params.o2Excess != 0) {
-    let cycle = 0, onlyO2 = true;
-    const comb_o2 = (airExcessVal) => {
-      cycle++;
-      const combO2 = combSection(airExcessVal, fuels, params, onlyO2)
-      if (!onlyO2) logger.info( `"O2%_comb": ${combO2.flows['O2_%']}, `+
-        `O2excess: ${params.o2Excess *100}`)
-      return Math.round(combO2.flows['O2_%']*1e5 -params.o2Excess*1e7)
-    }
-    const airExcess = newtonRaphson(comb_o2,.5,
-      params.NROptions, "o2_excess_to_air");
-    if (airExcess) params.airExcess = airExcess;
-    logger.info(`"air_excess": ${round(100*airExcess,2)}, `+
-      `"comb_cycle_reps": ${cycle}`);
-  } else {
-    params.airExcess = opts.airExcess
-  }
+  if (params.o2Excess != 0) combustionCycle(params, fuels);
 
   const comb_result = combSection(params.airExcess, fuels, params);
 
@@ -158,6 +142,7 @@ const heaterFunc = (fuels, opts) => {
 }
 
 const externalCycle = (params) => {
+  // cycle iter count and flag for debugging logs 
   let cycle = 0, noLog = true;
   const rad_dist = (radDist) => {
     cycle++;
@@ -167,10 +152,10 @@ const externalCycle = (params) => {
       shld: shieldSection(params, noLog),
       conv: convSection(  params, noLog)
     };
-    const error = params.duty - int_rlt.rad.duty - 
-    int_rlt.shld.duty - int_rlt.conv.duty;
-    return error /* (int_rlt.rad.duty + 
-    int_rlt.shld.duty + int_rlt.conv.duty); //*/
+    const duty_calc = int_rlt.rad.duty + 
+    int_rlt.shld.duty + int_rlt.conv.duty;
+
+    return (params.duty - duty_calc)/duty_calc;
   };
   const rad_dist_final = newtonRaphson(rad_dist, 
     params.duty_rad_dist, params.NROptions, "rad_dist_final");
@@ -181,6 +166,25 @@ const externalCycle = (params) => {
     params.duty_rad_dist);
   }
   logger.info(`duty_rad_dist: ${round(100*rad_dist_final,2)}, ext_cycle_reps: ${cycle}`);
+}
+
+const combustionCycle = (params, fuels) => {
+  // cycle iter count and flag for debugging logs 
+  let cycle = 0, onlyO2 = true;
+  const comb_o2 = (airExcessVal) => {
+    cycle++;
+    const combO2 = combSection(airExcessVal, fuels, params, onlyO2)
+    if (!onlyO2) logger.info( `"O2%_comb": ${combO2.flows['O2_%']}, `+
+      `O2excess: ${params.o2Excess *100}`);
+
+    return Math.round(combO2.flows['O2_%']*1e5 -params.o2Excess*1e7);
+  }
+  const airExcess = newtonRaphson(comb_o2,.5,
+    params.NROptions, "o2_excess_to_air");
+
+  if (airExcess) params.airExcess = airExcess;
+  logger.info(`'air_excess': ${round(100*airExcess,2)}, `+
+    `'comb_cycle_reps': ${cycle}`);
 }
 
 let fuelsObject = { 

@@ -83,7 +83,6 @@ const shieldSection = (params, noLog) => {
     R_ext = (tG_out, tG_in = tg_in) => 1/ho(tG_out, tG_in),  // Outside
     
     R_sum = (tG_out, tG_in, tB, tW) => R_ext(tG_out, tG_in) + R_tube(tW) + R_int(tB,tW),
-    // Uo  = (tG_out, tG_in, tB, tW) => unitConv.hcENtohcSI(5.92) + 0*R_sum(tG_out, tG_in, tB, tW);
     Uo  = (tG_out, tG_in, tB, tW) => 1 / R_sum(tG_out, tG_in, tB, tW);
   
   const Q_rad = params.q_rad_sh;            // (kJ/h) Q_rad = σ*(α*Acp)*F*(Tg**4 - Tw**4)
@@ -97,40 +96,36 @@ const shieldSection = (params, noLog) => {
   const Q_flue = (tG_in,tG_out=tg_out) => m_flue * Cp_flue(tG_in, tG_out) * (tG_in - tG_out);
   
   const tg_out_func = (tG_out) => Q_flue(tg_in, tG_out) + Q_rad - Q_fluid(t_in, t_out);
-  // opt2 tg_out_func = (tG_out) => Q_conv(t_in, tg_in, tG_out, Tb(t_in), Tw(Tb(t_in))) - Q_flue(tg_in,tG_out);
-  
   const Tin_sh_func = (tIn) => Q_fluid(tIn) - Q_R(tIn, tg_in, tg_out, Tb(tIn), Tw( Tb(tIn),Tw(Tb(tIn)) ));
-  
   // -------- 1st estimation of tg_out   #.#.#.#.#
   tg_out = newtonRaphson(tg_out_func, (tg_in - 200), params.NROptions, "Tg_out_shield-1",noLog);
   t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-1",noLog);
 
+  let iter = 1;
   const 
-    normalized_error = 1e-6, // 0.0001%
-    normalized_diff = (tIn_calc, tIn = t_in) => Math.abs(tIn_calc - tIn) /tIn;
-  let iterations = 0;
-  while (normalized_diff(t_in_calc) > normalized_error) {
-    if (!noLog) logger.debug(`"Tin_shield",  "t_in_sh_calc": ${round(t_in_calc)}, "t_in_sh_sup": ${round(t_in)}`)
-    if (t_in_calc) {
-      t_in = t_in_calc;
-    } else {
-      if (!noLog) logger.error("Invalid t_in_calc at shield sect");
+    normalized_error = 1e-3, // 0.1%
+    normalized_diff = (tG_out) => Math.abs((Q_flue(tg_in, tG_out) -
+      Q_conv(t_in,tg_in,tG_out,Tb(t_in),Tw(Tb(t_in),Tw(Tb(t_in)))) )/ Q_flue(tg_in, tg_out));
+  while (normalized_diff(tg_out) - normalized_error > 0) {
+    if (t_in_calc) { t_in = t_in_calc; } else {
+      logger.error("Invalid t_in_calc at shield sect");
       break;
     }
     
-    t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-2",noLog);
-    tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_shield-2",noLog);
+    t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-2",true);
+    tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_shield-2",true);
 
     // Forced break of loop
-    iterations++;
-    if (iterations > 10) {
-      if (!noLog) logger.info(`diff vs error: ${normalized_error}-${normalized_diff(t_in_calc)}`);
-      if (!noLog) logger.error("Max iterations reached for inlet temp calc at shield sect");
+    iter++;
+    if (iter > 50) {
+      logger.debug(`"Tin_shield",  "t_in_sh_calc": ${round(t_in_calc)}, "t_in_sh_sup": ${round(t_in)}`);
+      if (!noLog) logger.info(`diff vs error: ${normalized_diff(tg_out)}-${normalized_error}`);
+      logger.error("Max iterations reached for inlet temp calc at shield sect");
       break;
     }
   }
   
-  if (!noLog) logger.default(`SHLD, T_in_calc: ${params.units.tempC(t_in)}, `+
+  if (!noLog) logger.default(`SHLD, cycles: ${iter}, T_in_calc: ${params.units.tempC(t_in)}, `+
     `Tg_out: ${params.units.tempC(tg_out)}`)
 
   params.t_in_sh = t_in;
