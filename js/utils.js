@@ -56,11 +56,12 @@ const logger = {
 };
 
 /** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
-const newtonRaphson = (f, fp, x0, nrOptions, name) => {
+const newtonRaphson = (f, fp, x0, nrOptions, name, noLog) => {
   let x1, y, yp, iter, yph, ymh, yp2h, ym2h;
 
   // Interpret variadic forms:
   if (typeof fp !== 'function') {
+    noLog = name;
     name = nrOptions;
     nrOptions = x0;
     x0 = fp;
@@ -103,7 +104,8 @@ const newtonRaphson = (f, fp, x0, nrOptions, name) => {
 
     // Check for convergence:
     if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
-      logger.debug(`"Newton-Raphson", "func":"${name}", "var converged to":${x1}, "iterations":${iter}`);
+      if (!noLog) logger.debug(`"Newton-Raphson", "func":"${name}",`+
+        ` "var converged to":${x1}, "iterations":${iter}`);
       return x1;
     }
 
@@ -161,7 +163,7 @@ const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
   }
     
   // ( (t_hot_in - t_cold_out) - (t_hot_out - t_cold_in) ) / ln( (t_hot_in - t_cold_out) / (t_hot_out-t_cold_in) )
-  return (delta_t1 - delta_t2) /Math.log( delta_t1 / delta_t2 );
+  return Math.abs((delta_t1 - delta_t2) /Math.log(Math.abs(delta_t1 / delta_t2)) );
 };
 
 const 
@@ -206,6 +208,7 @@ const getOptions = () => {
     pAtmRef,
 
     // Entry default arguments
+    runDistCycle: true,     // boolean
     verbose:    true,       // boolean
     tAmb:       tempAmbRef, // K
     tAir:       tempAmbRef, // K
@@ -258,13 +261,13 @@ const roundDict = (object = {}) => {
 };
 
 /** Normalize an object of fuels/products */
-const normalize = (fuels, name) => {
+const normalize = (fuels, name, noLog) => {
   const normalFuel = {...fuels};
   const total = Object.values(normalFuel).reduce((acc, value)=> acc + value);
   for (const fuel in normalFuel) {
     normalFuel[fuel] = normalFuel[fuel]/total;
   }
-  if (options.verbose) 
+  if (!noLog) 
     logger.debug(`"normalize", "name": "${name}", "total": ${total}`);
   return normalFuel;
 };
@@ -274,8 +277,7 @@ const kw = ({k0, k1, k2, Substance}) => {
   // Thermal Cond equation from NIST data with polynomial approx. R2=1
   // k2*T^2 + k1*T + k0  (valid from 300K to 1350K)* SO2 only to 500K
   if (k0 == 0 || k0 == "-") {
-    if (options.verbose) 
-      logger.debug(`"Thermal Cond func called for '${Substance}' without coffs"`);
+    logger.debug(`"Thermal Cond func called for '${Substance}' without coffs"`);
     return () => 0;
   }
   const cnv_fact = 3_600 * 1e-3; // Therm. Cond. (W/m*K) -> (kJ/h*m*K)
@@ -305,8 +307,7 @@ const miu = ({u0, u1, u2, Substance}) => {
   // Viscosity equation from NIST data with polynomial approx. R2=0.99998
   // u2*T^2 + u1*T + u0  (valid from 300K to 1350K)* SO2 only to 500K
   if (u0 == 0 || u0 == "-") {
-    if (options.verbose) 
-      logger.debug(`"Viscosity func called for '${Substance}' without coffs"`);
+    logger.debug(`"Viscosity func called for '${Substance}' without coffs"`);
     return () => 0;
   }
   return (temp) => u0 + u1* temp + u2* temp**2;
@@ -348,12 +349,12 @@ const englishSystem = { //(US Customary)
   "energy/mol":   (n) => round(unitConv.kJtoBTU(n)) + " Btu/mol",
   "mass/mol":     (n) => round(n) + " lb/lb-mol",
   heat_flow :     (n) => round(unitConv.kJtoBTU(n)*1e-6) + " MBtu/h",
-  heat_flux:      (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**2) + " Btu/h-ft2",
-  fouling_factor: (n) => round(n * 10.763910417*1.8/0.94781712) + " h-ft2-°F/Btu",
+  heat_flux:      (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**2) + " Btu/h-ft²",
+  fouling_factor: (n) => round(n * 10.763910417*1.8/0.94781712) + " h-ft²-°F/Btu",
   "energy/mass":  (n) => round(unitConv.kJtoBTU(n)/unitConv.kgtolb(1)) + " Btu/lb",
-  "energy/vol":   (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**3) + " Btu/ft3",
+  "energy/vol":   (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**3) + " Btu/ft³",
 
-  area:     (n) => round(n * 10.763910417)    + " ft2",
+  area:     (n) => round(n * 10.763910417)    + " ft²",
   length:   (n) => round(unitConv.mtoft(n))   + " ft",
   lengthC:  (n) => round(unitConv.mtoin(n))   + " in",
   lengthInv:(n) => round(n /unitConv.mtoft(1))+ " 1/ft",
@@ -362,15 +363,15 @@ const englishSystem = { //(US Customary)
   pressure: (n) => round(n * 0.0001450377)    + " psi",
   mass:     (n) => round(n * 2.2046244202e-3) + " lb",
   mass_flow:(n) => round(unitConv.kgtolb(n))  + " lb/h",
-  vol_flow: (n) => round(unitConv.mtoft(n)**3)+ " f3/h",
+  vol_flow: (n) => round(unitConv.mtoft(n)**3)+ " ft³/h",
   cp:       (n) => round(n * 0.238845896627)  + " Btu/lb-°F",
   cp_mol:   (n) => round(n * 0.238845896627)  + " Btu/lb-mol-°F",
   power:    (n) => round(n * 3.4121416331)    + " Btu/h",
-  moist:    (n) => round(n * 1e3)             + "x10^(-3) lb-H2O/lb",
+  moist:    (n) => round(n * 1e3)             + " ÷10³ lb-H2O/lb",
   thermal:  (n) => round( unitConv.kJtoBTU(n) /
     unitConv.KtoR(1)/unitConv.mtoft(1) )      + " BTU/h-ft-°F",
   convect:  (n) => round( unitConv.kJtoBTU(n) /
-    unitConv.KtoR(1)/(unitConv.mtoft(1)**2) ) + " BTU/h-ft2-°F",
+    unitConv.KtoR(1)/(unitConv.mtoft(1)**2) ) + " BTU/h-ft²-°F",
   viscosity:(n) => round(n * 1)    + " cP",
   system:   {en: "English", es: "Inglés"}
 };
@@ -379,12 +380,12 @@ const siSystem = {
   "energy/mol":   (n) => round(n * 1) + " kJ/mol",
   "mass/mol":     (n) => round(n * 1) + " kg/kmol",
   heat_flow:      (n) => round(n*1e-6)+ " MJ/h",
-  heat_flux:      (n) => round(n * 1) + " W/m2",
-  fouling_factor: (n) => round(n * 1) + " m2-K/W",
+  heat_flux:      (n) => round(n * 1) + " W/m²",
+  fouling_factor: (n) => round(n * 1) + " m²-K/W",
 
   "energy/mass":  (n) => round(n * 1) + " kJ/kg",
-  "energy/vol":   (n) => round(n * 1) + " kJ/m3",
-  area:     (n) => round(n * 1)    + " m2",
+  "energy/vol":   (n) => round(n * 1) + " kJ/m³",
+  area:     (n) => round(n * 1)    + " m²",
   length:   (n) => round(n * 1)    + " m",
   lengthC:  (n) => round(n * 1e2)  + " cm",
   lengthInv:(n) => round(n * 1)    + " 1/m",
@@ -393,13 +394,13 @@ const siSystem = {
   pressure: (n) => round(n * 1e-3) + " kPa",
   mass:     (n) => round(n * 1e-3) + " kg",
   mass_flow:(n) => round(n * 1)    + " kg/h",
-  vol_flow: (n) => round(n * 1)    + " m3/h",
+  vol_flow: (n) => round(n * 1)    + " m³/h",
   cp:       (n) => round(n * 1)    + " kJ/kg-K",
   cp_mol:   (n) => round(n * 1)    + " kJ/kmol-K",
   power:    (n) => round(n * 1)    + " W",
   moist:    (n) => round(n * 1e3)  + " g-H2O/kg",
   thermal:  (n) => round(n * 1)    + " kJ/h-m-C",
-  convect:  (n) => round(n * 1)    + " kJ/h-m2-C",
+  convect:  (n) => round(n * 1)    + " kJ/h-m²-C",
   viscosity:(n) => round(n * 1)    + " cP",
   system:   {en: "SI", es: "SI"}
 };

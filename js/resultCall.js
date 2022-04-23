@@ -6,5 +6,5 @@ window.onload = function(){
         scriptElement.src = "../js/bundle.js";
         document.getElementById("output-combustion").textContent = 'Is this taking too long? check the console log for debugging.';
         document.head.appendChild(scriptElement);
-    }, 1000);
+    }, 500);
 };

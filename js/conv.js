@@ -1,16 +1,6 @@
 const {newtonRaphson, logger, LMTD, round, unitConv} = require('./utils');
 
-// TODO: delete after testing inside
-const {options, initSystem} = require('./utils');
-const unitSystem = initSystem('EN');
-
-const convSection = (params) => {
-  // Failing in case of a wrong call
-  if (params === null || params === undefined) {
-    logger.error("wrong call for convection section, no parameters set at call.")
-    return {};
-  }
-
+const convSection = (params, noLog) => {
   let
     tg_in  = params.tg_sh,  // (K) Inlet gas temp coming from shld sect
     tg_out = 0,             // (K) Outlet gas temp
@@ -41,20 +31,19 @@ const convSection = (params) => {
     Do = params.Do_conv,// (m) external diameter conv section 
     Di = params.Do_conv - params.Sch_sh_cnv*2,// (m) int diameter conv sect
     S_tube = params.Pitch_sh_cnv, // (m) Tube spacing, 2*NPS
-    N  = params.N_conv,     // (-) number of tubes convective sect
-    Nt = params.Tpr_sh_cnv, // (-) Number of tube wide
-    Nf = params.Nf,         // (1/m) Fin's number per meter
-    Lf = params.Lf,         // (m) Fin's height
-    Tf = params.Tf,         // (m) Fin's thickness
-    Ad = Nt*S_tube*L,     // Cross sectional area of box
-    Ac = Do + 2*Lf*Tf*Nf, // Fin tube cross sectional area/ft, ft2/ft
-    An = Ad - Ac*L*Nt,             // Free area for flue flow
-    // An = (Nt*(S_tube - Do) + S_tube/2)*L, // Free area for flue flow at shld sect //TODO: needs to consider fins
-    Ao  = Math.PI*Do*(1-Nf*Tf) + Math.PI*Nf*(2*Lf*(Do + Lf) + Tf*(Do + 2*Lf)),
-    Apo = Math.PI*Do*(1-Nf*Tf), // (m2) Outside prime tube surface area, m2/m
-    Afo = Ao - Apo,             // (m2) Fin outside surface area, m2/m
-    At = N*Ao*L,//N *Math.PI *Do *L,  // (m2) Area of tubes in bank, total outside surface area, m2/m
-    Ai = Math.PI *(Di**2) /2,// (m2) Inside tube surface area, m2/m
+    N  = params.N_conv,        // (-) number of tubes convective sect
+    N_tpr = params.Tpr_sh_cnv, // (-) Number of tube wide
+    N_f = params.Nf,           // (1/m) Fin's number per meter
+    L_fin = params.Lf,         // (m) Fin's height
+    Th_fin = params.Tf,        // (m) Fin's thickness
+    Ad = N_tpr*S_tube*L,       // Cross sectional area of box
+    Ac = Do+2*L_fin*Th_fin*N_f,// Fin tube cross sectional area/ft, ft2/ft
+    An  = Ad - Ac*L*N_tpr,     // Free area for flue flow
+    Apo = Math.PI*Do*(1-N_f*Th_fin), // (m2) Outside prime tube surface area, m2/m
+    Ao  = Math.PI*Do*(1-N_f*Th_fin) +Math.PI*N_f*(2*L_fin*(Do +L_fin) +Th_fin*(Do +2*L_fin)),
+    Afo = Ao - Apo,            // (m2) Fin outside surface area, m2/m
+    At  = N * Ao * L,          // (m2) Area of tubes in bank, total outside surface area, m2/m
+    Ai  = Math.PI *(Di**2) /2, // (m2) Inside tube surface area, m2/m
     
     /** (ft) Mean Beam Length, dim ratio 1-2-1 to 1-2-4*/
     MBL = 2/3 * (params.Width_rad*params.Length_rad*params.Height_rad) **(1/3), //TODO: implement
@@ -67,36 +56,34 @@ const convSection = (params) => {
     prandtl_flue = (t)=> miu_flue(t)*cnv_fact*Cp_flue(t)/kw_flue(t),// (-)
     G = (m_fluid/cnv_fact) /Ai, // Fluid mass flow per area unit inside tubes
     reynolds = (t) => G * Di/miu_fluid(t), // (-) G*Di/miu
-    // Gn it's the mass speed based on the free area for the gas flow (the space between the tubes across the heater).
-    Gn = (m_flue/cnv_fact) /An,
-    reynolds_flue = (t) => Gn * Do/miu_flue(t), // (-) G*Di/miu
+    Gn = m_flue/An, // mass speed based on the free area for the gas flow
+    reynolds_flue = (t) => Gn/cnv_fact *Do/miu_flue(t), // (-) G*Di/miu
     /** (kJ/m²h-°C) internal heat transfer coff */
     hi = (tB, tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *prandtl(tB)**(1/3) *(miu_fluid(tB)/miu_fluid(tW))**.14;
     
   /** Q_fluid = M *Cp *deltaT */
-  const Q_fluid = (tIn, tOut = t_out) => m_fluid *Cp_fluid(tIn, tOut) *(tOut -tIn);
+  const Q_fluid = (tIn, tOut =t_out) => m_fluid *Cp_fluid(tIn, tOut) *(tOut -tIn);
   const duty_conv = (tIn) => Q_fluid(tIn);  // Duty in convective sect used for Tw calc
 
   /** Tw = Average tube wall temperature in Kelvin degrees */
   const Tw = (tB = Tb(t_out, t_in) , tW = tB, tIn = t_in) => (duty_conv(tIn) /At) * 
-    (Do/Di) *( Rfi +1/hi(tB,tW) +( Di *Math.log(Do/Di) /(2*kw_tube(tW) )) ) +tB;
+    (Do/Di) *( Rfi +1/hi(tB,tW) +( Di *Math.log(Do/Di) /(2*kw_tube(tW)) ) ) +tB;
   
   const
-    gr = (_tB, _tW) => 3.5*0.29307107*cnv_fact, // (Btu/hr-ft2-F) Outside radiation factor //TODO: implement
-    
+    gr = (_tB, _tW) => 3.5*(0.29307107*cnv_fact), // (Btu/hr-ft2-F) Outside radiation factor //TODO: implement
     hr = (tG_b, tW) => 2.2 *gr(tG_b, tW) *(PL)**.50 *(Apo/Ao)**.75; // (kJ/m²h-°C) effective radiative coff wall tube
 
-  let hc = (tG_b, _tW) => .33 *(kw_flue(tG_b) /Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
+  let hc = (tG_b, _tW) => .33 *(kw_flue(tG_b)/Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
 
   const
     ho = (tG_b, tW) => 1/( 1/(hc(tG_b, tW) +hr(tG_b,tW)) +Rfo ), // (kJ/m²h-°C) external heat transfer coff
     /** Fin's Efficiency */
-    Kf = kw_tube(Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))),
-    B = Lf + (Tf /2),
-    m = (ho(Tb(tg_in,tg_out), Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))) / (6 * Kf * Tf))**0.5,
+    Kw_fin = 1.36* kw_tube(Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))), // TODO: find correct kw_fin value
+    B = L_fin + (Th_fin /2),
+    m = (ho(Tb(tg_in,tg_out), Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))) / (6 * Kw_fin * Th_fin))**0.5,
     x = Math.tanh(m * B) / (m * B),
     y = x * (0.7 + 0.3 * x),
-    Df = Do + 2*Lf,
+    Df = Do + 2*L_fin,
     Ef  = y * (0.45 * Math.log(Df / Do) * (y - 1) + 1),    // (-) Fin efficiency
     he = (tG_b, tW) => ho(tG_b, tW) *(Ef*Afo + Apo) / Ao,  // (kJ/m²h-°C)
     j = (tG_b, tW) => colburnFactor(reynolds_flue, params, m, B)(tG_b, tW);   // Colburn factor
@@ -112,110 +99,120 @@ const convSection = (params) => {
     R_ext = (tG_b, tW) => 1/he(tG_b, tW),                     // Outside
     
     R_sum = (tG_b, tB, tW) => R_ext(tG_b, tW) + R_tube(tW) + R_int(tB,tW),
+    //Uo  = (tG_b, tB, tW) => unitConv.hcENtohcSI(1) + R_sum(tG_b, tB, tW)*0;
     Uo  = (tG_b, tB, tW) => 1 / R_sum(tG_b, tB, tW);
   
   
   /** Q_flue  = M *Cp *deltaT */
   const Q_flue = (tG_in, tG_out) => m_flue*Cp_flue(tG_in,tG_out) *(tG_in -tG_out);
 
-  /** Q_conv = Uo *AO *LMTD + Q_rad_conv */
+  /** Q_conv = Uo * Ao *LMTD */
   const Q_conv = (tIn, tG_in, tG_out) => 
-    Uo( Tb(tG_out, tG_in), Tb(tIn), Tw(Tb(tIn),Tw(Tb(tIn))) ) * At * LMTD_Tin(tIn);
+    Uo( Tb(tG_out, tG_in), Tb(tIn), Tw(Tb(tIn),Tw(Tb(tIn))) ) *At *LMTD_Tin(tIn);
 
   const tg_out_func = (tG_out) => Q_flue(tg_in, tG_out) - Q_fluid(t_in, t_out);
   const Tin_conv_func = (tIn) => Q_fluid(tIn) - Q_conv(tIn, tg_in, tg_out);
 
   // -------- 1st estimation of tg_out   #.#.#.#.#
-  tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_convective-1");
-  t_in_calc = newtonRaphson(Tin_conv_func, t_in, params.NROptions, "T_in_convective-1");
+  tg_out = newtonRaphson(tg_out_func, (tg_in -100), params.NROptions, "Tg_out_convective-1",noLog);
+  t_in_calc = newtonRaphson(Tin_conv_func, t_in, params.NROptions, "T_in_convective-1",noLog);
 
-
-  // TODO: Delete debugger
-  logger.warn(`"vars to check in shld section",
-    "t_in_conv":  "${unitSystem.tempC(t_in_calc)} vs ${unitSystem.tempC(t_in)}"`)
-  //*/
+  if (!noLog) logger.debug(`"Tin_convective", "t_in_cnv_calc": ${round(unitConv.KtoF(t_in_calc))},`+
+    ` "tg_stack": ${round(unitConv.KtoF(tg_out))}`);
   
-  const
-    normalized_error = 1e-6, // .0001%
-    normalized_diff = (tIn_calc, tIn = t_in) => Math.abs(tIn_calc - tIn) /tIn;
-  let iterations = 0;
-  while (normalized_diff(t_in_calc) > normalized_error) {
-    logger.debug(`"Tin_convective", "t_in_cnv_calc": ${t_in_calc}, "t_in_cnv_sup": ${t_in}`)
-    if (t_in_calc) {
-      t_in = t_in_calc;
-    } else {
-      logger.error("Invalid t_in_calc at convective sect");
-      break;
-    }
+  /// Cycle to improve result:
+  // const
+  //   normalized_error = 1e-3, // .001%
+  //   // normalized_diff = (tIn_calc, tIn = t_in) => Math.abs(tIn_calc - tIn) /tIn;
+  //   normalized_diff = (tIn_calc, tIn = t_in) => Math.abs(Q_flue(tg_in, tg_out) -Q_fluid(tIn) /Q_flue(tg_in, tg_out));
+  // let iter = 0;
+  // logger.debug(`"Tin_convective", "t_in_cnv_calc": ${unitConv.KtoF(t_in_calc)}, "t_in_cnv_sup": ${unitConv.KtoF(t_in)}`);
+  // while (normalized_diff(t_in_calc) > normalized_error) {
+  //   if (t_in_calc) { t_in = t_in_calc }
+  //   iter++;
+  //   const tg_stack = newtonRaphson(tg_out_func, tg_out, params.NROptions, "Tg_out_convective-2");
+  //   if (tg_stack >t_in) {tg_out = tg_stack } else {logger.error(`error in tg_stack: ${tg_stack}, t_in: ${t_in}, iter: ${iter}`);}
+  //   t_in_calc = newtonRaphson(Tin_conv_func, t_in +100, params.NROptions, "T_in_convective-2");
+
+  //   // Forced break of loop
+  //   iter++;
+  //   if (iter > 20) {
+  //     logger.info(`error vs diff: ${normalized_error}-${round(normalized_diff(t_in_calc),5)}`)
+  //     logger.error("Max iterations reached for inlet temp calc at convective sect");
+  //     break;
+  //   }
+  // }
+  if (t_in_calc) t_in = t_in_calc;
+
+  if (!noLog) logger.default(`CONV, T_in_calc: ${params.units.tempC(t_in_calc)}, ` +
+    `T_in_given: ${params.units.tempC(params.t_in_conv)}, Tg_stack: ${params.units.tempC(tg_out)}`);
+
+  params.t_in_conv_calc = t_in;
+  params.tg_conv = tg_out;
+
+  return {
+    t_fin:        params.Ts( Tb(t_in), Tw( Tb(t_in), Tw(Tb(t_in)) )),
+    t_in_given:   params.t_in_conv,
+    t_in:         t_in,
+    t_out:        t_out,
+    Tb:           Tb(t_in),
+    Tw:           Tw( Tb(t_in), Tw(Tb(t_in)) ),
+    tg_out:       tg_out,
+    tg_in:        tg_in,
+    Tb_g:         Tb(tg_in, tg_out),
+
+    LMTD:         LMTD_Tin(t_in),
+    DeltaA:       (tg_in - t_out),
+    DeltaB:       (tg_out - t_in),
+
+    Q_flue:       Q_flue( tg_in, tg_out),
+    Q_fluid:      Q_fluid(t_in),
+    Q_conv:       Q_conv( t_in, tg_in, tg_out),
+    Q_stack:      Q_flue( tg_out, params.t_air),
     
-    tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_convective-2");
-    t_in_calc = newtonRaphson(Tin_conv_func, t_in, params.NROptions, "T_in_convective-2");
+    duty:         Q_fluid(t_in),
+    "%":          round(100*Q_fluid(t_in)/params.duty,2),
+    duty_flux:    Q_fluid(t_in)/At,
+    
+    Cp_fluid:     Cp_fluid( t_in, t_out   ),
+    Cp_flue:      Cp_flue(  tg_in, tg_out ),
+    miu_fluid:    miu_fluid(Tw(Tb(t_in))  ) ,
+    miu_flue:     miu_flue( tg_out        ),
+    kw_fluid:     kw_fluid( Tb(t_in)      ),
+    kw_tube:      kw_tube(  Tw(Tb(t_in))  ),
+    kw_fin:       Kw_fin,
+    kw_flue:      kw_flue(  Tb(tg_in, tg_out)),
 
-    // Forced break of loop
-    iterations++;
-    if (iterations > 20) {
-      logger.info(`diff vs error: ${normalized_error}-${normalized_diff(t_in_calc)}`)
-      logger.error("Max iterations reached for inlet temp calc at convective sect");
-      break;
-    }
-  }
+    Prandtl:      round(prandtl(Tb(t_out))),
+    Reynolds:     round(reynolds(Tb(t_out))),
+    PrandtlFlue:  round(prandtl_flue(Tb(t_out))),
+    ReynoldsFlue: round(reynolds_flue(Tb(t_out))),
 
-  const conv_result = {
-    "t_fin":    params.Ts( Tb(t_in), Tw( Tb(t_in), Tw(Tb(t_in)) )),
-    "t_in_given":params.t_in_conv,
-    "t_in":     t_in,
-    "t_out":    t_out,
-    "Tb":       Tb(t_in),
-    "Tw":       Tw( Tb(t_in), Tw(Tb(t_in)) ),
-    "tg_out":   tg_out,
-    "tg_in":    tg_in,
-    "Tb_g":     Tb(tg_in, tg_out),
+    At:           At,
+    Ai:           Ai,
+    An:           An,
+    Ao :          Ao,
+    Apo:          Apo,
+    Afo:          Afo,
+    Ef :          Ef,
+    Gn:           Gn/cnv_fact,
 
-    "LMTD":     LMTD_Tin(t_in),
-    "DeltaA":   (tg_in - t_out),
-    "DeltaB":   (tg_out - t_in),
+    hi:           hi( Tb(t_in),          Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    hr:           hr( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    ho:           ho( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    hc:           hc( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    he:           he( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    j:            j(  Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    gr:           gr( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
 
-    "Q_flue":   Q_flue(tg_in, tg_out),
-    "Q_fluid":  Q_fluid(t_in),
-    "Q_conv":   Q_conv(t_in, tg_in, tg_out),
-
-    "Cp_fluid": Cp_fluid(t_in,t_out),
-    "Cp_flue":  Cp_flue(tg_in,tg_out),
-    "miu_fluid":  miu_fluid(Tw(Tb(t_in))) ,
-
-    "kw_fluid":   kw_fluid(Tb(t_in)),
-    "kw_tube":    kw_tube(Tw(Tb(t_in))),
-    "kw_flue":    kw_flue(Tb(tg_in, tg_out)),
-
-    "Prandtl":    round(prandtl(Tb(t_out))),
-    "Reynolds":   round(reynolds(Tb(t_out))),
-    "PrandtlFlue": round(prandtl_flue(Tb(t_out))),
-    "ReynoldsFlue":round(reynolds_flue(Tb(t_out))),
-
-    "At":         At,
-    "Ai":         Ai,
-    "An":         An,
-    Ao  :         Ao,
-    Apo :         Apo,
-    Afo :         Afo,
-    Ef  :         Ef,
-
-    "hi":         hi( Tb(t_in),         Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "hr":         hr( Tb(tg_out,tg_in), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "ho":         ho( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "hc":         hc( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "he":         he( Tb(tg_in, tg_out),Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "j":          j(  Tb(tg_out,tg_in), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    "gr":         gr( Tb(tg_out,tg_in), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-
-    "Uo":         Uo( Tb(tg_in, tg_out), Tb(t_in), Tw(Tb(t_in)) ),
-    "R_int":      R_int(                 Tb(t_in), Tw(Tb(t_in))),
-    "R_tube":     R_tube(                          Tw(Tb(t_in))),
-    "R_ext":      R_ext(Tb(tg_in, tg_out),         Tw(Tb(t_in))),
+    Uo:           Uo( Tb(tg_in, tg_out), Tb(t_in), Tw(Tb(t_in)) ),
+    R_int:        R_int(                 Tb(t_in), Tw(Tb(t_in))),
+    R_tube:       R_tube(                          Tw(Tb(t_in))),
+    R_ext:        R_ext(Tb(tg_in, tg_out),         Tw(Tb(t_in))),
 
     TUBING: {
       Material: params.Material,
-      Nt:       Nt,
+      Nt:       N_tpr,
       N:        N,
       Sch:      params.Sch_sh_cnv,
       Do:       Do,
@@ -231,14 +228,6 @@ const convSection = (params) => {
       Arrange:     params.FinArrange
     }
   };
-  conv_result.miu_flue = miu_flue(tg_out);
-
-  logger.default(`T_in_given: ${unitSystem.tempC(params.t_in_conv)}, T_in_calc: ${unitSystem.tempC(t_in_calc)}, Tg_out_conv: ${unitSystem.tempC(tg_out)}`);
-
-  params.t_in_conv_calc = t_in;
-  params.tg_conv = tg_out;
-
-  return conv_result;
 }
 
 const colburnFactor = (reynoldsFlue, parm, m, B) => {

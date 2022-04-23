@@ -17,10 +17,6 @@
  *****************************************************************/
 const {newtonRaphson, logger, round, unitConv} = require('./utils');
 
-// TODO: delete options after internal tests are taken outside
-const {options, initSystem} = require('./utils');
-const unitSystem = initSystem(options.unitSystem);
-
 /** radSection receives the parameters dictionary and
  * calculates the required mass fluid or the necessary
  * temperature change at the radiant section.
@@ -34,39 +30,20 @@ const unitSystem = initSystem(options.unitSystem);
  * 
  * Q_rad + Q_conv = Q_R = Q_fluid(out-in)
 */
-const radSection = (params) => {
-  let rad_result = {}
-  // Failing in case of a wrong call
-  if (params === null || params === undefined) {
-    logger.error("wrong call for radiant section, no parameters set at call.")
-    return rad_result
-  }
-  /** There two start cases A & B
-   * Case A: given the fluid temp at teh exit point of heater.
+const radSection = (params, noLog) => {
+  /** There are two starting cases A & B
+   * Case A: given the fluid temp at the exit point of heater.
    * Case B: given the flow mass of the fuel at the heater burners. 
    * */
-  if (params.t_out !== undefined) {
-    // Case A
-    rad_result = radSection_full(undefined, params.t_out, params)
-  } else if (params.m_fuel !== undefined) {
-    // Case B
-    rad_result = radSection_full(params.m_fuel, undefined, params)
-  } else {
-    // Failing case
-    const err = "wrong call for radiant section, no seed for mass fuel or out temp."
-    logger.error(err)
-    params.err += `-${err}`
-  }
-  return rad_result
-}
-
-const radSection_full = (m_fuel_seed, t_out_seed, params) => {
   let 
     tg_out = 0, // (K) Leaving/effective gas temp
     t_in   = 0, // (K) Inlet fluid temp
-    t_out  = params.t_out, // (K) Outlet fluid temp
-    /** (kg/h) */
-    m_fuel = m_fuel_seed || params.m_fuel;
+    t_out  = params.t_out,  // (K) Outlet fluid temp
+    m_fuel = params.m_fuel; // (kg/h)
+
+  let 
+    duty_total  = 0, // (kJ/h) Duty in the hole fired heater
+    duty_rad = 0; // (kJ/h) Duty in the radiant section
   
   const // Temperatures
     t_air     = params.t_air,    // (K) Inlet air temp
@@ -94,22 +71,21 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     alpha = 1 +.49*(S_tube/Do)/6 -.09275*(S_tube/Do)**2 +.065*(S_tube/Do)**3/6 +.00025*(S_tube/Do)**4,
     alpha_shld =  1, // (-) alpha shield factor
     
-    Ar = Ar_calc(params), // (m2) Total refractory area
-    Acp_shld = N_shld *S_tube_shld *L_shld / 2, // (m2) Cold plane area of shield tube bank
-    Acp = N * S_tube * L,   // (m2) Cold plane area of tube bank
     At = N *Math.PI *Do *L, // (m2) Bank tube's external surface area
+    Acp = N * S_tube * L,   // (m2) Cold plane area of radiant tube bank
+    Acp_shld = N_shld/2 *S_tube_shld*L_shld, // (m2) Cold plane area of shield tube bank
+    Ar = Ar_calc(params),   // (m2) Total refractory area
+    {Aw, Aw_aAcp} = Aw_calc(alpha, Acp, alpha_shld, Acp_shld, Ar), // (m2)
     Ai = Math.PI*(Di**2)/2, // (m2) Tube's inside flux area x2
-
     cnv_fact = 3_600 *1e-3, // (g/s -> kg/h) secondsToHours * 1/k
+
     sigma = 5.670374e-8 *cnv_fact, // (W/m2-K4) -> (kJ/h-m2-K4)
     F = (temp) => effectivity(PL, alpha, Acp, alpha_shld, Acp_shld, Ar)(unitConv.KtoF(temp));// (-)
-    
-  logger.warn(`Acp: ${round(unitConv.m2toft2(Acp))} ft, Acp_shld: ${round(unitConv.m2toft2(Acp_shld))} ft`);
-  
+
   const // Process Variables
-    duty_rad_dist = params.duty_rad_dist         || .7,
-    efficiency = params.efficiency               || .8,
-    heat_loss_percent = params.heat_loss_percent || .015,
+    duty_rad_dist = params.duty_rad_dist         || .7,   // (-) % *.01
+    efficiency = params.efficiency               || .8,   // (-) % *.01
+    heat_loss_percent = params.heat_loss_percent || .015, // (-) % *.01
     NCV = params.NCV, // (kJ/kg) net calorific value
     m_fluid= params.m_fluid, // (kg/h) Fluid mass flow
     m_air  = (mFuel = m_fuel) => params.m_air_ratio*mFuel, // (kg/h) Air mass flow
@@ -120,14 +96,11 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     Cp_flue  = (tG,tG_out=tG) => params.Cp_flue(Tb(tG, tG_out)), // (kJ/kg.K)
     kw_fluid = (temp) => params.kw_fluid(temp),// (kJ/h-m-C) fluid thermal conductivity
     kw_tube  = (temp) => params.kw_tube(temp), // (kJ/h-m-C - J/s-m-C-3.6) tube thermal conductivity
-    miu_fluid= (temp) =>params.miu_fluid(temp);//(cP - g/m-s) fluid Viscosity
-  
-  const 
-    prandtl = (t) => miu_fluid(t)*Cp_fluid(t)*cnv_fact/kw_fluid(t), // (miu*Cp/kw)
+    miu_fluid= (temp) =>params.miu_fluid(temp),//(cP - g/m-s) fluid Viscosity
     G = (m_fluid/cnv_fact) /Ai, // Fluid mass speed inside radiant tubes
+    prandtl = (t) => miu_fluid(t)*Cp_fluid(t)*cnv_fact/kw_fluid(t), // (miu*Cp/kw)
     reynolds = (t) => G * Di/miu_fluid(t); // (-) G*Di/miu
   
-  let duty_rad = 0; // (kJ/h) Duty in the radiant section
   const 
     /** (kJ/h-m2-C) internal heat transfer coff */
     hi = (tB,tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *
@@ -149,128 +122,135 @@ const radSection_full = (m_fuel_seed, t_out_seed, params) => {
     Q_rad  = (tG, tW) => F(tG)*sigma*alpha*Acp*(tG**4-tW**4), // Radiant heat transfer
     Q_shld = (tG, tW) => F(tG)*sigma*alpha_shld*Acp_shld*(tG**4-tW**4), // Shld_rad heat transfer
     Q_R = (tG, tW) => Q_rad(tG,tW) + Q_conv(tG,tW), // Heat absorbed by radiant tubes
-    Q_out = (tG, mFuel=m_fuel, tW = Tw(Tb(t_out,t_in), Tw(Tb(t_out,t_in)))) => 
+    Q_out = (tG, mFuel=m_fuel, tW = Tw(Tb(t_out), Tw(Tb(t_out)))) => 
     Q_R(tG, tW) + Q_shld(tG, tW) + Q_losses(mFuel) + Q_flue(tG, mFuel);
 
   const Q_fluid = (tOut, tIn) => m_fluid*Cp_fluid(tIn,tOut)*(tOut -tIn); // Fluid's sensible heat
 
   // **************************************************
 
-  // Calculating tg_out from the given variable (mass_fuel or temp_out)
-  let
-    flame = 0, // (K) Flame arc temperature
-    duty  = 0; // (kJ/h) Duty in the hole fired heater
+  /* Calculating tg_out the option missing from given variables (mass_fuel or temp_out) */
 
-  if (t_out_seed !== undefined) { // Given temp_out
-    duty = Q_fluid(t_out,t_in_conv); // Duty effective from t_out
-    duty_rad = duty * duty_rad_dist; // Calculate Tw with seed from 30-70 duty distribution
+  if (t_out !== 0) { // Given temp_out
+    duty_total = Q_fluid(t_out,t_in_conv); // Duty effective from t_out
+    duty_rad = duty_total * duty_rad_dist; // Calculate Tw with seed from 30-70 duty distribution
     // Approximating t_in_rad with assumption from duty distribution
-    t_in = t_in_conv + duty*(1 -duty_rad_dist)/(m_fluid*Cp_fluid(t_in_conv,t_out));
+    t_in = t_in_conv + duty_total*(1 -duty_rad_dist)/(m_fluid*Cp_fluid(t_in_conv,t_out));
 
     // Calculating tg_out (effective gas temp)
-    const tg_out_func = (tG) => Q_fluid(t_out,t_in) -Q_R(tG,Tw(Tb(t_out,t_in),Tw(Tb(t_out,t_in))));
-    flame = newtonRaphson(tg_out_func, 1000, params.NROptions, "Tg_Tout-seed_radiative");
+    const tg_out_func = (tG) => Q_fluid(t_out,t_in) -Q_R(tG,Tw(Tb(t_out),Tw(Tb(t_out))));
+    const flame = newtonRaphson(tg_out_func, 1000, 
+      params.NROptions, "Tg_Tout-seed_radiant", noLog);
     if (flame) tg_out = flame;
 
     // Calculating fuel mass
-    const m_fuel_func = (mFuel) => Q_in(mFuel) -Q_out(tg_out,mFuel,Tw(Tb(t_out,t_in),Tw(Tb(t_out,t_in))));
+    const m_fuel_func = (mFuel) => Q_in(mFuel) -Q_out(tg_out,mFuel,Tw(Tb(t_out),Tw(Tb(t_out))));
+    let mass_fuel_seed = Q_fluid(t_out,t_in_conv) /(NCV*efficiency);
+    if (!noLog) logger.debug(`"mass_fuel_seed", "value": "${mass_fuel_seed}"`);
+    mass_fuel_seed = newtonRaphson(m_fuel_func, mass_fuel_seed,
+      params.NROptions, "M-fuel_T-seed_radiant", noLog);
+    if (mass_fuel_seed) m_fuel = mass_fuel_seed;
 
-    const mass_fuel_seed = Q_fluid(t_out,t_in_conv) /(NCV*efficiency);
-    m_fuel = newtonRaphson(m_fuel_func, mass_fuel_seed, params.NROptions, "M-fuel_Tout-seed_radiative");
-    if (m_fuel) params.m_fuel = m_fuel;
-
-  } else if (m_fuel_seed !== undefined) { // Given mass_fuel
-    duty = Q_rls(m_fuel_seed) *efficiency; // Duty effective from from q release by fuel
-    duty_rad = duty *duty_rad_dist; // Calculate Tw with seed from 30-70 duty distribution
-
+  } else { // Given mass_fuel
+    duty_total = Q_rls(m_fuel) *efficiency; // Duty effective from from q release by fuel
+    duty_rad = duty_total *duty_rad_dist; // Calculate Tw with seed from 30-70 duty distribution
     // Approximating t_in_rad and t_out with efficiency and duty dist
-    t_in = t_in_conv + duty*(1 -duty_rad_dist) /(m_fluid*Cp_fluid(t_in_conv));
-    t_out_seed = t_in_conv + duty /(m_fluid*Cp_fluid(t_in));
+    t_in = t_in_conv + duty_total*(1 -duty_rad_dist) /(m_fluid*Cp_fluid(t_in_conv));
+    let t_out_seed = t_in_conv + duty_total /(m_fluid*Cp_fluid(t_in));
 
     // Calculating tg_out (effective gas temp) //TODO: t_out isn't set needs recalculate
-    const tg_out_func = (tG) => Q_out(tG,m_fuel,Tw(Tb(t_out_seed,t_in),Tw(Tb(t_out_seed,t_in)))) -Q_in(m_fuel);
-    flame = newtonRaphson(tg_out_func, 1000, params.NROptions, "Tg_mFuel-seed_radiative");
+    const tg_out_func = (tG) => Q_in(m_fuel) -Q_out(tG,m_fuel,Tw(Tb(t_out_seed),Tw(Tb(t_out_seed))));
+    const flame = newtonRaphson(tg_out_func, 1000, 
+      params.NROptions, "Tg_mFuel-seed_radiant", noLog);
     if (flame) tg_out = flame;
 
     // Calculating t_out 
-    const t_out_func = (tOut) => Q_fluid(tOut,t_in) -Q_R(tg_out,Tw(Tb(tOut,t_in),Tw(Tb(tOut,t_in))));
+    const t_out_func = (tOut) => Q_fluid(tOut,t_in) -Q_R(tg_out,Tw(Tb(tOut),Tw(Tb(tOut))));
 
-    t_out = newtonRaphson(t_out_func, t_out_seed, params.NROptions, "Tout_mFuel-seed_radiative");
-    if (t_out) params.t_out = t_out;
+    t_out_seed = newtonRaphson(t_out_func, t_out_seed, 
+      params.NROptions, "Tout_mFuel-seed_radiant", noLog);
+    if (t_out_seed) t_out = t_out_seed;
 
-    // Discrepancies on recalculation
-    logger.info(`t_out, seed: ${t_out_seed} vs calc: ${t_out}`)
-
+    //TODO: recalculation let t_out_recall = t_in - t_out + (Q_rad(tg_out) + Q_conv(tg_out)) / (m_fluid*Cp_fluid(t_in,t_out))
     const duty_recalculated = m_fluid*Cp_fluid(t_in,t_out)*(t_out -t_in_conv);
-    const t_in_recalculated = params.t_in_conv + duty_recalculated*(1 -duty_rad_dist)/(m_fluid*Cp_fluid(t_in,t_out))
-
-    logger.info(`t_in_rad, seed: ${t_in} vs calc: ${t_in_recalculated}`)
+    const t_in_recalculated = params.t_in_conv + duty_recalculated*(1 -duty_rad_dist)/(m_fluid*Cp_fluid(t_in,t_out));  
+    // Discrepancies on recalculation
+    if (!noLog) logger.info(`t_out, seed: ${t_out_seed} vs calc: ${t_out}`);
+    if (!noLog) logger.info(`t_in_rad, seed: ${t_in} vs calc: ${t_in_recalculated}`);
   }
 
-  //TODO: recalculation let t_out_recall = t_in - t_out + (Q_rad(tg_out) + Q_conv(tg_out)) / (m_fluid*Cp_fluid(t_in,t_out))
-
   // **************************************************
-  params.t_out    = t_out;
+  if (!noLog) logger.default(`RADI, T_in_calc: ${params.units.tempC(t_in)},`+
+    ` M_fuel: ${params.units.mass(m_fuel)}, Tg_out: ${params.units.tempC(tg_out)}`);
+
   params.t_in_rad = t_in;
+  params.t_out    = t_out;
   params.tg_rad   = tg_out;
-  params.duty_rad = duty_rad;
-  params.q_rad_sh = Q_shld(tg_out, Tw(Tb(t_out,t_in), Tw(Tb(t_out,t_in))));
+  params.duty     = duty_total;
   params.m_flue   = m_flue(m_fuel);
+  params.t_w_rad  = Tw(Tb(t_out), Tw(Tb(t_out)));
+  params.q_rad_sh = Q_shld(tg_out, params.t_w_rad);
 
   const rad_result = {
-    "m_fuel":   m_fuel,
-    "m_fluid":  m_fluid,
-    "t_in":     t_in,
-    "t_out":    t_out,
-    "Tw":       Tw(Tb(t_out), Tw(Tb(t_out))),
-    "tg_out":   tg_out,
+    m_fuel:   m_fuel,
+    m_fluid:  m_fluid,
+    t_in:     t_in,
+    t_out:    t_out,
+    Tw:       params.t_w_rad,
+    tg_out:   tg_out,
 
-    "Q_in":     Q_in(m_fuel),
-    "Q_rls":    Q_rls(m_fuel),
-    "Q_air":    Q_air(m_fuel),
-    "Q_fuel":   Q_fuel(m_fuel),
+    Q_in:     Q_in(m_fuel),
+    Q_rls:    Q_rls(m_fuel),
+    Q_air:    Q_air(m_fuel),
+    Q_fuel:   Q_fuel(m_fuel),
     
-    "Q_out":    Q_out(tg_out, m_fuel),
-    "Q_flue":   Q_flue(tg_out, m_fuel),
-    "Q_losses": Q_losses(m_fuel),
-    "Q_shld":   Q_shld(tg_out, Tw(Tb(t_out,t_in), Tw(Tb(t_out,t_in))) ),
-    "Q_conv":   Q_conv(tg_out, Tw(Tb(t_out,t_in), Tw(Tb(t_out,t_in))) ),
-    "Q_rad":    Q_rad( tg_out, Tw(Tb(t_out,t_in), Tw(Tb(t_out,t_in))) ),
+    Q_out:    Q_out(tg_out, m_fuel),
+    Q_flue:   Q_flue(tg_out, m_fuel),
+    Q_losses: Q_losses(m_fuel),
+    Q_shld:   Q_shld(tg_out, params.t_w_rad ),
+    Q_conv:   Q_conv(tg_out, params.t_w_rad ),
+    Q_rad:    Q_rad( tg_out, params.t_w_rad ),
 
-    "Q_R":      Q_R(tg_out, Tw(Tb(t_out,t_in),Tw(Tb(t_out,t_in)))),
-    "Q_fluid":  Q_fluid(t_out,t_in),
+    Q_R:      Q_R(tg_out, params.t_w_rad),
+    Q_fluid:  Q_fluid(t_out,t_in),
 
-    "At":       At,
-    "Ar":       Ar,
-    "Ai":       Ai,
-    "Acp":      Acp,
-    "Acp_sh":   Acp_shld,
+    At:       At,
+    Ar:       Ar,
+    Ai:       Ai,
+    Aw:       Aw,
+    Aw_aAcp:  Aw_aAcp,
+    Acp:      Acp,
+    aAcp:     alpha*Acp,
+    Acp_sh:   Acp_shld,
 
-    "hi":       hi( Tb(t_out), Tw(Tb(t_out) ) ),
-    "h_conv":   h_conv,
-    "duty":     duty,
-    "duty_rad": duty_rad,
-    "duty_flux":duty_rad/At,
+    hi:       hi( Tb(t_out), params.t_w_rad ),
+    h_conv:   h_conv,
 
-    "Alpha":    round(alpha),
-    "MBL":      round(MBL),
-    "Pco2":     round(params.Pco2),
-    "Ph2o":     round(params.Ph2o),
-    "PL":       round(PL),
-    "F":        round(F(tg_out)),
-    "emiss":    round(emissivity(PL)(tg_out)),
+    duty_total:duty_total,
+    duty:      duty_rad,
+    "%":       round(100*duty_rad/duty_total,2),
+    eff_total:round(100*duty_total/Q_rls(m_fuel),2),
+    duty_flux:duty_rad/At,
 
-    "kw_tube":  kw_tube(Tw(Tb(t_in))),
-    "kw_fluid": kw_fluid(Tb(t_in)),
-    "kw_flue":  params.kw_flue(tg_out),
+    Alpha:    round(alpha),
+    MBL:      round(MBL),
+    Pco2:     round(params.Pco2),
+    Ph2o:     round(params.Ph2o),
+    PL:       round(PL),
+    F:        round(F(tg_out)),
+    emiss:    round(emissivity(PL)(tg_out)),
 
-    "Cp_fluid": Cp_fluid(t_in,t_out),
-    "Cp_flue":  Cp_flue(tg_out,t_amb),
-    "Cp_fuel":  Cp_fuel,
-    "Cp_air":   Cp_air,
+    kw_tube:  kw_tube(Tw(Tb(t_in))),
+    kw_fluid: kw_fluid(Tb(t_in)),
+    kw_flue:  params.kw_flue(tg_out),
 
-    "Prandtl":  round(prandtl(Tb(t_out))),
-    "Reynolds": round(reynolds(Tb(t_out))),
+    Cp_fluid: Cp_fluid(t_in,t_out),
+    Cp_flue:  Cp_flue(tg_out,t_amb),
+    Cp_fuel:  Cp_fuel,
+    Cp_air:   Cp_air,
+
+    Prandtl:  round(prandtl(Tb(t_out))),
+    Reynolds: round(reynolds(Tb(t_out))),
 
     TUBING: {
       Material: params.Material,
@@ -323,19 +303,23 @@ const Ar_calc = (prams) => {
     wall_length = prams.Height_rad * prams.Length_rad;
 
   const Ar_esteem = 2*wall_width + 2*wall_length + 2*base - exitArea;
-  const Ar2 = 2*(22.7+5.3+1)*prams.Width_rad + 2*wall_length + base;
-  const Ar = 2*wall_width + 2*wall_length + 1.234*base;
-
-  logger.warn(`{"Ar prev (ft)": ${Ar2},"Ar calc (ft)": ${Ar}, "Ar esteem (ft)": ${Ar_esteem}}`);
+  // const Ar2 = 2*(22.7+5.3+1)*prams.Width_rad + 2*wall_length + base;
+  // const Ar = 2*wall_width + 2*wall_length + 1.234*base;
+  // check logger.warn(`{"Ar prev (ft)": ${Ar2},"Ar calc (ft)": ${Ar}, "Ar esteem (ft)": ${Ar_esteem}}`);
 
   return unitConv.ft2tom2(Ar_esteem);
 };
 
-/** returns effectivity(temp) function of temperature to use as F */
-const effectivity = (pl, alpha, Acp, a_shld, Acp_shld, Ar) => {
+/** returns {Aw (m2), Aw_aAcp (-)} */
+const Aw_calc = (alpha, Acp, a_shld, Acp_shld, Ar) => {
   const Total_Acp = a_shld*Acp_shld + alpha*Acp; // Equivalent cp area
   const Aw = Ar - Total_Acp; // Effective refractory area
   const Aw_aAcp = Aw / Total_Acp;
+  return {Aw, Aw_aAcp};
+}
+/** returns effectivity(temp) function of temperature to use as F */
+const effectivity = (pl, alpha, Acp, a_shld, Acp_shld, Ar) => {
+  const {Aw_aAcp} = Aw_calc(alpha, Acp, a_shld, Acp_shld, Ar);
   const emiss = emissivity(pl);
   // debug logger.warn(`{"Aw (ft)": ${unitConv.m2toft2(Aw)},"Aw_aAcp (-)": ${Aw_aAcp}}`);
 
@@ -358,7 +342,8 @@ const effectivity = (pl, alpha, Acp, a_shld, Acp_shld, Ar) => {
     A = factors("A"),
     B = factors("B"),
     C = factors("C");
-  // log logger.debug(`Aw/aAcp: ${round(Aw_aAcp)}, A: ${round(A(Aw_aAcp))}, B: ${round(B(Aw_aAcp))}, C: ${round(C(Aw_aAcp))}`);
+  // log logger.debug(`"Aw/aAcp", "value": "${round(Aw_aAcp)}",`+
+  // `"A": "${round(A(Aw_aAcp))}", "B": "${round(B(Aw_aAcp))}", "C": "${round(C(Aw_aAcp))}"`);
 
   return (temp) => A(Aw_aAcp) + B(Aw_aAcp)*emiss(temp) + C(Aw_aAcp)*emiss(temp)**2;
 };
