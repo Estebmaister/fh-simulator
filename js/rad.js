@@ -302,12 +302,13 @@ const Ar_calc = (prams) => {
     wall_width  = prams.Height_rad * prams.Width_rad,
     wall_length = prams.Height_rad * prams.Length_rad;
 
-  const Ar_esteem = 2*wall_width + 2*wall_length + 2*base - exitArea;
+  // Several references
+  // const Ar_esteem = 2*wall_width + 2*wall_length + 2*base - exitArea;
   // const Ar2 = 2*(22.7+5.3+1)*prams.Width_rad + 2*wall_length + base;
-  // const Ar = 2*wall_width + 2*wall_length + 1.234*base;
+  const Ar = 2*wall_width + 2*wall_length + 1.234*base; //WinHeat
   // check logger.warn(`{"Ar prev (ft)": ${Ar2},"Ar calc (ft)": ${Ar}, "Ar esteem (ft)": ${Ar_esteem}}`);
 
-  return unitConv.ft2tom2(Ar_esteem);
+  return unitConv.ft2tom2(Ar);
 };
 
 /** returns {Aw (m2), Aw_aAcp (-)} */

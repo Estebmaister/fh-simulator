@@ -33,7 +33,7 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
     Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } vs 51.41
 
   duty_total: ${unit.heat_flow(result_obj.duty_total)}
-  duty_rad:   ${result_obj['%']                  }%  vs  71.88%
+  duty_rad:   ${result_obj['%']                  }%  vs  ${round(45_78.337/71.530,2)}%
   duty_flux:  ${unit.heat_flux(result_obj.duty_flux)  }
 
   At:       ${unit.area(result_obj.At)            }    vs 5888
@@ -112,12 +112,12 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
 
   Q_flue:   ${unit.heat_flow( result_obj.Q_flue )  } 
     M_fuel x Cp x (Tg_in - Tg_out)
-  Q_R:      ${unit.heat_flow( result_obj.Q_R )     } vs 12.542
+  Q_Shield: ${unit.heat_flow( result_obj.Q_R )     } vs 12.542
     Q_rad:   ${unit.heat_flow( result_obj.Q_rad )  } vs  ${4.369+1.312}
     Q_conv:  ${unit.heat_flow( result_obj.Q_conv ) } vs  ${3.745+2.931}
   Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } vs 12.357
 
-  duty_shld: ${result_obj['%']                   }%  vs  ${round(100*12_357.43/71_530,1)}%
+  duty_shld: ${result_obj['%']                   }%  vs  ${round(12_35.743/71.530,1)}%
   duty_flux: ${unit.heat_flux(result_obj.duty_flux)}
 
   At:    ${unit.area(result_obj.At)    }     vs 1708.
@@ -196,7 +196,7 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid)}   vs 13.439
   Q_stack:  ${unit.heat_flow( result_obj.Q_stack )}
 
-  duty_conv: ${result_obj['%']                   }%  vs  ${round(100*13_439.01/71_530,2)}%
+  duty_conv: ${result_obj['%']                   }%  vs  ${round(13_43.901/71.530,2)}%
   duty_flux: ${unit.heat_flux(result_obj.duty_flux)}
 
   At:   ${unit.area(result_obj.At)          }        vs 52448

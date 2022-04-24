@@ -283,7 +283,7 @@ Total flue gas moles and percentage (per fuel mol)
 
   Fuel mol weight: ${result.flows["fuel_MW"]}
   Fuel Cp(t_fuel): ${result.flows["Cp_fuel"]}
-  NCV:             ${result.flows["NCV"]}
+  NCV:             ${result.flows["NCV"]} vs ${Math.round(87_998_730/4_477)}
 
   Flue gas mol weight: ${result.flows["flue_MW"]}
   Flue gas Cp(t_amb):  ${result.flows["Cp_flue"]}

@@ -204,7 +204,7 @@ const ncv = (fuels, products, compounds, tAmb) => {
   for (const fuel in fuels) {
     if (fuel in products) continue;
     const compound = compounds.filter(elem => elem.Formula == fuel)[0]
-    value += fuels[fuel]*combustionH(compound)(tAmb)/compound.MW;
+    value += fuels[fuel]*combustionH(compound)(tAmb);
     //logger.info(`H of combustion for ${fuel}: ` +
     // `${combustionH(compound)(tAmb)/compound.MW} KJ/Kg` )
   }
@@ -294,7 +294,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
     moisture:   units.moist(moistAirWeightRatio(
-      params.t_amb, params.humidity)),
+      params.t_air, params.humidity)),
     unitSystem: units.system[params.lang]
   };
   const compounds = data.filter((elem, _i, _arr) => elem.Formula in fuels)
@@ -325,7 +325,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     products['O2'] = -products['O2'];
   } else {
     const 
-      waterPressure  = pressureH2OinAir(params.t_amb, params.humidity),
+      waterPressure  = pressureH2OinAir(params.t_air, params.humidity),
       dryAirPressure = params.p_atm - waterPressure;
     air.N2  = .01* dryAirN2Percentage* dryAirPressure / params.p_atm;
     air.O2  = .01* dryAirO2Percentage* dryAirPressure / params.p_atm;
@@ -391,10 +391,10 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   params.Cp_flue = flows.Cp_flue;
   params.miu_flue= flueViscosity( data, products );
   params.kw_flue = flueThermalCond(data, products);
-  flows.Cp_flue  = units.cp(flows.Cp_flue(params.t_amb));
+  flows.Cp_flue  = units.cp(flows.Cp_flue(params.t_air));
   flows.flue_MW  = units["mass/mol"](flows.flue_MW);
 
-  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb); // kJ/kg
+  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb)/MW_multicomp(normalFuel); // kJ/kg
   flows.NCV = units["energy/mass"](params.NCV);
 
   params.adFlame = newtonRaphson(
