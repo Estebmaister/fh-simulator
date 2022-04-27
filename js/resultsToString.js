@@ -11,7 +11,7 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   
   string += `\n
   m_fuel:   ${unit.mass_flow( result_obj.m_fuel )  }   vs 4477.
-  m_fluid:  ${unit.mass_flow( result_obj.m_fluid )  } 
+  m_fluid:  ${unit.barrel_flow( result_obj.m_fluid )  } 
   t_in:     ${unit.tempC( result_obj.t_in )     }      vs 711.8
   t_out:    ${unit.tempC( result_obj.t_out )    }      vs 772.0
   Tw:       ${unit.tempC( result_obj.Tw )       }      vs 858.2
@@ -29,8 +29,8 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
     Q_shld:   ${unit.heat_flow( result_obj.Q_shld ) }  vs 5.680
     Q_R:      ${unit.heat_flow( result_obj.Q_R )     } 
       Q_conv: ${unit.heat_flow( result_obj.Q_conv ) }  vs 5.629
-      Q_rad:  ${unit.heat_flow( result_obj.Q_rad )   } vs 45.78
-    Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } vs 51.41
+      Q_rad:  ${unit.heat_flow( result_obj.Q_rad )   } vs ${round(45.783 -4.369 -1.311,2)}
+    Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } vs 45.78
 
   duty_total: ${unit.heat_flow(result_obj.duty_total)}
   duty_rad:   ${result_obj['%']                  }%  vs  ${round(45_78.337/71.530,2)}%
@@ -50,7 +50,7 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   h_conv:   ${unit.convect(result_obj.h_conv)        } vs NR
 
   MBL:      ${result_obj.MBL                     } ft vs 20.45
-  GPpres:   ${result_obj.Pco2*1+result_obj.Ph2o*1} atm vs 0.250
+  GPpres:   ${round(result_obj.Pco2*1+result_obj.Ph2o*1)} atm vs 0.250
   PL:       ${result_obj.PL                  } atm-ft vs 5.107
   GEmiss:   ${result_obj.emiss                      } vs 0.580
   F:        ${result_obj.F                          } vs 0.635

@@ -55,62 +55,68 @@
       <p>Página de prueba, una vista inicial para el ingreso de datos.</p>
     </section>
     <form id="data-form" method="GET" action="./result.html">
-      <h2>Datos operacionales básicos</h2>
 
       <div class="form-div">
-        <div class="form-div">
-          <p class="project-info">
-            Nombre:      <input name="project_title" value="fire_heater_sim" required> <span class="validity"></span>
-          </p>
-          <p class="project-info">
-            N° proyecto: <input name="project_n" type="number" min="0" value="1">
-          </p>
+        <div class="form-block">
+          <hr>
+          <h3>Datos básicos del proyecto</h3>
+          <div class="form-div">
+            <div class="form-div">
+              <p class="project-info">
+                Nombre:      <input name="project_title" value="fh_simulation" required> <span class="validity"></span>
+              </p>
+              <p class="project-info">
+                N° proyecto: <input name="project_n" type="number" min="0" value="1">
+              </p>
+            </div>
+            <div class="form-div">
+              <p class="project-info">
+                N° Revisión: <input name="revision_n" type="number" min="0" max="5" value="0">
+              </p>
+              <p class="project-info">
+                Fecha:       <input name="date" id="date" type="date">
+                <script>
+                  const date = new Date(new Date().toLocaleDateString()).toISOString().substring(0, 10)
+                  document.getElementById("date").value = date;
+                </script>
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="form-div">
-          <p class="project-info">
-            N° Revisión: <input name="revision_n" type="number" min="0" max="5" value="0">
-          </p>
-          <p class="project-info">
-            Fecha:       <input name="date" id="date" type="date">
-            <script>
-              const date = new Date(new Date().toLocaleDateString()).toISOString().substring(0, 10)
-              document.getElementById("date").value = date;
-            </script>
-          </p>
+        <div class="form-block">
+          <hr>
+          <h3>Eficiencia del horno</h3>
+          <div class="form-div">
+            <p class="project-info">
+              Pérdidas <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
+            </p>
+            <p class="project-info">
+              Dist. Rad. <input step="0.1" min="0" name="rad_dist" type="number" placeholder="70.0"> %
+            </p>
+            <p class="project-info">
+              Eficiencia <input step="0.1" min="0" name="efficiency" type="number" value="80.0" disabled> %
+            </p>
+            <p class="project-info">
+              Ensuciamiento int. R<sub>fi</sub> <input step="0.001" min="0" name="efficiency" type="number" value="0.000" disabled>
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+            <p class="project-info">
+              Ensuciamiento ext. R<sub>fo</sub> <input step="0.001" min="0" name="efficiency" type="number" value="0.000" disabled>
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+          </div>
         </div>
-      </div>
-
-      <hr class="debug-hidden">
-      <h3 class="debug-hidden">Eficiencia del horno</h3>
-      <div class="form-div debug-hidden">
-        <p class="project-info">
-          Pérdidas <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
-        </p>
-        <p class="project-info">
-          Dist. Rad. <input step="0.1" min="0" name="rad_dist" type="number" value="70.0" disabled> %
-        </p>
-        <p class="project-info">
-          Eficiencia <input step="0.1" min="0" name="efficiency" type="number" value="80.0" disabled> %
-        </p>
-        <p class="project-info">
-          Ensuciamiento interno R<sub>fi</sub> <input step="0.001" min="0" name="efficiency" type="number" value="0.000" disabled>
-          <sub>hr-ft²-°F/Btu</sub>
-        </p>
-        <p class="project-info">
-          Ensuciamiento externo R<sub>fo</sub> <input step="0.001" min="0" name="efficiency" type="number" value="0.000" disabled>
-          <sub>hr-ft²-°F/Btu</sub>
-        </p>
       </div>
 
       <hr>
       <h3>Fluido de Proceso</h3>
       <div class="form-div">
         <p class="project-info">
-          Flujo másico M<sub>fluido</sub> <input step="0.1" min="0" name="m_fluid" type="number" value="1103.6"> x10<sup>3</sup> lb/h 
+          Flujo másico M<sub>fluido</sub> <input step="0.1" min="0" name="m_fluid" type="number" value="90.0"> x10<sup>3</sup> BPD 
         </p>
         <br class="hidden">
         <p class="project-info">
-          Grav. esp. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled> <em>@Tin</em>
+          Grav. esp. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled> <em>@ 60°F</em>
         </p>
       </div>
       <div class="form-div">
@@ -148,11 +154,11 @@
             <div class="form-block flex-evenly">
               <p class="project-info">
                 Cond. térmica kw<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" disabled value="0.038">
-              <sub>BTU/h-ft-°F</sub>
+              <sub>BTU/h.ft.°F</sub>
               </p>
               <p class="project-info">
                 Cond. térmica kw<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" disabled value="0.035">
-              <sub>BTU/h-ft-°F</sub>
+              <sub>BTU/h.ft.°F</sub>
               </p>
             </div>
           </div>
@@ -309,14 +315,28 @@
       </div>
 
       </div>
-          
+      
+      <hr>
       <div class="form-div"> 
-        <div class="toggle">
+        <!-- <div class="toggle">
           <span>Sistema de Unidades en Resultados </span> 
           <input class="tgl" id="unit_system" name="unit_system" type="checkbox" value="english" checked/>
           <label class="tgl-btn" data-tg-off="SI" data-tg-on="Inglés" for="unit_system"></label>
-        </div>
-        <button>Calcular</button>
+        </div> -->
+        <div class="form-block"> 
+          <div class="toggle">
+            <div class="toggle-inside">
+              <p>SI</p>
+              <label class="switch" for="unit_system">
+                <input id="unit_system" name="unit_system" type="checkbox" value="english" checked/>
+                <div class="slider round"></div>
+              </label>
+              <p>EN</p>
+            </div>
+            <p>Sistema de Unidades en Resultados</p>
+          </div>
+      </div>
+      <button>Calcular</button>
       </div>
     </form>
 
@@ -328,7 +348,7 @@
 			</a>
 		</p>
     <p>
-      v1.0<em> - Calculos realizados en el motor del navegador, registros disponibles en la consola</em>
+      v1.0.1<em> - Calculos realizados en el motor del navegador, registros disponibles en la consola</em>
     </p>
 	</footer>
 </body>

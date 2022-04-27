@@ -26,7 +26,7 @@ const optionsModifierFluid = (key, browserData, options) => {
     case "m_fluid":
       optValue = parseFloat(browserData[key])
       if (optValue > 0) 
-        options.mFluid = optValue*1e3;
+        options.mFluid = unitConv.BPDtolb_h(optValue*1e3);
       break;
     case "t_in":
       optValue = parseFloat(browserData[key])
