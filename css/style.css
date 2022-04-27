@@ -329,6 +329,7 @@ input, select {
   box-shadow: inset 3px 3px 1px var(--shadow, gray), inset -3px -3px 1px var(--light-color2, white);
   color: #4a5568;
   padding-left: .7rem;
+  padding-right: .2rem;
 }
 input[type="number"] {
   /* Just enough to display 4 digits */
