@@ -1,10 +1,11 @@
 :root {
   --primary-color: black;
   --secondary-color: #595f6e;
-  --light-color: #cfdce4;
+  --light-color: #dceaf3;
+  --light-color2: #cfdce4;
   --nav-color: rgba(228, 228, 25, 0.99);
   --contrast-color: white;
-  --shadow: #95a5a6;
+  --shadow: #b3c4c5;
   --alert-color: red;
   --passing-color: #bec82d;
 }
@@ -19,6 +20,11 @@
 
 /* -------  Page structure   ------*/
 
+*, *::before, *::after {
+  box-sizing: border-box;
+  text-rendering: optimizeLegibility;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
@@ -29,8 +35,13 @@ body {
   margin: 0px;
   padding: 0px;
   font-family: "helvetica", sans-serif;
+  font-size: 18px;
 }
 
+hr {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
 
 header {
   position: fixed;
@@ -62,11 +73,12 @@ footer {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 0.8em;
+  font-size: 0.9rem;
+  padding: 0 1rem;
 }
 @media screen and (max-width: 570px) {
   footer {
-    font-size: 0.5em;
+    font-size: 0.6rem;
   }
 }
 
@@ -77,12 +89,12 @@ footer {
   right: 1%;
   top: 42px;
   padding: 2px;
-  width: 5em;
-  height: 12px;
+  width: 4rem;
+  height: 1.1rem;
   opacity: 0.9;
   transition: 0.3s;
 
-  font-size: 10px;
+  font-size: 0.7rem;
   font-family: sans-serif;
   color: var(--secondary-color);
   text-transform: uppercase;
@@ -99,8 +111,8 @@ footer {
 #lang:hover {
   background-color: var(--primary-color,#000);
   color: var(--contrast-color, #fff);
-  font-size: 13px;
-  height: 15px;
+  font-size: 0.9rem;
+  height: 1.4rem;
 }
 
 /* -------    Navbar (header)------*/
@@ -143,7 +155,7 @@ footer {
   text-decoration: none;
   color: var(--primary-color, black);
   font-weight: bold;
-  font-size: 15px;
+  font-size: 1rem;
   text-transform: uppercase;
 }
 .nav-link:after {
@@ -181,7 +193,7 @@ pre {
   text-decoration: none;
   font-family: "Trebuchet MS", sans-serif;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 0.9rem;
   display: block;
   width: 6em;
 }
@@ -204,12 +216,16 @@ h1 {
   display: flex;
   justify-content: space-evenly;
   flex-wrap: wrap;
+  margin: 1em;
+}
+.form-div > .form-div {
+  margin: 1%;
 }
 .form-block {
   min-width: 285px;
   width: 50%;
 }
-@media screen and (max-width: 585px) {
+@media screen and (max-width: 600px) {
   .hidden {
     display: none;
   }
@@ -227,7 +243,7 @@ h1 {
 }
 .comp {
   justify-content: space-between;
-  padding: 2em;
+  padding: 1rem;
 }
 
 h1, h2, h3, h4 {
@@ -235,7 +251,7 @@ h1, h2, h3, h4 {
 }
 
 h3 span {
-  font-size: 16px;
+  font-size: 0.9rem;
   font-weight: normal;
 }
 
@@ -259,14 +275,15 @@ h3 span {
 .fuel-name, .fuel-formula, .fuel-input {
   margin: 0;
   padding: 0;
+  padding-bottom: 0.5em;
   display: inline-flex;
   align-items: center;
   height: 2em;
-  width: 4em;
+  width: 5.5em;
   transition: 0.4s;
 }
 .fuel-input:hover {
-  width: 4.1em;
+  width: 5.8em;
   height: 2.1em;
 }
 .fuel-formula {
@@ -282,10 +299,11 @@ h3 span {
 /* -------  Form structure   ------*/
 
 form div button {
-  padding: 0 1em;
-  margin: 2em 0 0.5em;
-  height: 2em;
-  width: 7em;
+  padding: 0 1rem;
+  margin: auto;
+  margin-top: 0.5rem;
+  height: 2.5rem;
+  width: 8rem;
   border: none;
   background-color: var(--contrast-color, #fff);
   border-radius: 4px;
@@ -298,22 +316,27 @@ form div button {
 form div button:hover {
   background-color: var(--primary-color,#000);
   color: var(--contrast-color, #fff);
-  height: 2.4em;
-  width: 7em;
+  height: 2.5rem;
+  width: 48%;
 }
 
 input, select {
-  height: 1.5em;
+  height: 1.8rem;
   border: none;
-  border-radius: 3px;
+  border-radius: 1rem;
+  width: 8rem;
+
+  box-shadow: inset 3px 3px 1px var(--shadow, gray), inset -3px -3px 1px var(--light-color2, white);
+  color: #4a5568;
+  padding-left: .7rem;
 }
-/* Just enough to 4 decimals */
 input[type="number"] {
-  width: 4.1em;
+  /* Just enough to display 4 digits */
+  width: 5.3em;
   transition: 0.4s;
 }
 input[type="number"]:hover {
-  width: 4.2em;
+  width: 5.8em;
 }
 
 input:invalid+span:after {
@@ -338,8 +361,72 @@ input:valid+span:after {
   background-color: var(--contrast-color, #fff);
 }
 
-/* -------  Toggle  -------  */
+/* -------  Toggle1  -------  */
+.toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.toggle-inside {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.toggle-inside > p, .toggle > p {
+  margin: 0.35rem;
+}
+.switch {
+  display: inline-block;
+  height: 1.55rem;
+  position: relative;
+  width: 2.75rem;
+}
+.switch input {
+  display:none;
+}
 
+.slider {
+  box-shadow: inset 3px 3px 1px var(--shadow, gray), inset -3px -3px 1px var(--light-color2, white);
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+}
+
+.slider:before {
+  border: solid 1.5px #CCC;
+  background-color: var(--contrast-color);
+  content: "";
+
+  position: absolute;
+  left: .185rem;
+  bottom: .185rem;
+  height: 1.15rem;
+  width: 1.15rem;
+  transition: .4s;
+}
+
+input:checked + .slider:before {
+  background-color: #181818;
+  border: solid 0.5px var(--shadow);
+  transform: translateX(1.15rem);
+}
+
+.slider.round {
+  border-radius: 2rem;
+}
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+/* -------  Toggle2  -------  */
+/* 
 .toggle {
   margin: 1em 0.5em 0.5em;
 }
@@ -411,11 +498,12 @@ input:valid+span:after {
 }
 .tgl:checked + .tgl-btn:active:after {
   transform: rotateY(20deg);
-}
+} */
 
 /* -------  Results  -------  */
 
 pre {
+  font-size: 1rem;
   overflow-x: auto;
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;

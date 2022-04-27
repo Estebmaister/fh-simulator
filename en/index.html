@@ -54,62 +54,65 @@
       <h4>(Designed to instruct engineers and operators)</h4>
       <p>Testing page, a simple view for the input and output.</p>
     </section>
-    <form id="data-form" method="GET" action="./result.html">
-      <h2>Project data inputs</h2>
 
+    <form id="data-form" method="GET" action="./result.html">
+
+      
       <div class="form-div">
-        <div class="form-div">
-          <p class="project-info">
-            Project Title: <input name="project_title" value="fire_heater_sim" required> <span class="validity"></span>
-          </p>
-          <p class="project-info">
-            Project N°:    <input name="project_n" type="number" min="0" value="1">
-          </p>
+        <div class="form-block">
+          <hr>
+          <h3>Project data inputs</h3>
+          <div class="form-div">
+            <div class="form-div">
+              <p class="project-info">
+                Project Title: <input name="project_title" value="fh_simulation" required> <span class="validity"></span>
+              </p>
+              <p class="project-info">
+                Project N°:    <input name="project_n" type="number" min="0" value="1">
+              </p>
+            </div>
+            <div class="form-div">
+              <p class="project-info">Revision No:   <input name="revision_n" type="number" min="0" max="5" value="0"></p>
+              <p class="project-info">
+                  Date :       <input name="date" id="date" type="date">
+                  <script>
+                    const date = new Date(new Date().toLocaleDateString()).toISOString().substring(0, 10)
+                    document.getElementById("date").value = date;
+                  </script>
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="form-div">
-          <p class="project-info">
-            Revision No:   <input name="revision_n" type="number" min="0" max="5" value="0"></p>
-            <p class="project-info">
-              Date :       <input name="date" id="date" type="date">
-              <script>
-                const date = new Date(new Date().toLocaleDateString()).toISOString().substring(0, 10)
-                document.getElementById("date").value = date;
-              </script>
+      
+        <div class="form-block">
+          <hr>
+          <h3>Process Efficiency</h3>
+          <div class="form-div">
+            <p class="project-info">Heat Loss <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
+            </p>
+            <p class="project-info">Rad. Dist. <input step="0.1" min="50" name="rad_dist" type="number" placeholder="70.0"> %
+            </p>
+            <p class="project-info">Efficiency <input step="0.1" min="0" name="efficiency" type="number" value="80.0" disabled> %
+            </p>
+            <p class="project-info">Inside Fouling Resistance R<sub>fi</sub> <input step="0.001" min="0" name="efficiency" type="number" value="0.000" disabled>
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+            <p class="project-info">Out. Fouling Resistance R<sub>fo</sub> <input step="0.001" min="0" name="efficiency" type="number" value="0.000" disabled>
+              <sub>hr.ft².°F/Btu</sub>
             </p>
           </div>
-      </div>
-
-      <hr class="debug-hidden">
-      <h3 class="debug-hidden">Process Efficiency</h3>
-      <div class="form-div debug-hidden">
-        <p class="project-info">
-          Heat Loss <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
-        </p>
-        <p class="project-info">
-          Rad. Dist. <input step="0.1" min="0" name="rad_dist" type="number" value="70.0"> %
-        </p>
-        <p class="project-info">
-          Efficiency <input step="0.1" min="0" name="efficiency" type="number" value="80.0" disabled> %
-        </p>
-        <p class="project-info">
-          Inside Fouling Resistance R<sub>fi</sub> <input step="0.001" min="0" name="efficiency" type="number" value="0.000" disabled>
-          <sub>hr-ft²-°F/Btu</sub>
-        </p>
-        <p class="project-info">
-          Outside Fouling Resistance R<sub>fo</sub> <input step="0.001" min="0" name="efficiency" type="number" value="0.000" disabled>
-          <sub>hr-ft²-°F/Btu</sub>
-        </p>
+        </div>
       </div>
 
       <hr>
       <h3>Process Fluid</h3>
       <div class="form-div">
         <p class="project-info">
-          Mass flow M<sub>fluid</sub> <input step="0.1" min="0" name="m_fluid" type="number" value="1103.6"> x10<sup>3</sup> lb/h 
+          Mass flow M<sub>fluid</sub> <input step="0.1" min="0" name="m_fluid" type="number" value="90.0"> x10<sup>3</sup> BPD 
         </p>
         <br class="hidden">
         <p class="project-info">
-          Spec. Grav. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled> <em>@Tin</em>
+          Spec. Grav. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled> <em>@ 60°F</em>
         </p>
       </div>
       <div class="form-div">
@@ -139,19 +142,19 @@
           <div class="form-div">
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Viscosity μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" disabled value="1.45"> cp
+                Viscosity - μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" disabled value="1.45"> cp
               <p class="project-info">
-                Viscosity μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" disabled value="0.96"> cp
+                Viscosity - μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" disabled value="0.96"> cp
               </p>
             </div>
             <div class="form-block flex-evenly">
               <p class="project-info">
                 Therm. cond. kw<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" disabled value="0.038">
-              <sub>BTU/h-ft-°F</sub>
+              <sub>BTU/h.ft.°F</sub>
               </p>
               <p class="project-info">
                 Therm. cond kw<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" disabled value="0.035">
-              <sub>BTU/h-ft-°F</sub>
+              <sub>BTU/h.ft.°F</sub>
               </p>
             </div>
           </div>
@@ -197,16 +200,12 @@
 
       <hr>
       <h3>Fuel Gas</h3>
-
-      <!-- <div class="form-div"> 
+      <div class="form-div comp"> 
+        <p class="project-info">Temperature T<sub>f</sub> <input name="t_fuel" step="1" value="77.0" type="number"> °F </p>
         <p class="project-info">Fuel gas Specified as <select name="fuel_percent">
           <option value="mole_percent">mole percent</option> 
           <option value="mass_percent">mass percent</option>
         </select></p>
-      </div>  -->
-      
-      <div class="form-div comp"> 
-        <p class="project-info">Temperature T<sub>f</sub> <input name="t_fuel" step="1" value="77.0" type="number"> °F </p>
         <p class="project-info">Composition</p>
         <p class="project-info">Total <span id="total" style="font-weight: bold;"> 0 </span></p>
       </div> 
@@ -308,13 +307,26 @@
       </div>
 
       </div>
-          
+      <hr>
       <div class="form-div"> 
-        <div class="toggle">
+        <!-- <div class="toggle">
           <span>Results Unit System </span> 
           <input class="tgl" id="unit_system" name="unit_system" type="checkbox" value="english" checked/>
           <label class="tgl-btn" data-tg-off="SI" data-tg-on="English" for="unit_system"></label>
-        </div>
+        </div> -->
+        <div class="form-block"> 
+          <div class="toggle">
+            <div class="toggle-inside">
+              <p>SI</p>
+              <label class="switch" for="unit_system">
+                <input id="unit_system" name="unit_system" type="checkbox" value="english" checked/>
+                <div class="slider round"></div>
+              </label>
+              <p>EN</p>
+            </div>
+            <p>UNIT SYSTEM</p>
+          </div>
+      </div>
         <button>Calculate</button>
       </div>
     </form>
