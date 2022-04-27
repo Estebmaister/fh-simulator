@@ -70,7 +70,7 @@ const convSection = (params, noLog) => {
     (Do/Di) *( Rfi +1/hi(tB,tW) +( Di *Math.log(Do/Di) /(2*kw_tube(tW)) ) ) +tB;
 
   const
-    gr = (_tB, _tW) => 3.5*(0.29307107*cnv_fact), // (Btu/hr-ft2-F) Outside radiation factor //TODO: implement
+    gr = (_tB, _tW) => 2.6*(0.29307107*cnv_fact), // (Btu/hr-ft2-F) Outside radiation factor //TODO: implement
     hr = (tG_b, tW) => 2.2 *gr(tG_b, tW) *(PL)**.50 *(Apo/Ao)**.75; // (kJ/m²h-°C) effective radiative coff wall tube
 
   let hc = (tG_b, _tW) => .33 *(kw_flue(tG_b)/Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
@@ -120,28 +120,28 @@ const convSection = (params, noLog) => {
   if (!noLog) logger.debug(`"Tin_convective", "t_in_cnv_calc": ${round(unitConv.KtoF(t_in_calc))},`+
     ` "tg_stack": ${round(unitConv.KtoF(tg_out))}`);
 
-  let iter = 1;
+  let iter = noLog ? 2 : 1;
   const
-    normalized_error = 1e-3, // .1%
+    normalized_error = 1e-2, // 1%
     // normalized_diff = (tIn_calc =t_in_calc, tIn = t_in) => Math.abs((tIn_calc - tIn) /tIn);
-    normalized_diff = (tIn=t_in,tG_out=tg_out) => Math.abs((Q_flue(tg_in, tG_out) -Q_fluid(tIn))/Q_flue(tg_in, tG_out));
+    normalized_diff = (tIn=t_in,tG_out=tg_out) => Math.abs((Q_flue(tg_in, tG_out) -Q_fluid(tIn))/Q_fluid(tIn));
   //// Cycle to improve result
-  // while (normalized_diff(t_in_calc) > normalized_error) {
-  //   if (t_in_calc) { t_in = t_in_calc }
-  //   iter++;
-  //   const tg_stack = newtonRaphson(tg_out_func, tg_out, params.NROptions, "Tg_out_convective-2", true);
-  //   if (tg_stack > 0) {tg_out = tg_stack } else {
-  //     logger.error(`error in tg_stack: ${params.units.tempC(tg_stack)}, t_in: ${t_in}, tg_out: ${tg_out}, iter: ${iter}`);
-  //   }
-  //   t_in_calc = newtonRaphson(Tin_conv_func, t_in +100, params.NROptions, "T_in_convective-2", true);
-  //   // Forced break of loop
-  //   iter++;
-  //   if (iter > 25) {
-  //     logger.info(`error vs diff: ${normalized_error}-${round(normalized_diff(t_in_calc),5)}`)
-  //     logger.error("Max iterations reached for inlet temp calc at convective sect");
-  //     break;
-  //   }
-  // }
+  while (normalized_diff(t_in_calc) > normalized_error) { 
+    // Forced break of loop
+    if (iter > 0) {
+      if (!noLog) logger.info(`error vs diff: ${normalized_error}-${round(normalized_diff(t_in_calc),5)}`)
+      if (!noLog) logger.error("Max iterations reached for inlet temp calc at convective sect");
+      break;
+    }
+    if (t_in_calc > t_in *0.9) { t_in = t_in_calc }
+    iter++;
+    const tg_stack = newtonRaphson(tg_out_func, tg_out, params.NROptions, "Tg_out_convective-2", true);
+    if (tg_stack > t_in *0.9) {tg_out = tg_stack; } else {
+      tg_out*=1.01;
+      if (!noLog) logger.error(`error in tg_stack: ${params.units.tempC(tg_stack)}, t_in: ${t_in}, tg_out: ${tg_out}, iter: ${iter}`);
+    }
+    t_in_calc = newtonRaphson(Tin_conv_func, t_in +100, params.NROptions, "T_in_convective-2", true);
+  }
   if (t_in_calc) t_in = t_in_calc;
   if (!noLog) logger.info(`diff vs error: ${normalized_diff()}-${normalized_error}`);
 

@@ -169,6 +169,8 @@ const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
 const 
   tempToK = 273.15,
   pAtmRef = 101_325,
+  barrelsToft3 = 5.6145833333,
+  ft3Tolb = 62.371, // for Water @60°F
   tempAmbRef = tempToK + 15.55556; // 288.7 K
 
 const unitConv = {
@@ -182,6 +184,7 @@ const unitConv = {
 
   kgtolb: (n) => n*2.20462,
   lbtokg: (n) => n/2.20462,
+  BPDtolb_h:(n) => n*barrelsToft3*ft3Tolb/24*0.84,
 
   kJtoBTU: (n) => n/1.05506,
   BTUtokJ: (n) => n*1.05506,
@@ -221,7 +224,7 @@ const getOptions = () => {
     effcy:      .01 * 80,   // % *.01
     tIn:        678,        // F
     tOut:       772,        // F
-    mFluid:     1_103_600,  // lb/h
+    mFluid:     unitConv.BPDtolb_h(90e3),  // lb/h
     pAtm:       pAtmRef,    // Pa
     unitSystem: "SI",       // string
     lang:       "en",       // string
@@ -354,25 +357,26 @@ const englishSystem = { //(US Customary)
   "energy/mass":  (n) => round(unitConv.kJtoBTU(n)/unitConv.kgtolb(1)) + " Btu/lb",
   "energy/vol":   (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**3) + " Btu/ft³",
 
-  area:     (n) => round(n * 10.763910417,2)  + " ft²",
-  length:   (n) => round(unitConv.mtoft(n),2) + " ft",
-  lengthC:  (n) => round(unitConv.mtoin(n))   + " in",
-  lengthInv:(n) => round(n /unitConv.mtoft(1))+ " 1/ft",
-  temp:     (n) => round(unitConv.KtoR(n),2)  + " °R",
-  tempC:    (n) => round(unitConv.CtoF(n-tempToK),2) + " °F",
-  pressure: (n) => round(n * 0.0001450377,2)  + " psi",
-  mass:     (n) => round(n * 2.2046244202e-3) + " lb",
-  mass_flow:(n) => round(unitConv.kgtolb(n))  + " lb/h",
-  vol_flow: (n) => round(unitConv.mtoft(n)**3)+ " ft³/h",
-  cp:       (n) => round(n * 0.238845896627)  + " Btu/lb-°F",
-  cp_mol:   (n) => round(n * 0.238845896627)  + " Btu/lb-mol-°F",
-  power:    (n) => round(n * 3.4121416331)    + " Btu/h",
-  moist:    (n) => round(n * 1e3)             + " ÷10³ lb-H2O/lb",
-  thermal:  (n) => round( unitConv.kJtoBTU(n) /
-    unitConv.KtoR(1)/unitConv.mtoft(1) )      + " BTU/h-ft-°F",
-  convect:  (n) => round( unitConv.kJtoBTU(n) /
-    unitConv.KtoR(1)/(unitConv.mtoft(1)**2) ) + " BTU/h-ft²-°F",
-  viscosity:(n) => round(n * 1)    + " cP",
+  area:     (n) => round(n * 10.763910417)     + " ft²",
+  length:   (n) => round(unitConv.mtoft(n))    + " ft",
+  lengthC:  (n) => round(unitConv.mtoin(n))    + " in",
+  lengthInv:(n) => round(n /unitConv.mtoft(1)) + " 1/ft",
+  temp:     (n) => round(unitConv.KtoR(n))     + " °R",
+  tempC:    (n) => round(unitConv.CtoF(n-tempToK))+" °F",
+  pressure: (n) => round(n * 0.0001450377)     + " psi",
+  mass:     (n) => round(n * 2.2046244202e-3)  + " lb",
+  mass_flow:(n) => round(unitConv.kgtolb(n))   + " lb/h",
+  barrel_flow:(n)=>round(unitConv.kgtolb(n)/unitConv.BPDtolb_h(1)/1000) + " x10³ BPD",
+  vol_flow: (n) => round(n*unitConv.mtoft(1)**3)+" ft³/h",
+  cp:       (n) => round(n * 0.238845896627)   + " Btu/lb-°F",
+  cp_mol:   (n) => round(n * 0.238845896627)   + " Btu/lb-mol-°F",
+  power:    (n) => round(n * 3.4121416331)     + " Btu/h",
+  moist:    (n) => round(n * 1e3)              + " ÷10³ lb-H2O/lb",
+  thermal:  (n) => round(n *unitConv.kJtoBTU(1)/
+    unitConv.KtoR(1)/unitConv.mtoft(1) )       + " BTU/h-ft-°F",
+  convect:  (n) => round(n *unitConv.kJtoBTU(1)/
+    unitConv.KtoR(1)/(unitConv.mtoft(1)**2) )  + " BTU/h-ft²-°F",
+  viscosity:(n) => round(n * 1)                + " cP",
   system:   {en: "English", es: "Inglés"}
 };
 
@@ -385,15 +389,16 @@ const siSystem = {
 
   "energy/mass":  (n) => round(n * 1) + " kJ/kg",
   "energy/vol":   (n) => round(n * 1) + " kJ/m³",
-  area:     (n) => round(n * 1,2)  + " m²",
-  length:   (n) => round(n * 1,2)  + " m",
+  area:     (n) => round(n * 1)    + " m²",
+  length:   (n) => round(n * 1)    + " m",
   lengthC:  (n) => round(n * 1e2)  + " cm",
   lengthInv:(n) => round(n * 1)    + " 1/m",
-  tempC:    (n) => round(n * 1-tempToK,2) + " °C",
-  temp:     (n) => round(n * 1,2)  + " K",
+  tempC:    (n) => round(n * 1-tempToK) + " °C",
+  temp:     (n) => round(n * 1)    + " K",
   pressure: (n) => round(n * 1e-3) + " kPa",
   mass:     (n) => round(n * 1e-3) + " kg",
   mass_flow:(n) => round(n * 1)    + " kg/h",
+  barrel_flow:(n)=>round(unitConv.kgtolb(n)/unitConv.BPDtolb_h(1)/1000) + " x10³ BPD",
   vol_flow: (n) => round(n * 1)    + " m³/h",
   cp:       (n) => round(n * 1)    + " kJ/kg-K",
   cp_mol:   (n) => round(n * 1)    + " kJ/kmol-K",

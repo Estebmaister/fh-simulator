@@ -160,9 +160,7 @@ const externalCycle = (params) => {
   };
   const rad_dist_final = newtonRaphson(rad_dist, 
     params.duty_rad_dist, params.NROptions, "rad_dist_final");
-  if (rad_dist_final) {
-    params.duty_rad_dist = rad_dist_final;
-  } else {
+  if (rad_dist_final) { params.duty_rad_dist = rad_dist_final; } else {
     logger.error("external cycle broken, error in rad_dist estimation, using: "+
     params.duty_rad_dist);
   }
