@@ -79,7 +79,6 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
     Pitch:          ${unit.lengthC(result_obj.TUBING.S_tube)}
     Ef. Length:     ${unit.length(result_obj.TUBING.L)}
     
-  FINING: No
   `;
   return `\n` + string;
 }
@@ -160,7 +159,6 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
     Long Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
     Ef. Length:     ${unit.length(result_obj.TUBING.L)}
 
-  FINING: No
   `;
   return `\n` + string;
 }
@@ -248,7 +246,7 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
     Long Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
     Ef. Length:     ${unit.length(result_obj.TUBING.L)}
 
-  FINING: 
+  FINNING: 
     Material:       ${result_obj.FINING.Material}
     Type:           ${result_obj.FINING.Type}
     Height:         ${unit.lengthC(result_obj.FINING.Height)}

@@ -109,8 +109,7 @@ const convSection = (params, noLog) => {
   const Q_conv = (tIn, tG_in, tG_out) =>
     Uo( Tb(tG_out, tG_in), Tb(tIn), Tw(Tb(tIn),Tw(Tb(tIn))) ) *At *LMTD_Tin(tIn);
 
-  const tg_out_func = (tG_out) =>  Q_fluid(t_in, t_out) - Q_flue(tg_in, tG_out);
-  // const tg_out_func = (tG_out) =>  2*Q_fluid(t_in, t_out) - Q_flue(tg_in, tG_out) -Q_conv(tg_in, tg_in, tG_out);
+  const tg_out_func = (tG_out) => Q_fluid(t_in) - Q_flue(tg_in, tG_out);
   const Tin_conv_func = (tIn) => Q_fluid(tIn) - Q_conv(tIn, tg_in, tg_out);
 
   // -------- 1st estimation of tg_out   #.#.#.#.#
@@ -120,35 +119,30 @@ const convSection = (params, noLog) => {
   if (!noLog) logger.debug(`"Tin_convective", "t_in_cnv_calc": ${round(unitConv.KtoF(t_in_calc))},`+
     ` "tg_stack": ${round(unitConv.KtoF(tg_out))}`);
 
-  let iter = noLog ? 2 : 1;
+  let iter = noLog ? 21 : 1; // Due to divergence in this cycle, avoid it during external cycle run
   const
-    normalized_error = 1e-2, // 1%
-    // normalized_diff = (tIn_calc =t_in_calc, tIn = t_in) => Math.abs((tIn_calc - tIn) /tIn);
+    normalized_error = 1e-3, // .1%
+    // normalized_diff = (tIn_calc =t_in_calc, tIn = t_in) => Math.abs((tIn_calc - tIn) /tIn); // temp diff
     normalized_diff = (tIn=t_in,tG_out=tg_out) => Math.abs((Q_flue(tg_in, tG_out) -Q_fluid(tIn))/Q_fluid(tIn));
-  //// Cycle to improve result
+  // Internal cycle to improve result
   while (normalized_diff(t_in_calc) > normalized_error) { 
     // Forced break of loop
-    if (iter > 0) {
+    if (iter > 20) {
       if (!noLog) logger.info(`error vs diff: ${normalized_error}-${round(normalized_diff(t_in_calc),5)}`)
       if (!noLog) logger.error("Max iterations reached for inlet temp calc at convective sect");
       break;
     }
-    if (t_in_calc > t_in *0.9) { t_in = t_in_calc }
-    iter++;
+    if (t_in_calc) { t_in = t_in_calc } else { break; }
     const tg_stack = newtonRaphson(tg_out_func, tg_out, params.NROptions, "Tg_out_convective-2", true);
-    if (tg_stack > t_in *0.9) {tg_out = tg_stack; } else {
-      tg_out*=1.01;
-      if (!noLog) logger.error(`error in tg_stack: ${params.units.tempC(tg_stack)}, t_in: ${t_in}, tg_out: ${tg_out}, iter: ${iter}`);
-    }
+    if (tg_stack) {tg_out = tg_stack; } else { break; }
     t_in_calc = newtonRaphson(Tin_conv_func, t_in +100, params.NROptions, "T_in_convective-2", true);
+    iter++;
   }
   if (t_in_calc) t_in = t_in_calc;
   if (!noLog) logger.info(`diff vs error: ${normalized_diff()}-${normalized_error}`);
 
-
   if (!noLog) logger.default(`CONV, cycles: ${iter}, T_in_calc: ${params.units.tempC(t_in_calc)}, ` +
     `T_in_given: ${params.units.tempC(params.t_in_conv)}, Tg_stack: ${params.units.tempC(tg_out)}`);
-
   if (!noLog) logger.default(`CONV, T_in_calc: ${params.units.tempC(t_in_calc)}, ` +
     `T_in_given: ${params.units.tempC(params.t_in_conv)}, Tg_stack: ${params.units.tempC(tg_out)}`);
 
@@ -193,27 +187,27 @@ const convSection = (params, noLog) => {
     PrandtlFlue:  round(prandtl_flue(Tb(t_out))),
     ReynoldsFlue: round(reynolds_flue(Tb(t_out))),
 
-    At:           At,
-    Ai:           Ai,
-    An:           An,
-    Ao :          Ao,
-    Apo:          Apo,
-    Afo:          Afo,
-    Ef :          Ef,
-    Gn:           Gn/cnv_fact,
+    At:     At,
+    Ai:     Ai,
+    An:     An,
+    Ao :    Ao,
+    Apo:    Apo,
+    Afo:    Afo,
+    Ef :    Ef,
+    Gn:     Gn/cnv_fact,
 
-    hi:           hi( Tb(t_in),          Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    hr:           hr( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    ho:           ho( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    hc:           hc( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    he:           he( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    j:            j(  Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
-    gr:           gr( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    hi:     hi( Tb(t_in),          Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    hr:     hr( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    ho:     ho( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    hc:     hc( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    he:     he( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    j:      j(  Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
+    gr:     gr( Tb(tg_in, tg_out), Tw(Tb(t_in), Tw(Tb(t_in))) ),
 
-    Uo:           Uo( Tb(tg_in, tg_out), Tb(t_in), Tw(Tb(t_in)) ),
-    R_int:        R_int(                 Tb(t_in), Tw(Tb(t_in))),
-    R_tube:       R_tube(                          Tw(Tb(t_in))),
-    R_ext:        R_ext(Tb(tg_in, tg_out),         Tw(Tb(t_in))),
+    Uo:     Uo( Tb(tg_in, tg_out), Tb(t_in), Tw(Tb(t_in)) ),
+    R_int:  R_int(                 Tb(t_in), Tw(Tb(t_in))),
+    R_tube: R_tube(                          Tw(Tb(t_in))),
+    R_ext:  R_ext(Tb(tg_in, tg_out),         Tw(Tb(t_in))),
 
     TUBING: {
       Material: params.Material,

@@ -85,6 +85,9 @@ const createParams = (opts) => {
     h_conv: unitConv.hcENtohcSI(1.5),// (kJ/h-m2-C)
     kw_tube: kw_tubes_A312_TP321,    // (kJ/h-m-C)
     Pass_number: 2,          // - number of tube passes
+
+    Burner_number: 13,       // - burner's number
+    Do_Burner:   2.24,       // - burner's outside diameter
     
     Pitch_rad: unitConv.intom(2*8),// (m) NPS * 2
     N_rad:  42,                    // - number of tubes 
@@ -152,9 +155,9 @@ const externalCycle = (params) => {
       shld: shieldSection(params, noLog),
       conv: convSection(  params, noLog)
     };
-    if (int_rlt.conv.tg_out < int_rlt.conv.t_in) int_rlt.conv.duty*=2;
-    const duty_calc = int_rlt.rad.duty + 
-    int_rlt.shld.duty + int_rlt.conv.duty;
+    if (int_rlt.conv.tg_out < int_rlt.conv.t_in) int_rlt.conv.Q_fluid*=2;
+    const duty_calc = int_rlt.rad.Q_fluid + 
+    int_rlt.shld.Q_fluid + int_rlt.conv.Q_fluid;
 
     return (params.duty - duty_calc)/duty_calc;
   };

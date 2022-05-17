@@ -103,7 +103,7 @@ const shieldSection = (params, noLog) => {
 
   let iter = 1;
   const 
-    normalized_error = 1e-3, // 0.1%
+    normalized_error = 1e-5, // 0.001%
     normalized_diff = (tG_out) => Math.abs((Q_flue(tg_in, tG_out) -
       Q_conv(t_in,tg_in,tG_out,Tb(t_in),Tw(Tb(t_in),Tw(Tb(t_in)))) )/ Q_flue(tg_in, tg_out));
   while (normalized_diff(tg_out) - normalized_error > 0) {
@@ -117,7 +117,7 @@ const shieldSection = (params, noLog) => {
 
     // Forced break of loop
     iter++;
-    if (iter > 50) {
+    if (iter > 35) {
       logger.debug(`"Tin_shield",  "t_in_sh_calc": ${round(t_in_calc)}, "t_in_sh_sup": ${round(t_in)}`);
       if (!noLog) logger.info(`diff vs error: ${normalized_diff(tg_out)}-${normalized_error}`);
       logger.error("Max iterations reached for inlet temp calc at shield sect");
