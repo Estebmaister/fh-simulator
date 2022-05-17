@@ -151,6 +151,8 @@ const radSection = (params, noLog) => {
       params.NROptions, "M-fuel_T-seed_radiant", noLog);
     if (mass_fuel_seed) m_fuel = mass_fuel_seed;
 
+    duty_rad = Q_R(tg_out,Tw( Tb(t_out), Tw(Tb(t_out)) ));
+
   } else { // Given mass_fuel
     duty_total = Q_rls(m_fuel) *efficiency; // Duty effective from from q release by fuel
     duty_rad = duty_total *duty_rad_dist; // Calculate Tw with seed from 30-70 duty distribution
@@ -188,7 +190,7 @@ const radSection = (params, noLog) => {
   params.tg_rad   = tg_out;
   params.duty     = duty_total;
   params.m_flue   = m_flue(m_fuel);
-  params.t_w_rad  = Tw(Tb(t_out), Tw(Tb(t_out)));
+  params.t_w_rad  = Tw( Tb(t_out), Tw(Tb(t_out)) );
   params.q_rad_sh = Q_shld(tg_out, params.t_w_rad);
 
   const rad_result = {
@@ -297,15 +299,22 @@ const emissivity = (pl) => {
 /** (m2) parameters must be in ft */
 const Ar_calc = (prams) => {
   const
-    exitArea = unitConv.m2toft2(prams.Pitch_sh_cnv*prams.Tpr_sh_cnv*prams.L_shld),
-    base = prams.Length_rad * prams.Width_rad,
-    wall_width  = prams.Height_rad * prams.Width_rad,
-    wall_length = prams.Height_rad * prams.Length_rad;
-
+    ExitArea = unitConv.m2toft2(prams.Pitch_sh_cnv*prams.Tpr_sh_cnv*prams.L_shld),
+    Base       = prams.Length_rad * prams.Width_rad,
+    WallWidth  = prams.Height_rad * prams.Width_rad,
+    WallLength = prams.Height_rad * prams.Length_rad,
+    WidthConv   = unitConv.mtoft(prams.Pitch_sh_cnv * prams.Tpr_sh_cnv),
+    RoofDeclined_X = (prams.Width_rad - WidthConv)/2,
+    RoofDeclined_Z = unitConv.mtoft( 4 * prams.Pitch_rad ),
+    RoofDeclined_Y = Math.sin( Math.acos(RoofDeclined_X/RoofDeclined_Z) ) * RoofDeclined_Z,
+    RoofDeclined   = 2*RoofDeclined_X*RoofDeclined_Y + 2*WidthConv*RoofDeclined_Y,
+    Burners = 13 * (Math.PI/4)*2.24**2;
+    
+  const Ar  = 2*WallWidth + 2*WallLength + 2*Base - ExitArea - RoofDeclined - Burners;
   // Several references
-  // const Ar_esteem = 2*wall_width + 2*wall_length + 2*base - exitArea;
-  // const Ar2 = 2*(22.7+5.3+1)*prams.Width_rad + 2*wall_length + base;
-  const Ar = 2*wall_width + 2*wall_length + 1.234*base; //WinHeat
+  // const Ar_calc = 2*(22.7+5.3+1)*prams.Width_rad + 2*WallLength + Base;
+  // const Ar_W = 2*WallWidth + 2*wall_length + 1.234*base; //WinHeat
+  // logger.warn(`{"RoofDeclined_X (ft)": ${RoofDeclined_X},"RoofDeclined_Y (ft)": ${RoofDeclined_Y}, "RoofDeclined_Z (ft)": ${RoofDeclined_Z}}`);
   // check logger.warn(`{"Ar prev (ft)": ${Ar2},"Ar calc (ft)": ${Ar}, "Ar esteem (ft)": ${Ar_esteem}}`);
 
   return unitConv.ft2tom2(Ar);
