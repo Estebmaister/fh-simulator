@@ -29,7 +29,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
-  background-color: var(--nav-color, lightgray);
+  background-color: var(--light-color, lightgray);
 }
 
 body {

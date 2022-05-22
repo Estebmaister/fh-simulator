@@ -170,7 +170,7 @@ const convSection = (params, noLog) => {
     Q_stack:      Q_flue( tg_out, params.t_air),
 
     duty:         Q_fluid(t_in),
-    "%":          round(100*Q_fluid(t_in)/params.duty,2),
+    "%":          Q_fluid(t_in)/params.duty,
     duty_flux:    Q_fluid(t_in)/At,
 
     Cp_fluid:     Cp_fluid( t_in, t_out   ),

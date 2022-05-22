@@ -24,15 +24,19 @@ const totalRecalculate = () => {
       if (inputElement.value !== "") total += parseFloat(inputElement.value);
     }
   });
-  document.getElementById(totalElementID).innerHTML = parseInt(total * 1e4)/1e4
+  if (document.getElementById(totalElementID)) {
+    document.getElementById(totalElementID).innerHTML = parseInt(total * 1e4)/1e4
+  }
 };
 
 // ------- Instructions for browser view ----------
 
 // set the default fuels at first load
 for (const key in defaultFuels) {
-  document.getElementById(key).value = Math.round((parseFloat(defaultFuels[key]) * 10000)) / 100;
-};
+  if (document.getElementById(key)) {
+    document.getElementById(key).value = Math.round((parseFloat(defaultFuels[key]) * 10000)) / 100;
+  }
+}
 
 // calls at the first load for default fuels
 totalRecalculate();

@@ -134,14 +134,14 @@ const heaterFunc = (fuels, opts) => {
   // if params.o2Excess is set, start airExcess iteration
   if (params.o2Excess != 0) combustionCycle(params, fuels);
 
-  const comb_result = combSection(params.airExcess, fuels, params);
+  const heat_result = combSection(params.airExcess, fuels, params);
 
   if (params.runDistCycle) externalCycle(params);
 
-  comb_result.rad_result = radSection(params)
-  comb_result.shld_result = shieldSection(params)
-  comb_result.conv_result = convSection(params)
-  return comb_result
+  heat_result.rad_result = radSection(params)
+  heat_result.shld_result = shieldSection(params)
+  heat_result.conv_result = convSection(params)
+  return heat_result
 }
 
 const externalCycle = (params) => {
@@ -156,15 +156,15 @@ const externalCycle = (params) => {
       conv: convSection(  params, noLog)
     };
     if (int_rlt.conv.tg_out < int_rlt.conv.t_in) int_rlt.conv.Q_fluid*=2;
-    const duty_calc = int_rlt.rad.Q_fluid + 
-    int_rlt.shld.Q_fluid + int_rlt.conv.Q_fluid;
+    const duty_calc = Math.abs(int_rlt.rad.Q_fluid) + 
+    Math.abs(int_rlt.shld.Q_fluid) + Math.abs(int_rlt.conv.Q_fluid);
 
     return (params.duty - duty_calc)/duty_calc;
   };
   const rad_dist_final = newtonRaphson(rad_dist, 
-    params.duty_rad_dist, params.NROptions, "rad_dist_final");
+    params.duty_rad_dist, params.NROptions, 'rad_dist_final');
   if (rad_dist_final) { params.duty_rad_dist = rad_dist_final; } else {
-    logger.error("external cycle broken, error in rad_dist estimation, using: "+
+    logger.error('external cycle broken, error in rad_dist estimation, using: '+
     params.duty_rad_dist);
   }
   logger.info(`duty_rad_dist: ${round(100*rad_dist_final,2)}, ext_cycle_reps: ${cycle}`);
@@ -176,13 +176,13 @@ const combustionCycle = (params, fuels) => {
   const comb_o2 = (airExcessVal) => {
     cycle++;
     const combO2 = combSection(airExcessVal, fuels, params, onlyO2)
-    if (!onlyO2) logger.info( `"O2%_comb": ${combO2.flows['O2_%']}, `+
+    if (!onlyO2) logger.info( `'O2%_comb': ${combO2.flows['O2_%']}, `+
       `O2excess: ${params.o2Excess *100}`);
 
     return Math.round(combO2.flows['O2_%']*1e5 -params.o2Excess*1e7);
   }
   const airExcess = newtonRaphson(comb_o2,.5,
-    params.NROptions, "o2_excess_to_air");
+    params.NROptions, 'o2_excess_to_air');
 
   if (airExcess) params.airExcess = airExcess;
   logger.info(`'air_excess': ${round(100*airExcess,2)}, `+
@@ -204,5 +204,5 @@ let fuelsObject = {
 if (typeof window !== 'undefined') {
   browserProcess(fuelsObject, data, options, heaterFunc)
 } else {
-  heaterFunc(fuelsObject, options)
+  logger.info(JSON.stringify(heaterFunc(fuelsObject, options), null, 2))
 }

@@ -230,11 +230,11 @@ const radSection = (params, noLog) => {
 
     duty_total:duty_total,
     duty:      duty_rad,
-    "%":       round(100*duty_rad/duty_total,2),
+    "%":       duty_rad/duty_total,
     eff_total:round(100*duty_total/Q_rls(m_fuel),2),
     duty_flux:duty_rad/At,
 
-    Alpha:    round(alpha),
+    Alpha:    alpha,
     MBL:      round(MBL),
     Pco2:     round(params.Pco2),
     Ph2o:     round(params.Ph2o),

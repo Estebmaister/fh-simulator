@@ -157,7 +157,7 @@ const shieldSection = (params, noLog) => {
     miu_flue:   miu_flue(tg_out),
 
     duty:       duty_sh(t_in),
-    "%":        round(100*duty_sh(t_in)/params.duty,2),
+    "%":        duty_sh(t_in)/params.duty,
     duty_flux:  duty_sh(t_in)/At,
 
     kw_fluid:   kw_fluid(Tb(t_in)),
