@@ -185,6 +185,7 @@ const unitConv = {
   kgtolb: (n) => n*2.20462,
   lbtokg: (n) => n/2.20462,
   BPDtolb_h:(n) => n*barrelsToft3*ft3Tolb/24*0.84,
+  lb_htoBPD:(n) => n/barrelsToft3/ft3Tolb*24/0.84,
 
   kJtoBTU: (n) => n/1.05506,
   BTUtokJ: (n) => n*1.05506,
@@ -228,6 +229,10 @@ const getOptions = () => {
     pAtm:       pAtmRef,    // Pa
     unitSystem: "SI",       // string
     lang:       "en",       // string
+    title:      "heater_sim",
+    graphVar:   "t_out",    // string
+    graphRange: 50,         // number > 0
+    graphPoints:100,         // number > 0
   
     // Newton Raphson arguments
     NROptions: {

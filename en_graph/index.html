@@ -27,50 +27,47 @@
 	<meta name="twitter:card" content="summary_large_image" />
 
 	<link rel="stylesheet" href="../css/style.css" />
-	<link rel="stylesheet" href="../css/loaderForms.css" />
+  <script src="https://d3js.org/d3.v5.min.js" defer></script>
+  <script src="../js/graphicDraw.js" defer></script>
   <script src="../js/webResultScript.js" defer></script>
 </head>
 <body>
   <header id="header">
-    <a class="logo"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" onclick="history.back()"/></a>
+    <a class="logo" href="#"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo"  onclick="window.history.back()"/></a>
+
     <nav id="navbar">
       <ul id="nav-list">
-        <li class="nav-sec"> <a class="nav-link" href="./">Data</a> </li>
-        <li class="nav-sec"> <a class="nav-link" href="">Result</a> </li>
-        <li class="nav-sec"> <a class="nav-link" href="https://github.com/estebmaister/" target="_blank">Projects</a> </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="../en">Data</a>
+        </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="../en/result.html">Result</a>
+        </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="https://github.com/estebmaister/" target="_blank">Projects</a>
+        </li>
       </ul>
     </nav>
+    <a id="lang" href="#" onclick="window.location.href = window.location.href.replace('en','es')">EN | <span>ES</span></a>
+    <!-- <a id="lang" href="../es_graph"><span>EN</span> | ES</a> -->
   </header>
   <main>
     <section id="data-sect">
       <h1>Fire heater natural draft simulator</h1>
-      <p>Testing page, a simple view for the output.</p>
+      <h4>(Designed to instruct engineers and operators)</h4>
+      <p>Testing page, a simple view for the input and output.</p>
     </section>
-    <section id="output-sect">
-      <div id="loader-wrapper" style="display: flex;">
-        <!-- Floating Loader <div class="loader"></div> <div class="shadow"></div> <!---->
-        <!-- loaderForms .css -->
-        <div class="loader"> <svg viewBox="0 0 80 80"> <circle id="test" cx="40" cy="40" r="32"></circle> </svg> </div>
-        <div class="loader triangle"> <svg viewBox="0 0 86 80"> <polygon points="43 8 79 72 7 72"></polygon> </svg> </div>
-        <div class="loader"> <svg viewBox="0 0 80 80"> <rect x="8" y="8" width="64" height="64"></rect> </svg> </div> <!-- -->
-      </div>
-      <pre>
-        <code id="output-combustion"></code>
-        <code id="output-radiant"></code>
-        <code id="output-shield"></code>
-        <code id="output-convective"></code>
-      </pre>
-    </section>
+    <svg></svg>
   </main>
-	<footer>
-		<p>
+  <footer>
+    <p>
       <a class="credits" id="profile-link" href="http://www.usb.ve" target="_blank">
         © USB 2021
-			</a>
-		</p>
+      </a>
+    </p>
     <p>
       v1.0.1<em> - Calculations performed at web browser engine, logs can be seen at the console</em>
     </p>
-	</footer>
+  </footer>
 </body>
 </html>

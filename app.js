@@ -26,10 +26,10 @@ const {
   kw_tubes_A312_TP321
 } = require('./js/utils');
 const data = require('./data/data.json');
-const {radSection} = require('./js/rad');
-const {convSection} = require('./js/conv');
-const {shieldSection} = require('./js/shield');
-const {combSection} = require('./js/combustion');
+const {radSection} = require('./js/heaterSections/rad');
+const {convSection} = require('./js/heaterSections/conv');
+const {shieldSection} = require('./js/heaterSections/shield');
+const {combSection} = require('./js/heaterSections/combustion');
 const {browserProcess} = require('./js/browser');
 
 const createParams = (opts) => {
@@ -149,7 +149,9 @@ const externalCycle = (params) => {
   let cycle = 0, noLog = true;
   const rad_dist = (radDist) => {
     cycle++;
-    params.duty_rad_dist = radDist;
+    if (radDist >0.1 && radDist <1) {
+      params.duty_rad_dist = radDist;
+    }
     const int_rlt = {
       rad:  radSection(   params, noLog),
       shld: shieldSection(params, noLog),
@@ -163,7 +165,9 @@ const externalCycle = (params) => {
   };
   const rad_dist_final = newtonRaphson(rad_dist, 
     params.duty_rad_dist, params.NROptions, 'rad_dist_final');
-  if (rad_dist_final) { params.duty_rad_dist = rad_dist_final; } else {
+  if (rad_dist_final >0.1 && rad_dist_final <1) { 
+    params.duty_rad_dist = rad_dist_final; 
+  } else {
     logger.error('external cycle broken, error in rad_dist estimation, using: '+
     params.duty_rad_dist);
   }

@@ -7,7 +7,10 @@ window.onload = function(){
         scriptElement.src = "../js/bundle.js";
 
         // Before appending the script, calls attention to see the console in case of a failure in the script
-        document.getElementById("output-combustion").textContent = 'Is this taking too long? check the console log for debugging.';
+        const outputElement = document.getElementById("output-combustion");
+        if (outputElement) {
+            outputElement.textContent = 'Is this taking too long? check the console log for debugging.';
+        }
         document.head.appendChild(scriptElement);
-    }, 500);
+    }, 20);
 };

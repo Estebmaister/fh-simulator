@@ -12,7 +12,7 @@
  * Q_conv = h_conv * At * ( Tb(tg_in, tg_out) - Tw(t_in, t_out) )
  * Q_conv = m_flue * Cp_flue * (tg_in - tg_out) = Q_flue
  *****************************************************************/
-const {newtonRaphson, logger, LMTD, round, unitConv} = require('./utils');
+const {newtonRaphson, logger, LMTD, round, unitConv} = require('../utils');
 
 const shieldSection = (params, noLog) => {
   let // Temperatures declaration
@@ -107,6 +107,7 @@ const shieldSection = (params, noLog) => {
     normalized_diff = (tG_out) => Math.abs((Q_flue(tg_in, tG_out) -
       Q_conv(t_in,tg_in,tG_out,Tb(t_in),Tw(Tb(t_in),Tw(Tb(t_in)))) )/ Q_flue(tg_in, tg_out));
   while (normalized_diff(tg_out) - normalized_error > 0) {
+    if (true) break;
     if (t_in_calc) { t_in = t_in_calc; } else {
       logger.error("Invalid t_in_calc at shield sect");
       break;

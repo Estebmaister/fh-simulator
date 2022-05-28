@@ -1,4 +1,5 @@
 const {optionsModifier} = require('./optionsModifier');
+const {graphicData} = require('./graphicData');
 const {logger} = require('./utils');
 const {
   stringRadResult, 
@@ -65,15 +66,19 @@ const outputData = (result, browserData, lang, unitSystem) => {
 const browserProcess = (fuels, data, options, combustion) => {
 
   let lang = 'en';  
-  const browserLang = window.location.pathname.split('/'); // ex ',en,result.html'}
-  if (browserLang.length > 0) browserLang.forEach(element => {if (element == 'es') lang = 'es'});
+  const browserPath = window.location.pathname.split('/'); // ex ',en,result.html'}
+  if (browserPath.length > 0) browserPath.forEach(item => {if (item == 'es') lang = 'es'});
   options.lang = lang;
 
   const browserData = extractURIdata(window.location.search.substring(1).split('&'));
   if (browserData !== {}) insertBrowserData(browserData, fuels, data, options);
   
-  const result = combustion(fuels, options);
-	outputData(result, browserData, lang, options.unitSystem);
+  if (browserPath[1].includes('_graph')) {
+    graphicData(combustion, fuels, options);
+  } else {
+    const result = combustion(fuels, options);
+    outputData(result, browserData, lang, options.unitSystem);
+  }
 };
 
 module.exports = {

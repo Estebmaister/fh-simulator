@@ -1,5 +1,35 @@
 const {logger, unitConv} = require('./utils');
 
+// Logic to modified default options for graph function
+const optionsModifierGraph = (key, browserData, options) => {
+  let optValue;
+  switch (key) {
+    case 'graph_var':
+      switch (browserData[key]) {
+        case 'humidity':
+          options.graphVar = 'humidity';
+          break;
+        case 'air_excess':
+          options.graphVar = 'air_excess';
+          break;
+        case 'm_fluid':
+          options.graphVar = 'm_fluid';
+          break;
+      }
+      break;
+    case 'graph_range':
+      optValue = parseFloat(browserData[key])
+      if (optValue > 0) 
+        options.graphRange = optValue;
+      break;
+    case 'graph_points':
+      optValue = parseFloat(browserData[key])
+      if (optValue > 0 && optValue <= 200) 
+        options.graphPoints = optValue;
+      break;
+  }
+}
+
 // Logic to modified default options for process fluid with data from browser
 const optionsModifierFluid = (key, browserData, options) => {
   let optValue;
@@ -20,7 +50,7 @@ const optionsModifierFluid = (key, browserData, options) => {
         options.tOut = optValue;
       break;
     case 'sp':
-      
+      // TODO: include fouling resistance
       break;
     case 'miu_in':
       
@@ -133,6 +163,7 @@ const optionsModifier = (key, browserData, options) => {
       options.unitSystem = browserData[key];
       break;
     default:
+      optionsModifierGraph(key, browserData, options);
       optionsModifierFluid(key, browserData, options);
       optionsModifierAmbient(key, browserData, options);
       break;
