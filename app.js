@@ -59,23 +59,23 @@ const createParams = (opts) => {
     t_in_conv:  t_in,       // (K) global process inlet
     t_out:      t_out,      // (K) global process outlet
     m_fluid:    m_fluid,    // (kg/h) 
-    Rfi:        0.000,      // (h-m2-C/kJ) int. fouling factor
-    Rfo:        0.000,      // (h-m2-C/kJ) ext. fouling factor
+    Rfi: unitConv.RfENtoRfSI(opts.rfi), // (h-m2-C/kJ) int. fouling
+    Rfo: unitConv.RfENtoRfSI(opts.rfo), // (h-m2-C/kJ) ext. fouling
     efficiency: opts.effcy,         // (% *.01)
     duty_rad_dist: opts.radDist,    // (% *.01)
     heat_loss_percent: opts.hLoss,  // (% *.01)
     max_duty: unitConv.BTUtokJ(71.5276*1e3),// (kJ/h)
     miu_fluid: viscosityApprox({
-      t1: t_in , v1: miu_fluid_in,
-      t2: t_out, v2: miu_fluid_out
+      t1: unitConv.FtoK(678), v1: miu_fluid_in,
+      t2: unitConv.FtoK(772), v2: miu_fluid_out
     }),                     // (cP)
     Cp_fluid: linearApprox({
-      x1: t_in , y1: cp_fluid_in,
-      x2: t_out, y2: cp_fluid_out
+      x1: unitConv.FtoK(678), y1: cp_fluid_in,
+      x2: unitConv.FtoK(772), y2: cp_fluid_out
     }),                     // (kJ/kg-C) 
     kw_fluid: linearApprox({
-      x1: t_in , y1: kw_fluid_in,
-      x2: t_out, y2: kw_fluid_out
+      x1: unitConv.FtoK(678), y1: kw_fluid_in,
+      x2: unitConv.FtoK(772), y2: kw_fluid_out
     }),                     // (kJ/h-m-C)
 
     // m_fuel: 100,         // (kg/h)
@@ -149,7 +149,7 @@ const externalCycle = (params) => {
   let cycle = 0, noLog = true;
   const rad_dist = (radDist) => {
     cycle++;
-    if (radDist >0.1 && radDist <1) {
+    if (radDist >0.3 && radDist <1) {
       params.duty_rad_dist = radDist;
     }
     const int_rlt = {
@@ -163,8 +163,13 @@ const externalCycle = (params) => {
 
     return (params.duty - duty_calc)/duty_calc;
   };
+  const convNROptions = {...params.NROptions};
+  convNROptions.maxIterations *= 5;
+  // convNROptions.tolerance *= 1e1;
+  // convNROptions.epsilon *= 1e1;
+  // convNROptions.h *= 1e1;
   const rad_dist_final = newtonRaphson(rad_dist, 
-    params.duty_rad_dist, params.NROptions, 'rad_dist_final');
+    params.duty_rad_dist, convNROptions, 'rad_dist_final');
   if (rad_dist_final >0.1 && rad_dist_final <1) { 
     params.duty_rad_dist = rad_dist_final; 
   } else {

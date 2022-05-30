@@ -148,9 +148,21 @@ const optionsModifier = (key, browserData, options) => {
       break;
     case 'rad_dist':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 50) {
+      if (optValue >= 40) {
         options.radDist = optValue*1e-2;
         options.runDistCycle = false;
+      }
+      break;
+    case 'rfi':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) {
+        options.rfi = optValue;
+      }
+      break;
+    case 'rfo':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) {
+        options.rfo = optValue;
       }
       break;
     case 't_fuel':
