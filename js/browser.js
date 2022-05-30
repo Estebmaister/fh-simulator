@@ -67,7 +67,9 @@ const browserProcess = (fuels, data, options, combustion) => {
 
   let lang = 'en';  
   const browserPath = window.location.pathname.split('/'); // ex ',en,result.html'}
-  if (browserPath.length > 0) browserPath.forEach(item => {if (item == 'es') lang = 'es'});
+  if (browserPath.length > 0) browserPath.forEach(item => {
+    if (item == 'es' || item == 'es_graph') lang = 'es'
+  });
   options.lang = lang;
 
   const browserData = extractURIdata(window.location.search.substring(1).split('&'));
