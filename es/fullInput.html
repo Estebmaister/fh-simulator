@@ -31,12 +31,12 @@
 </head>
 <body>
   <header id="header">
-    <a class="logo" href="#"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" /></a>
+    <a class="logo" href="./"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" /></a>
 
     <nav id="navbar">
       <ul id="nav-list">
         <li class="nav-sec">
-          <a class="nav-link" href="./fullInput.html">+Datos</a>
+          <a class="nav-link" href="./">-Datos</a>
         </li>
         <li class="nav-sec">
           <a class="nav-link" href="./result.html">Resultados</a>
@@ -67,20 +67,17 @@
       <div class="form-div">
         <div class="form-block">
           <hr>
-          <h3>Variables Internas</h3>
+          <h3>Variables del fluido</h3>
           <div class="form-div">
             <p id="sub-duty" class="project-info">
               Flujo <input step="1" min="0" name="m_fluid" type="number" value="90"> x10<sup>3</sup> BPD
               <sub><span>~</span> MBtu/hr</sub>
             </p>
             <p class="project-info">
-              Pérdidas <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
-            </p>
-            <br class="hidden">
-            <p class="project-info hidden">
               Grav. esp. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled><sub><em>@ 60°F</em></sub>
             </p>
           </div>
+          
 
           <div class="form-div">
             <div class="form-block">
@@ -95,7 +92,7 @@
                     <sub><span>~</span> °C</sub>
                   </p>
                 </div>
-                <div class="form-block flex-evenly hidden"> 
+                <div class="form-block flex-evenly"> 
                   <p class="project-info">
                     Cap. calorífica Cp<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" disabled value="0.676"> 
                     <sub>Btu/lb-°F</sub>
@@ -107,46 +104,90 @@
                 </div>
               </div>
             </div>
-
+            <div class="form-block">
+              <div class="form-div">
+                <div class="form-block flex-evenly"> 
+                  <p class="project-info">
+                    Viscosidad μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" disabled value="1.45"> cp
+                  <p class="project-info">
+                    Viscosidad μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" disabled value="0.96"> cp
+                  </p>
+                </div>
+                <div class="form-block flex-evenly">
+                  <p class="project-info">
+                    Cond. térmica k<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" disabled value="0.038">
+                  <sub>Btu/h.ft.°F</sub>
+                  </p>
+                  <p class="project-info">
+                    Cond. térmica k<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" disabled value="0.035">
+                  <sub>Btu/h.ft.°F</sub>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
 
         <div class="form-block">
           <hr>
-          <h3>Variables Externas</h3>
+          <h3>Variables externas</h3>
   
-          <div class="form-div"> 
-            <p class="project-info sub-temp">
-              Temp. aire T<sub>a</sub> <input step="1" min="0" name="t_amb" type="number" value="80"> °F
-              <sub><span>~</span> °C</sub>
-            </p> 
-            <p class="project-info">
-              Humedad relativa RH <input step="0.1" min="0" name="humidity" type="number" value="50.0"> %
-            </p>
-            <p class="project-info">
-              Presión atmosférica <input step="0.01" min="0" name="p_atm" type="number" placeholder="1.00"> 
-              <sub>atm</sub>
-            </p>
-            <p class="project-info">
-              Exceso de aire <input step="0.1" min="0" name="air_excess" type="number" value="20.0"> %
-            </p>
-            <p class="project-info">
-              Exceso de O<sub>2</sub> gases de comb. <input id="o2_excess" name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %
-            </p>
-          </div>
-          <div class="form-div hidden">
-            <p class="project-info">
-              R<sub>fi</sub> radiante <input step="0.001" min="0" name="rfi" type="number" value="0.000">
-              <sub>hr.ft².°F/Btu</sub> 
-            </p>
-            <p class="project-info">
-              R<sub>fo</sub> convect. <input step="0.001" min="0" name="rfo" type="number" value="0.000">
-              <sub>hr.ft².°F/Btu</sub> 
-            </p>
-          </div>
+          <div class="form-div">
+            <div class="form-block flex-evenly">
+
+              <p class="project-info sub-temp">
+                Temp. aire T<sub>a</sub> <input step="1" min="0" name="t_amb" type="number" value="80"> °F
+                <sub><span>~</span> °C</sub>
+              </p> 
+              <p class="project-info">
+                Humedad relativa RH <input step="0.1" min="0" name="humidity" type="number" value="50.0"> %
+              </p>
+              <p class="project-info">
+                Presión atmosférica <input step="0.01" min="0" name="p_atm" type="number" placeholder="1.00"> 
+                <sub>atm</sub>
+              </p>
+              <p class="project-info">
+                Exceso de aire <input step="0.1" min="0" name="air_excess" type="number" value="20.0"> %
+              </p>
+
+
+
+            </div>
+            <div class="form-block flex-evenly">
+
+              <p class="project-info">
+                R<sub>fi</sub> radiante <input step="0.001" min="0" name="rfi" type="number" value="0.000">
+                <sub>hr.ft².°F/Btu</sub>
+              </p>
+              <p class="project-info">
+                R<sub>fo</sub> convect. <input step="0.001" min="0" name="rfo" type="number" value="0.000">
+                <sub>hr.ft².°F/Btu</sub>
+              </p>
+              <p class="project-info">
+                Exceso de O<sub>2</sub> gases de comb. <input id="o2_excess" name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %
+                <br>
+                <span><em><sub>[Al definir este valor el exceso de aire sería calculado]</sub></em></span>
+              </p>
+
+              <p class="project-info">
+                Pérdidas <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
+              </p>
+              <p class="project-info">
+                Dist. Rad. <input step="0.1" min="50" max="90" name="rad_dist" type="number" placeholder="70.0"> %
+              </p>
+              <p class="project-info hidden">
+                Eficiencia <input step="0.1" min="0" name="efficiency" type="number" value="80.0" disabled> %
+              </p>
+
+            </div>
           </div>
         </div>
+
+      </div>
+
+      <div class="form-div">
+        
   
         <!-- <div class="form-block hidden">
           <hr>
