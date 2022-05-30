@@ -22,8 +22,8 @@ const {
   normalize,
   flueViscosity,
   flueThermalCond
-} = require('./utils');
-const data = require('../data/data.json');
+} = require('../utils');
+const data = require('../../data/data.json');
 const dryAirN2Percentage = 79.05;
 const dryAirO2Percentage = 20.95;
 const N2O2relation = dryAirN2Percentage/dryAirO2Percentage;
@@ -290,7 +290,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     fuelTemperature: units.tempC(params.t_fuel),
     ambTemperature:  units.tempC(params.t_amb),
     airTemperature:  units.tempC(params.t_air),
-    "humidity_%": round(params.humidity),
+    "humidity_%": params.humidity,
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
     moisture:   units.moist(moistAirWeightRatio(
@@ -403,7 +403,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   logger.info( `Adiabatic flame temp: [${round(params.adFlame)} K]`+
     ` ${units.tempC(params.adFlame)}`);
 
-  roundDict(products); roundDict(flows); roundDict(debug_data);
+  roundDict(products);
   if (debug_data.err == "") delete debug_data.err;
   return {flows, products, debug_data};
 };

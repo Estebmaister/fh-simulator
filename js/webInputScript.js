@@ -13,8 +13,15 @@ const dataFormulas = [
   "C10H8","CH3OH","C2H5OH","NH3","S","H2S","H2O","H2Ol","N2+O2","SO2"
 ];
 
+// HTML Elements ID's
+const tInElementID = "t_in";
+const tOutElementID = "t_out";
+const cpInElementID = "cp_in";
+const cpOutElementID = "cp_out";
 const totalElementID = "total";
+const subDutyElementID = "sub-duty";
 
+const totalElement = document.getElementById(totalElementID);
 // totalRecalculate change the total value for every new entry at the fuel composition
 const totalRecalculate = () => {
   let total = 0;
@@ -24,31 +31,118 @@ const totalRecalculate = () => {
       if (inputElement.value !== "") total += parseFloat(inputElement.value);
     }
   });
-  document.getElementById(totalElementID).innerHTML = parseInt(total * 1e4)/1e4
+  if (totalElement) {
+    totalElement.innerHTML = parseInt(total * 1e4)/1e4
+  }
 };
 
-// ------- Instructions for browser view ----------
+const firstFuelEditionCall = () => {
+  // set the default fuels at first load
+  for (const key in defaultFuels) {
+    if (document.getElementById(key)) {
+      document.getElementById(key).value = Math.round((parseFloat(defaultFuels[key]) * 10000)) / 100;
+    }
+  }
 
-// set the default fuels at first load
-for (const key in defaultFuels) {
-  document.getElementById(key).value = Math.round((parseFloat(defaultFuels[key]) * 10000)) / 100;
-};
+  // adding the function to be called at every input field change
+  dataFormulas.forEach(element => {
+    const inputElement = document.getElementById(element)
+    if (inputElement !== null) inputElement.addEventListener('input', totalRecalculate)
+  });
 
-// calls at the first load for default fuels
-totalRecalculate();
+  // calls at the first load for default fuels
+  totalRecalculate();
+}
+let fuelEditionCalled = false;
 
-// adding the function to be called at every input field change
-dataFormulas.forEach(element => {
-  const inputElement = document.getElementById(element)
-  if (inputElement !== null) inputElement.addEventListener('input', totalRecalculate)
-});
+const showHideDiv = (div, span) => {
+  if (div.style.height === "auto") {
+    span.textContent = "[➡]";
+    div.style.height = "0";
+    div.style.opacity = "0";
+  } else {
+    span.textContent = "[⬇]";
+    div.style.height = "auto";
+    div.style.opacity = "1";
+  }
+}
 
+const spanShowFuelID = "show-hide-fuel";
+const spanShowFuel = document.getElementById(spanShowFuelID);
+const fuelDivID = "fuel-div";
+const fuelDiv = document.getElementById(fuelDivID);
+const showHideFuelDiv = () => {
+  if (!fuelEditionCalled) {
+    fuelEditionCalled = true;
+    firstFuelEditionCall();
+  }
+  showHideDiv(fuelDiv,spanShowFuel);
+}
+if (fuelDiv && spanShowFuel) {
+  spanShowFuel.style.cursor = "pointer";
+  spanShowFuel.onclick = showHideFuelDiv;
+}
+
+const spanShowGraphID = "show-hide-graph";
+const spanShowGraph = document.getElementById(spanShowGraphID);
+const graphDivID = "graph-div";
+const graphDiv = document.getElementById(graphDivID);
+const showHideGraphDiv = () => {
+  showHideDiv(graphDiv,spanShowGraph);
+}
+if (graphDiv && spanShowGraph) {
+  spanShowGraph.style.cursor = "pointer";
+  spanShowGraph.onclick = showHideGraphDiv;
+}
+const graphButtonID = "graph-action";
+const graphButton = document.getElementById(graphButtonID);
+if (graphButton) graphButton.onmousedown = () => {
+
+  const formElement = document.getElementById("data-form");
+  formElement.action = `../${formElement.lang || "en"}_graph/`;
+}
+
+// -- Updating duty value to show in MBtu/h.
+const 
+  barrelsToft3 = 5.6145833333,
+  ft3Tolb = 62.371*0.84, // for crude oil @60°F
+  BPDtolb_h = barrelsToft3*ft3Tolb/24;
+
+const updateDuty = () => spanDutyField.innerHTML = Math.round(
+    +inputFlow.value*BPDtolb_h *
+    (+tOut.value-tIn.value) *(+cpOut.value+ +cpIn.value)/2
+    /100
+  ) /10;
+
+const tIn = document.getElementById(tInElementID);
+const tOut = document.getElementById(tOutElementID);
+const cpIn = document.getElementById(cpInElementID);
+const cpOut = document.getElementById(cpOutElementID);
+
+const subDuty = document.getElementById(subDutyElementID);
+let inputFlow, spanDutyField;
+if (subDuty) {
+  inputFlow = subDuty.getElementsByTagName('input')[0];
+  spanDutyField = subDuty.getElementsByTagName('span')[0];
+  if (inputFlow && spanDutyField) {
+    inputFlow.addEventListener('input', updateDuty)
+    cpOut.addEventListener('input', updateDuty)
+    cpIn.addEventListener('input', updateDuty)
+    // Functions for temps are already added at updateTemp()
+  }
+}
 
 // -- Updating temp input values to show, from fahrenheit to celsius.
 function updateTemp(_ev) {
+  if (subDuty) updateDuty();
   const inputField = this.getElementsByTagName('input')[0];
   const spanField = this.getElementsByTagName('span')[0];
   if (inputField == undefined || spanField == undefined) return;
+  if (inputField.type == "range") {
+    spanField.innerHTML = inputField.value; 
+    if (spanField.innerHTML.length == 1) spanField.innerHTML = "0"+spanField.innerHTML; 
+    return;
+  }
   spanField.innerHTML = Math.round((+inputField.value -32) *(5/9) *10) /10;
 }
 const subTemps = document.getElementsByClassName("sub-temp")

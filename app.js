@@ -26,10 +26,10 @@ const {
   kw_tubes_A312_TP321
 } = require('./js/utils');
 const data = require('./data/data.json');
-const {radSection} = require('./js/rad');
-const {convSection} = require('./js/conv');
-const {shieldSection} = require('./js/shield');
-const {combSection} = require('./js/combustion');
+const {radSection} = require('./js/heaterSections/rad');
+const {convSection} = require('./js/heaterSections/conv');
+const {shieldSection} = require('./js/heaterSections/shield');
+const {combSection} = require('./js/heaterSections/combustion');
 const {browserProcess} = require('./js/browser');
 
 const createParams = (opts) => {
@@ -59,23 +59,23 @@ const createParams = (opts) => {
     t_in_conv:  t_in,       // (K) global process inlet
     t_out:      t_out,      // (K) global process outlet
     m_fluid:    m_fluid,    // (kg/h) 
-    Rfi:        0.000,      // (h-m2-C/kJ) int. fouling factor
-    Rfo:        0.000,      // (h-m2-C/kJ) ext. fouling factor
+    Rfi: unitConv.RfENtoRfSI(opts.rfi), // (h-m2-C/kJ) int. fouling
+    Rfo: unitConv.RfENtoRfSI(opts.rfo), // (h-m2-C/kJ) ext. fouling
     efficiency: opts.effcy,         // (% *.01)
     duty_rad_dist: opts.radDist,    // (% *.01)
     heat_loss_percent: opts.hLoss,  // (% *.01)
     max_duty: unitConv.BTUtokJ(71.5276*1e3),// (kJ/h)
     miu_fluid: viscosityApprox({
-      t1: t_in , v1: miu_fluid_in,
-      t2: t_out, v2: miu_fluid_out
+      t1: unitConv.FtoK(678), v1: miu_fluid_in,
+      t2: unitConv.FtoK(772), v2: miu_fluid_out
     }),                     // (cP)
     Cp_fluid: linearApprox({
-      x1: t_in , y1: cp_fluid_in,
-      x2: t_out, y2: cp_fluid_out
+      x1: unitConv.FtoK(678), y1: cp_fluid_in,
+      x2: unitConv.FtoK(772), y2: cp_fluid_out
     }),                     // (kJ/kg-C) 
     kw_fluid: linearApprox({
-      x1: t_in , y1: kw_fluid_in,
-      x2: t_out, y2: kw_fluid_out
+      x1: unitConv.FtoK(678), y1: kw_fluid_in,
+      x2: unitConv.FtoK(772), y2: kw_fluid_out
     }),                     // (kJ/h-m-C)
 
     // m_fuel: 100,         // (kg/h)
@@ -134,14 +134,14 @@ const heaterFunc = (fuels, opts) => {
   // if params.o2Excess is set, start airExcess iteration
   if (params.o2Excess != 0) combustionCycle(params, fuels);
 
-  const comb_result = combSection(params.airExcess, fuels, params);
+  const heat_result = combSection(params.airExcess, fuels, params);
 
   if (params.runDistCycle) externalCycle(params);
 
-  comb_result.rad_result = radSection(params)
-  comb_result.shld_result = shieldSection(params)
-  comb_result.conv_result = convSection(params)
-  return comb_result
+  heat_result.rad_result = radSection(params)
+  heat_result.shld_result = shieldSection(params)
+  heat_result.conv_result = convSection(params)
+  return heat_result
 }
 
 const externalCycle = (params) => {
@@ -149,22 +149,31 @@ const externalCycle = (params) => {
   let cycle = 0, noLog = true;
   const rad_dist = (radDist) => {
     cycle++;
-    params.duty_rad_dist = radDist;
+    if (radDist >0.3 && radDist <1) {
+      params.duty_rad_dist = radDist;
+    }
     const int_rlt = {
       rad:  radSection(   params, noLog),
       shld: shieldSection(params, noLog),
       conv: convSection(  params, noLog)
     };
     if (int_rlt.conv.tg_out < int_rlt.conv.t_in) int_rlt.conv.Q_fluid*=2;
-    const duty_calc = int_rlt.rad.Q_fluid + 
-    int_rlt.shld.Q_fluid + int_rlt.conv.Q_fluid;
+    const duty_calc = Math.abs(int_rlt.rad.Q_fluid) + 
+    Math.abs(int_rlt.shld.Q_fluid) + Math.abs(int_rlt.conv.Q_fluid);
 
     return (params.duty - duty_calc)/duty_calc;
   };
+  const convNROptions = {...params.NROptions};
+  convNROptions.maxIterations *= 5;
+  // convNROptions.tolerance *= 1e1;
+  // convNROptions.epsilon *= 1e1;
+  // convNROptions.h *= 1e1;
   const rad_dist_final = newtonRaphson(rad_dist, 
-    params.duty_rad_dist, params.NROptions, "rad_dist_final");
-  if (rad_dist_final) { params.duty_rad_dist = rad_dist_final; } else {
-    logger.error("external cycle broken, error in rad_dist estimation, using: "+
+    params.duty_rad_dist, convNROptions, 'rad_dist_final');
+  if (rad_dist_final >0.1 && rad_dist_final <1) { 
+    params.duty_rad_dist = rad_dist_final; 
+  } else {
+    logger.error('external cycle broken, error in rad_dist estimation, using: '+
     params.duty_rad_dist);
   }
   logger.info(`duty_rad_dist: ${round(100*rad_dist_final,2)}, ext_cycle_reps: ${cycle}`);
@@ -176,13 +185,13 @@ const combustionCycle = (params, fuels) => {
   const comb_o2 = (airExcessVal) => {
     cycle++;
     const combO2 = combSection(airExcessVal, fuels, params, onlyO2)
-    if (!onlyO2) logger.info( `"O2%_comb": ${combO2.flows['O2_%']}, `+
+    if (!onlyO2) logger.info( `'O2%_comb': ${combO2.flows['O2_%']}, `+
       `O2excess: ${params.o2Excess *100}`);
 
     return Math.round(combO2.flows['O2_%']*1e5 -params.o2Excess*1e7);
   }
   const airExcess = newtonRaphson(comb_o2,.5,
-    params.NROptions, "o2_excess_to_air");
+    params.NROptions, 'o2_excess_to_air');
 
   if (airExcess) params.airExcess = airExcess;
   logger.info(`'air_excess': ${round(100*airExcess,2)}, `+
@@ -204,5 +213,5 @@ let fuelsObject = {
 if (typeof window !== 'undefined') {
   browserProcess(fuelsObject, data, options, heaterFunc)
 } else {
-  heaterFunc(fuelsObject, options)
+  logger.info(JSON.stringify(heaterFunc(fuelsObject, options), null, 2))
 }

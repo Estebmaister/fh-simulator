@@ -1,4 +1,4 @@
-const {newtonRaphson, logger, LMTD, round, unitConv} = require('./utils');
+const {newtonRaphson, logger, LMTD, round, unitConv} = require('../utils');
 
 const convSection = (params, noLog) => {
   let
@@ -121,11 +121,12 @@ const convSection = (params, noLog) => {
 
   let iter = noLog ? 21 : 1; // Due to divergence in this cycle, avoid it during external cycle run
   const
-    normalized_error = 1e-3, // .1%
+    normalized_error = 1e-2, // 1%
     // normalized_diff = (tIn_calc =t_in_calc, tIn = t_in) => Math.abs((tIn_calc - tIn) /tIn); // temp diff
     normalized_diff = (tIn=t_in,tG_out=tg_out) => Math.abs((Q_flue(tg_in, tG_out) -Q_fluid(tIn))/Q_fluid(tIn));
   // Internal cycle to improve result
   while (normalized_diff(t_in_calc) > normalized_error) { 
+    if (true) break;
     // Forced break of loop
     if (iter > 20) {
       if (!noLog) logger.info(`error vs diff: ${normalized_error}-${round(normalized_diff(t_in_calc),5)}`)
@@ -170,7 +171,7 @@ const convSection = (params, noLog) => {
     Q_stack:      Q_flue( tg_out, params.t_air),
 
     duty:         Q_fluid(t_in),
-    "%":          round(100*Q_fluid(t_in)/params.duty,2),
+    "%":          Q_fluid(t_in)/params.duty,
     duty_flux:    Q_fluid(t_in)/At,
 
     Cp_fluid:     Cp_fluid( t_in, t_out   ),

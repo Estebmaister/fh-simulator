@@ -185,6 +185,7 @@ const unitConv = {
   kgtolb: (n) => n*2.20462,
   lbtokg: (n) => n/2.20462,
   BPDtolb_h:(n) => n*barrelsToft3*ft3Tolb/24*0.84,
+  lb_htoBPD:(n) => n/barrelsToft3/ft3Tolb*24/0.84,
 
   kJtoBTU: (n) => n/1.05506,
   BTUtokJ: (n) => n*1.05506,
@@ -196,9 +197,10 @@ const unitConv = {
   intom:  (n) => n/39.3701,
   mtoin:  (n) => n*39.3701,
 
-  CpENtoCpSI: (n) => n*1.05506/(5/9)*2.20462,    // (kJ/kg-C)
-  kwENtokwSI: (n) => n*1.05506/(5/9)*3.28084,    // (kJ/h-m-C)
-  hcENtohcSI: (n) => n*1.05506/(5/9)*3.28084**2, // (kJ/h-m2-C)
+  CpENtoCpSI: (n) => n*1.05506/(5/9)*2.20462,     // (kJ/kg-C)
+  kwENtokwSI: (n) => n*1.05506/(5/9)*3.28084,     // (kJ/h-m-C)
+  RfENtoRfSI: (n) => n/(1.05506/(5/9)*3.28084**2),// (h-m2-C/kJ)
+  hcENtohcSI: (n) => n*1.05506/(5/9)*3.28084**2,  // (kJ/h-m2-C)
   BtuHtoW: (n) => n/3.4121416331,
 };
 
@@ -222,12 +224,18 @@ const getOptions = () => {
     radDist:    .01 * 70,   // % *.01
     hLoss:      .01 * 1.5,  // % *.01
     effcy:      .01 * 80,   // % *.01
+    rfi:        0,          // hr.ft².°F/Btu
+    rfo:        0,          // hr.ft².°F/Btu
     tIn:        678,        // F
     tOut:       772,        // F
     mFluid:     unitConv.BPDtolb_h(90e3),  // lb/h
     pAtm:       pAtmRef,    // Pa
     unitSystem: "SI",       // string
     lang:       "en",       // string
+    title:      "heater_sim",
+    graphVar:   "t_out",    // string
+    graphRange: 50,         // number > 0
+    graphPoints:100,         // number > 0
   
     // Newton Raphson arguments
     NROptions: {

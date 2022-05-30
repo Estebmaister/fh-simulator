@@ -1,6 +1,12 @@
-
-const {logger, unitConv, initSystem} = require('./utils');
-const {stringRadResult, stringShldResult, stringConvResult} = require('./resultsToString');
+const {optionsModifier} = require('./optionsModifier');
+const {graphicData} = require('./graphicData');
+const {logger} = require('./utils');
+const {
+  stringRadResult, 
+  stringShldResult, 
+  stringConvResult,
+  stringCombResult
+} = require('./resultsToString');
 
 // Extracts the data from the URL
 const extractURIdata = (argumentsArray) => {
@@ -18,142 +24,6 @@ const extractURIdata = (argumentsArray) => {
 		}
   }
 	return resultObject;
-}
-// Logic to modified default options for process fluid with data from browser
-const optionsModifierFluid = (key, browserData, options) => {
-  let optValue;
-  switch (key) {
-    case 'm_fluid':
-      optValue = parseFloat(browserData[key])
-      if (optValue > 0) 
-        options.mFluid = unitConv.BPDtolb_h(optValue*1e3);
-      break;
-    case 't_in':
-      optValue = parseFloat(browserData[key])
-      if (optValue > 0) 
-        options.tIn = optValue;
-      break;
-    case 't_out':
-      optValue = parseFloat(browserData[key])
-      if (optValue > 0) 
-        options.tOut = optValue;
-      break;
-    case 'sp':
-      
-      break;
-    case 'miu_in':
-      
-      break;
-    case 'miu_out':
-      
-      break;
-    case 'kw_in':
-      
-      break;
-    case 'kw_out':
-    
-      break;
-    case 'cp_in':
-      
-      break;
-    case 'cp_out':
-    
-      break;
-    default:
-      break;
-  }
-}
-
-
-// Logic to modified default options with data from browser
-const optionsModifierAmbient = (key, browserData, options) => {
-  const
-    maxAirExcess = 300,
-    maxHumidity = 100,
-    maxO2Excess = 30,
-    maxTamb = 1e2,
-    maxPatm = 2;
-  let optValue;
-  switch (key) {
-    case 't_amb':
-      optValue = parseFloat(browserData[key])
-      if (optValue < maxTamb) 
-        options.tAir = unitConv.FtoK(optValue);
-      break;
-    case 'humidity':
-      optValue = parseFloat(browserData[key])
-      if (optValue >= 0 && optValue <= maxHumidity) 
-        options.humidity = optValue;
-      break;
-    case 'p_atm':
-      optValue = parseFloat(browserData[key])
-      if (optValue > 1e-3 && optValue < maxPatm) 
-        options.pAtm = optValue *options.pAtmRef;
-      break;
-    case 'air_excess':
-      optValue = parseFloat(browserData[key])
-      if (optValue >= 0 && optValue <= maxAirExcess) 
-        options.airExcess = optValue * .01;
-      break;
-    case 'o2_excess':
-      optValue = parseFloat(browserData[key])
-      if (optValue >= 0 && optValue <= maxO2Excess) 
-        options.o2Excess = optValue * .01;
-      break;
-    case 'o2_basis':
-      
-      break;
-    default:
-      break;
-  }
-}
-
-// Logic to modified default options with data from browser
-const optionsModifier = (key, browserData, options) => {
-  let optValue;
-  switch (key) {
-    case 'project_title':
-      // TODO: not set yet
-      break;
-    case 'project_n':
-      break;
-    case 'revision_n':
-      break;
-    case 'date':
-      break;
-    case 'fuel_percent':
-      break;
-    case 'heat_loss':
-      optValue = parseFloat(browserData[key])
-      if (optValue <= 15) 
-        options.hLoss = optValue*1e-2;
-      break;
-    case 'efficiency':
-      optValue = parseFloat(browserData[key])
-      if (optValue >= 50) 
-        options.effcy = optValue*1e-2;
-      break;
-    case 'rad_dist':
-      optValue = parseFloat(browserData[key])
-      if (optValue >= 50) {
-        options.radDist = optValue*1e-2;
-        options.runDistCycle = false;
-      }
-      break;
-    case 't_fuel':
-      optValue = parseFloat(browserData[key])
-      if (optValue >= 0 && optValue) 
-        options.tFuel = unitConv.FtoK(optValue);
-      break;
-    case 'unit_system':
-      logger.debug(`"${key}", "value":"${browserData[key]}"`)
-      options.unitSystem = browserData[key];
-      break;
-    default:
-      optionsModifierFluid(key, browserData, options);
-      optionsModifierAmbient(key, browserData, options);
-      break;
-  }
 }
 
 // Modify the fuels and options object with the Browser Data
@@ -180,135 +50,15 @@ const insertBrowserData = (browserData, fuels, data, options) => {
 }
 
 const outputData = (result, browserData, lang, unitSystem) => {
-	// log logger.info(JSON.stringify(result, null, 2))
   logger.debug(JSON.stringify(browserData, null, 2))
-  const unit = initSystem(unitSystem);
 
-  let outputString = ''
-  if (lang == 'es') {
-    outputString += `
-Datos de entrada
-  (en caso de no haber sido introducidos, el 
-    simulador tomará los valores predeterminado)
+  let outputString = stringCombResult(lang, result, unitSystem)
 
-  Sistema de unidades:      ${result.debug_data['unitSystem']}
-  Presión atmosférica:      ${result.debug_data['atmPressure']}
-  Temperatura ref:          ${result.debug_data['ambTemperature']}
-  Temperatura aire:         ${result.debug_data['airTemperature']}
-  Temperatura comb:         ${result.debug_data['fuelTemperature']}
-
-  Humedad:                  ${result.debug_data['humidity_%']} %
-  N2 en aire seco:          ${result.debug_data['dryAirN2_%']} %
-  O2 en aire seco:          ${result.debug_data['dryAirO2_%']} %
-
-  Presión de aire seco:     ${result.debug_data['dryAirPressure']}
-  Presión de vapor de agua:  ${result.debug_data['waterPressure']}
-
-  Presión parcial de H2O: ${result.debug_data['H2OPressure_%']} ÷10²
-  Presión parcial de N2: ${result.debug_data['N2Pressure_%']} ÷10²
-  Presión parcial de O2: ${result.debug_data['O2Pressure_%']} ÷10²
-  Contenido húmedo (w):   ${result.debug_data['moisture']}-AireSeco
-
-  Capacidad de horno requerida: ${unit.heat_flow(result.rad_result.duty_total)}
-
-Moles de gases de combustión total y porcentajes por 
-cada mol de combustible
-
-  Flujo total: ${result.flows['total_flow']}
-  Flujo seco:  ${result.flows['dry_total_flow']}
-      ${''               }                  Porcentajes en base húmeda
-  N2:  ${result.products['N2']  }             N2:  ${result.flows['N2_%'] } %
-  O2:   ${result.products['O2'] }             O2:  ${result.flows['O2_%'] } %
-  H2O:  ${result.products['H2O']}             H2O: ${result.flows['H2O_%']} %
-  CO2:  ${result.products['CO2']}             CO2: ${result.flows['CO2_%']} %
-  SO2:  ${result.products['SO2']}             SO2: ${result.flows['SO2'] || '0.000'} %
-
-  Exceso de aire usado: ${result.flows['air_excess_%']} %
-  Moles O2 requeridos/mol de comb. (teórico): ${result.flows['O2_mol_req_theor']}
-
-  Relación A/C molar húmeda:  ${result.flows['AC']}
-  Relación A/C másica húmeda: ${result.flows['AC_mass']}
-  Relación A/C molar (aire seco, teórica):    ${result.flows['AC_theor_dryAir']}
-  Relación A/C másica (aire húmedo, teórica): ${result.flows['AC_mass_theor_moistAir']}
-
-  Peso molecular del comb. ${result.flows['fuel_MW']}
-  Cp(t_comb) del comb.  ${result.flows['Cp_fuel']}
-  NCV: ${result.flows['NCV']}
-
-  Peso molecular de los gases de comb. ${result.flows['flue_MW']}
-  Cp(t_amb) de los gases de comb. ${result.flows['Cp_flue']}
-
-
-Eficiencia del horno: ${result.rad_result.eff_total}% [Q_rls/Q_fluid]
-
-Calor req fluido: ${unit.heat_flow(result.rad_result.duty_total)}
-Calor calc horno: ${unit.heat_flow(result.rad_result.duty + result.shld_result.duty + result.conv_result.duty)}
-`;
-  } else {
-    outputString += `
-Input Data 
-  (in case of no input, 
-  default values will be taken)
-
-  Unit System:          ${result.debug_data['unitSystem']}
-  Atmospheric Pressure: ${result.debug_data['atmPressure']}
-  Ref Temperature:      ${result.debug_data['ambTemperature']}
-  Air Temperature:      ${result.debug_data['airTemperature']}
-  Fuel Temperature:     ${result.debug_data['fuelTemperature']}
-
-  Humidity:             ${result.debug_data['humidity_%']} %
-  N2 en aire seco:      ${result.debug_data['dryAirN2_%']} %
-  O2 en aire seco:      ${result.debug_data['dryAirO2_%']} %
-
-  Dry Air Pressure:     ${result.debug_data['dryAirPressure']}
-  Water Vapor Pressure:  ${result.debug_data['waterPressure']}
-
-  Partial Pressure H2O: ${result.debug_data['H2OPressure_%']} ÷10²
-  Partial Pressure N2: ${result.debug_data['N2Pressure_%']} ÷10²
-  Partial Pressure O2: ${result.debug_data['O2Pressure_%']} ÷10²
-  Moisture content (w): ${result.debug_data['moisture']}-dryAir
-
-  Fluid heat required: ${unit.heat_flow(result.rad_result.duty_total)}
-
-Total flue gas moles and percentage (per fuel mol)
-
-  Flow total: ${result.flows['total_flow']}
-  Dry total:  ${result.flows['dry_total_flow']}
-  ${''               }                      Moist basis percentage
-  N2:  ${result.products['N2']  }             N2:  ${result.flows['N2_%']} %
-  O2:  ${result.products['O2'] }              O2:  ${result.flows['O2_%']} %
-  H2O: ${result.products['H2O']}              H2O: ${result.flows['H2O_%']} %
-  CO2: ${result.products['CO2']}              CO2: ${result.flows['CO2_%']} %
-  SO2: ${result.products['SO2']}              SO2: ${result.flows['SO2_%'] ||'0.000'} %
-
-  Air excess used : ${result.flows['air_excess_%']} %
-  Moles O2 required/fuel-mol (theor): ${result.flows['O2_mol_req_theor']}
-
-  A/C molar moist relation:   ${result.flows['AC']}
-  A/C mass moist relation:    ${result.flows['AC_mass']}
-  A/C molar relation (dry air, theor):   ${result.flows['AC_theor_dryAir']}
-  A/C mass relation (moist air, theor):  ${result.flows['AC_mass_theor_moistAir']}
-
-  Fuel mol weight: ${result.flows['fuel_MW']}
-  Fuel Cp(t_fuel): ${result.flows['Cp_fuel']}
-  NCV:             ${result.flows['NCV']} vs ${Math.round(87_998_730/4_477)}
-
-  Flue gas mol weight: ${result.flows['flue_MW']}
-  Flue gas Cp(t_amb):  ${result.flows['Cp_flue']}
-
-
-Heater Efficiency: ${result.rad_result.eff_total}% [Q_rls/Q_fluid]
-
-Heat required:   ${unit.heat_flow(result.rad_result.duty_total)}
-Heat calculated: ${unit.heat_flow(result.rad_result.duty + result.shld_result.duty + result.conv_result.duty)}
-`;
-  }
-  
   document.getElementById('loader-wrapper').remove();
   // document.getElementById('output-combustion').remove();
   document.getElementById('output-combustion').textContent = outputString;
-  document.getElementById( 'output-radiant' ).textContent = stringRadResult(lang, result.rad_result, unitSystem);
-  document.getElementById( 'output-shield' ).textContent = stringShldResult(lang, result.shld_result, unitSystem);
+  document.getElementById('output-radiant'   ).textContent = stringRadResult(lang, result.rad_result, unitSystem);
+  document.getElementById('output-shield'    ).textContent = stringShldResult(lang, result.shld_result, unitSystem);
   document.getElementById('output-convective').textContent = stringConvResult(lang, result.conv_result, unitSystem);
 };
 
@@ -316,16 +66,21 @@ Heat calculated: ${unit.heat_flow(result.rad_result.duty + result.shld_result.du
 const browserProcess = (fuels, data, options, combustion) => {
 
   let lang = 'en';  
-  const browserLang = window.location.pathname.split('/'); // ex ',en,result.html'}
-  if (browserLang.length > 0) browserLang.forEach(element => {if (element == 'es') lang = 'es'});
+  const browserPath = window.location.pathname.split('/'); // ex ',en,result.html'}
+  if (browserPath.length > 0) browserPath.forEach(item => {
+    if (item == 'es' || item == 'es_graph') lang = 'es'
+  });
   options.lang = lang;
 
-  const browserData = extractURIdata(window.location.search.substr(1).split('&'));
+  const browserData = extractURIdata(window.location.search.substring(1).split('&'));
   if (browserData !== {}) insertBrowserData(browserData, fuels, data, options);
   
-  const result = combustion(fuels, options);
-  localStorage.setItem('result', JSON.stringify(result))
-	outputData(result, browserData, lang, options.unitSystem);
+  if (browserPath[1].includes('_graph')) {
+    graphicData(combustion, fuels, options);
+  } else {
+    const result = combustion(fuels, options);
+    outputData(result, browserData, lang, options.unitSystem);
+  }
 };
 
 module.exports = {

@@ -15,7 +15,7 @@
  * Q_out = Q_R + Q_shield + Q_losses + Q_flue_gases
  * Q_R = Q_rad + Q_conv = Q_fluid(out-in) = m_fluid*Cp_fluid(t_out - t_in)
  *****************************************************************/
-const {newtonRaphson, logger, round, unitConv} = require('./utils');
+const {newtonRaphson, logger, round, unitConv} = require('../utils');
 
 /** radSection receives the parameters dictionary and
  * calculates the required mass fluid or the necessary
@@ -183,7 +183,7 @@ const radSection = (params, noLog) => {
 
   // **************************************************
   if (!noLog) logger.default(`RADI, T_in_calc: ${params.units.tempC(t_in)},`+
-    ` M_fuel: ${params.units.mass(m_fuel)}, Tg_out: ${params.units.tempC(tg_out)}`);
+    ` M_fuel: ${params.units.mass_flow(m_fuel)}, Tg_out: ${params.units.tempC(tg_out)}`);
 
   params.t_in_rad = t_in;
   params.t_out    = t_out;
@@ -230,11 +230,11 @@ const radSection = (params, noLog) => {
 
     duty_total:duty_total,
     duty:      duty_rad,
-    "%":       round(100*duty_rad/duty_total,2),
-    eff_total:round(100*duty_total/Q_rls(m_fuel),2),
-    duty_flux:duty_rad/At,
+    "%":       duty_rad/duty_total,
+    eff_total: duty_total/Q_rls(m_fuel) > 1 ? 100 : 100*duty_total/Q_rls(m_fuel),
+    duty_flux: duty_rad/At,
 
-    Alpha:    round(alpha),
+    Alpha:    alpha,
     MBL:      round(MBL),
     Pco2:     round(params.Pco2),
     Ph2o:     round(params.Ph2o),
