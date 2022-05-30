@@ -14,46 +14,54 @@ function draw(data = [], opts = {}) {
   const innerHeight = svgHeight -margin.top  -margin.bottom;
   const innerWidth  = svgWidth  -margin.left -margin.right;
 
-  innerDraw(opts.graphVar, 'm_fuel',0,0,
+  innerDraw(opts, 'm_fuel',0,0,
     {svg,data,margin,innerHeight,innerWidth}
   );
-  innerDraw(opts.graphVar, 'efficiency',0,svgHeight/2,
+  innerDraw(opts, 'efficiency',0,svgHeight/2,
     {svg,data,margin,innerHeight,innerWidth}
   );
-  innerDraw(opts.graphVar, 'cnv_tg_out',svgWidth/2,0,
+  innerDraw(opts, 'cnv_tg_out',svgWidth/2,0,
     {svg,data,margin,innerHeight,innerWidth}
   );
-  innerDraw(opts.graphVar, 'rad_dist',svgWidth/2,svgHeight/2,
+  innerDraw(opts, 'rad_dist',svgWidth/2,svgHeight/2,
     {svg,data,margin,innerHeight,innerWidth}
   );
 }
 
 function innerDraw(
-  xVar, yVar, xDisplace, yDisplace,
+  opts, yVar, xDisplace, yDisplace,
   {svg, data, margin, innerHeight, innerWidth}
   ) {
 
   innerHeight = innerHeight -margin.top  -margin.bottom;
   innerWidth = innerWidth -margin.left -margin.right;
 
-  const xValue = d => d[xVar];
+  const xValue = d => d[opts.graphVar];
   let xAxisLabel = '', xTitle;
-  switch (xVar) {
+  switch (opts.graphVar) {
     case 'humidity':
-      xTitle = 'Humidity';
+      xTitle = opts.lang == "es" ? 
+        'Humedad' :
+        'Humidity';
       xAxisLabel = `${xTitle} [%]`;
       break;
     case 'air_excess':
-      xTitle = 'Air Excess';
+      xTitle = opts.lang == "es" ? 
+        'Exceso de aire' :
+        'Air Excess';
       xAxisLabel = `${xTitle} [%]`;
       break;
     case 'm_fluid':
-      xTitle = 'Fluid mass flow';
+      xTitle = opts.lang == "es" ? 
+        'Flujo del fluido' : 
+        'Fluid flow';
       xAxisLabel = `${xTitle} [10³-BPD]`;
       break;
   
     default:
-      xTitle = 'Fluid Outlet Temp';
+      xTitle = opts.lang == "es" ? 
+        'Temp. Salida del fluido' :
+        'Fluid Outlet Temp';
       xAxisLabel = 'Temp [F]';
       break;
   }
@@ -62,26 +70,34 @@ function innerDraw(
   let yAxisLabel = '', yTitle;
   switch (yVar) {
     case 'm_fuel':
-      yTitle = 'Fuel mass flow';
+      yTitle = opts.lang == "es" ? 
+        'Flujo de comb.' :
+        'Fuel mass flow';
       yAxisLabel = `${yTitle} [lb/h]`;
       break;
     case 'efficiency':
-      yTitle = 'Efficiency';
+      yTitle = opts.lang == "es" ? 
+      'Eficiencia' :
+      'Efficiency';
       yAxisLabel = `${yTitle} [%]`;
       break;
     case 'cnv_tg_out':
-      yTitle = 'Temp stack';
+      yTitle = opts.lang == "es" ? 
+      'Temp. Chimenea' :
+      'Temp stack';
       yAxisLabel = `${yTitle} [F]`;
       break;
     case 'rad_dist':
-      yTitle = 'Radiant dist.';
+      yTitle = opts.lang == "es" ? 
+      'Dist. Radiante' :
+      'Radiant dist.';
       yAxisLabel = `${yTitle} [%]`;
       break;
     default:
       break;
   }
 
-  const title = `Heater: ${yTitle} vs. ${xTitle}`;
+  const title = `${yTitle} vs. ${xTitle}`;
   const circleRadius = 3;
 
   const xExtent  = d3.extent(data, xValue)

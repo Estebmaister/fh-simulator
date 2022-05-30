@@ -231,7 +231,7 @@ const radSection = (params, noLog) => {
     duty_total:duty_total,
     duty:      duty_rad,
     "%":       duty_rad/duty_total,
-    eff_total: 100*duty_total/Q_rls(m_fuel),
+    eff_total: duty_total/Q_rls(m_fuel) > 1 ? 100 : 100*duty_total/Q_rls(m_fuel),
     duty_flux: duty_rad/At,
 
     Alpha:    alpha,

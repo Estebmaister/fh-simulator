@@ -14,7 +14,7 @@ const graphicData = ( comb, fuel, opt ) => {
 
   // Checking local storage to avoid repeating calculations
   let prevResult;
-  const localResult = JSON.parse(localStorage.getItem(`${opt.title}`));
+  let localResult = JSON.parse(localStorage.getItem(`${opt.title}`));
   if (localResult) {
     prevResult = localResult[`${window.location.search}`];
     if (Object.keys(localResult).length > 5)
@@ -41,10 +41,11 @@ const graphicData = ( comb, fuel, opt ) => {
   }
 
   const points = opt.graphPoints, range = opt.graphRange;
-  const initVar = opt[graphVar] - range/2
-  savedLogger.info(`Var: ${graphVar}, centerValue: ${opt[graphVar]}, range: ${range}, points: ${points}`)
+  let initVar = opt[graphVar] - range/2;
+  if (initVar < 0) initVar = 0;
+  savedLogger.info(`Var: ${graphVar}, centerValue: ${opt[graphVar]}, range: ${range}, points: ${points}`);
   for (let index = 0; index < points; index++) {
-    opt[graphVar] = initVar + index*range/points
+    opt[graphVar] = initVar + index*range/points;
     const runResult = comb(fuel, opt);
     browserResult[index] = {
 
@@ -81,11 +82,11 @@ const graphicData = ( comb, fuel, opt ) => {
     }
   }
   
-  const storageObject = {}
-  storageObject[`${window.location.search}`] = browserResult
-  localStorage.setItem(`${opt.title}`, JSON.stringify(storageObject))
-  console.log(browserResult)
-  draw(browserResult, opt)
+  if (!localResult) localResult = {};
+  localResult[`${window.location.search}`] = browserResult;
+  localStorage.setItem(`${opt.title}`, JSON.stringify(localResult));
+  console.log(browserResult);
+  draw(browserResult, opt);
 }
 
 module.exports = {
