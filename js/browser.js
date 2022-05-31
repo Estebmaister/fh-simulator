@@ -54,19 +54,25 @@ const outputData = (result, browserData, lang, unitSystem) => {
 
   let outputString = stringCombResult(lang, result, unitSystem)
 
-  document.getElementById('loader-wrapper').remove();
-  // document.getElementById('output-combustion').remove();
-  document.getElementById('output-combustion').textContent = outputString;
-  document.getElementById('output-radiant'   ).textContent = stringRadResult(lang, result.rad_result, unitSystem);
-  document.getElementById('output-shield'    ).textContent = stringShldResult(lang, result.shld_result, unitSystem);
-  document.getElementById('output-convective').textContent = stringConvResult(lang, result.conv_result, unitSystem);
+  const loader = document.getElementById('loader-wrapper');
+  if (loader) loader.remove();
+  
+  const outComb = document.getElementById('output-combustion');
+  if (outComb) outComb.textContent = outputString;
+  
+  const outRad = document.getElementById('output-radiant'   );
+  if (outRad) outComb.textContent = stringRadResult(lang, result.rad_result, unitSystem);
+  const outShl = document.getElementById('output-shield'    );
+  if (outShl) outComb.textContent = stringShldResult(lang, result.shld_result, unitSystem);
+  const outCnv = document.getElementById('output-convective');
+  if (outCnv) outComb.textContent = stringConvResult(lang, result.conv_result, unitSystem);
 };
 
 // Process the data and start the combustion algorithm
 const browserProcess = (fuels, data, options, combustion) => {
 
   let lang = 'en';  
-  const browserPath = window.location.pathname.split('/'); // ex ',en,result.html'}
+  const browserPath = window.location.pathname.split('/'); // ex ',fh-simulator,en,result.html'}
   if (browserPath.length > 0) browserPath.forEach(item => {
     if (item == 'es' || item == 'es_graph') lang = 'es'
   });
@@ -75,7 +81,7 @@ const browserProcess = (fuels, data, options, combustion) => {
   const browserData = extractURIdata(window.location.search.substring(1).split('&'));
   if (browserData !== {}) insertBrowserData(browserData, fuels, data, options);
   
-  if (browserPath[1].includes('_graph')) {
+  if (browserPath[1].includes('_graph') || browserPath[2].includes('_graph')) {
     graphicData(combustion, fuels, options);
   } else {
     const result = combustion(fuels, options);
