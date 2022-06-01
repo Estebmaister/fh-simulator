@@ -284,7 +284,10 @@ Datos de entrada
   Presión parcial de O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
   Cont. húmedo (w):   ${result_obj.debug_data['moisture']}-AireSeco
 
-  Capacidad de horno requerida: ${unit.heat_flow(result_obj.rad_result.duty_total)}
+  Calor requerido: ${unit.heat_flow(result_obj.rad_result.duty_total)}
+  Calor calculado: ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
+
+  Eficiencia del horno: ${round(result_obj.rad_result.eff_total,2)}% [Q_rls/Q_fluid]
 
 Moles de gases de combustión total y porcentajes
 por cada mol de combustible
@@ -312,12 +315,6 @@ por cada mol de combustible
 
   Peso mol. de los gases de comb. ${result_obj.flows['flue_MW']}
   Cp(t_amb) de los gases de comb. ${result_obj.flows['Cp_flue']}
-
-
-Eficiencia del horno: ${round(result_obj.rad_result.eff_total,2)}% [Q_rls/Q_fluid]
-
-Calor req fluido: ${unit.heat_flow(result_obj.rad_result.duty_total)}
-Calor calc horno: ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
 `;
   } else {
     outputString = `
@@ -344,6 +341,9 @@ Input Data
   Moisture content (w): ${result_obj.debug_data['moisture']}-dryAir
 
   Fluid heat required: ${unit.heat_flow(result_obj.rad_result.duty_total)}
+  Heat calculated: ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
+  
+  Heater Efficiency: ${round(result_obj.rad_result.eff_total,2)}% [Q_rls/Q_fluid]
 
 Total flue gas moles and percentage (per fuel mol)
 
@@ -370,12 +370,6 @@ Total flue gas moles and percentage (per fuel mol)
 
   Flue gas mol weight: ${result_obj.flows['flue_MW']}
   Flue gas Cp(t_amb):  ${result_obj.flows['Cp_flue']}
-
-
-Heater Efficiency: ${round(result_obj.rad_result.eff_total,2)}% [Q_rls/Q_fluid]
-
-Heat required:   ${unit.heat_flow(result_obj.rad_result.duty_total)}
-Heat calculated: ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
 `;
   }
   return outputString;
