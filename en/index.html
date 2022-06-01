@@ -351,7 +351,7 @@
             <option value="air_excess">Air Excess</option>
             <option value="humidity">Humidity</option>
           </select></p> 
-          <p class="project-info sub-temp">Variation range <input type="range" min="1" max="99" list="tickmarks">
+          <p class="project-info sub-temp">Variation range <input type="range" name="graph_range" min="1" max="99" list="tickmarks">
             <datalist id="tickmarks">
               <option value="1" label="01%"></option>
               <option value="10"></option>
@@ -367,7 +367,7 @@
             </datalist>
             ±<span>~</span>%
           </p>
-          <p class="project-info sub-temp">Number of runs <input type="range" max="99" list="tickmarks">
+          <p class="project-info sub-temp">Number of runs <input type="range" name="graph_points" max="99" list="tickmarks">
             <datalist id="tickmarks">
               <option value="001"></option>
               <option value="010"></option>
