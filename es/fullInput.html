@@ -59,7 +59,7 @@
       <div class="form-div">
         <p class="project-info">
           Nombre para la simulación: 
-          <input name="project_title" value="fh_simulation" required> 
+          <input name="project_title" type="text" value="fh_simulation" required> 
           <span class="validity"></span>
         </p>
       </div>
@@ -354,46 +354,10 @@
             <option value="air_excess">Exceso de aire</option>
             <option value="humidity">Humedad</option>
           </select></p> 
-          <p class="project-info sub-temp">Rango de variación <input type="range" name="graph_range" min="1" max="99" list="tickmarks">
-            <datalist id="tickmarks">
-              <option value="1" label="01%"></option>
-              <option value="10"></option>
-              <option value="20"></option>
-              <option value="30"></option>
-              <option value="40"></option>
-              <option value="50" label="50%"></option>
-              <option value="60"></option>
-              <option value="70"></option>
-              <option value="80"></option>
-              <option value="90"></option>
-              <option value="99" label="99%"></option>
-            </datalist>
+          <p class="project-info sub-temp">Rango de variación <input type="range" name="graph_range" step="1" min="1" max="99">
             ±<span>~</span>%
           </p>
-          <p class="project-info sub-temp">N° de puntos<input type="range" name="graph_points" max="99" list="tickmarks">
-            <datalist id="tickmarks">
-              <option value="001"></option>
-              <option value="010"></option>
-              <option value="020"></option>
-              <option value="030"></option>
-              <option value="040"></option>
-              <option value="050"></option>
-              <option value="060"></option>
-              <option value="070"></option>
-              <option value="080"></option>
-              <option value="090"></option>
-              <option value="100"></option>
-              <option value="110"></option>
-              <option value="120"></option>
-              <option value="130"></option>
-              <option value="140"></option>
-              <option value="150"></option>
-              <option value="160"></option>
-              <option value="170"></option>
-              <option value="180"></option>
-              <option value="190"></option>
-              <option value="200"></option>
-            </datalist>
+          <p class="project-info sub-temp">N° de puntos<input type="range" name="graph_points" step="2" min="2" max="200">
             <span>~</span>
           </p>
         </div> 
