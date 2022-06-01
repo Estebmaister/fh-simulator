@@ -361,12 +361,12 @@ input[type="number"]:hover {
   width: 5rem;
 }
 
-input:invalid+span:after {
+input[type="text"]:invalid+span:after {
   content: '✖';
   padding-left: 0.3rem;
 }
 
-input:valid+span:after {
+input[type="text"]:valid+span:after {
   content: '✓';
   padding-left: 0.3rem;
 }
