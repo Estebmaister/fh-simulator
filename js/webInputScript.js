@@ -150,7 +150,8 @@ if (subDuty) {
 
 // -- Updating temp input values to show, from fahrenheit to celsius.
 function updateTemp(_ev) {
-  if (subDuty) updateDuty(), updateFlow();
+  if (subDuty && spanDutyField) updateDuty();
+  if (spanDutyField) updateFlow();
   const inputField = this.getElementsByTagName('input')[0];
   const spanField = this.getElementsByTagName('span')[0];
   if (inputField == undefined || spanField == undefined) return;
