@@ -53,8 +53,8 @@ const firstFuelEditionCall = () => {
   // calls at the first load for default fuels
   totalRecalculate();
 }
-let fuelEditionCalled = false;
 
+// Change the content of the span element when clicked
 const showHideDiv = (div, span) => {
   if (div.style.height === "auto") {
     span.textContent = "[➡]";
@@ -67,9 +67,11 @@ const showHideDiv = (div, span) => {
   }
 }
 
+let fuelEditionCalled = false;
 const spanShowFuelID = "show-hide-fuel";
-const spanShowFuel = document.getElementById(spanShowFuelID);
 const fuelDivID = "fuel-div";
+// Show or hide the fuel section, for the first call it populates the default fuels
+const spanShowFuel = document.getElementById(spanShowFuelID);
 const fuelDiv = document.getElementById(fuelDivID);
 const showHideFuelDiv = () => {
   if (!fuelEditionCalled) {
@@ -84,8 +86,9 @@ if (fuelDiv && spanShowFuel) {
 }
 
 const spanShowGraphID = "show-hide-graph";
-const spanShowGraph = document.getElementById(spanShowGraphID);
 const graphDivID = "graph-div";
+// Show or hide the graph section
+const spanShowGraph = document.getElementById(spanShowGraphID);
 const graphDiv = document.getElementById(graphDivID);
 const showHideGraphDiv = () => {
   showHideDiv(graphDiv,spanShowGraph);
@@ -95,12 +98,21 @@ if (graphDiv && spanShowGraph) {
   spanShowGraph.onclick = showHideGraphDiv;
 }
 const graphButtonID = "graph-action";
+const formElementID = "data-form";
 const graphButton = document.getElementById(graphButtonID);
+const formElement = document.getElementById(formElementID);
 if (graphButton) graphButton.onmousedown = () => {
-
-  const formElement = document.getElementById("data-form");
   formElement.action = `../${formElement.lang || "en"}_graph/`;
 }
+
+formElement.addEventListener('submit', function () {
+  const allInputs = formElement.getElementsByTagName('input');
+
+  for (let i = 0; i < allInputs.length; i++) {
+    let input = allInputs[i];
+    if (input.name && !input.value) input.name = '';
+  }
+});
 
 // -- Updating duty value to show in MBtu/h.
 const 
@@ -111,8 +123,10 @@ const
 const updateDuty = () => spanDutyField.innerHTML = Math.round(
     +inputFlow.value*BPDtolb_h *
     (+tOut.value-tIn.value) *(+cpOut.value+ +cpIn.value)/2
-    /100
-  ) /10;
+    /10
+  ) /100;
+const updateFlow = () => spanFlowField.innerHTML = Math.round(
+  +inputFlow.value*BPDtolb_h*1e3 ).toLocaleString();
 
 const tIn = document.getElementById(tInElementID);
 const tOut = document.getElementById(tOutElementID);
@@ -120,12 +134,14 @@ const cpIn = document.getElementById(cpInElementID);
 const cpOut = document.getElementById(cpOutElementID);
 
 const subDuty = document.getElementById(subDutyElementID);
-let inputFlow, spanDutyField;
+let inputFlow, spanFlowField;
+const spanDutyField = document.getElementById('span-duty');
 if (subDuty) {
   inputFlow = subDuty.getElementsByTagName('input')[0];
-  spanDutyField = subDuty.getElementsByTagName('span')[0];
+  spanFlowField = subDuty.getElementsByTagName('span')[0];
   if (inputFlow && spanDutyField) {
     inputFlow.addEventListener('input', updateDuty)
+    inputFlow.addEventListener('input', updateFlow)
     cpOut.addEventListener('input', updateDuty)
     cpIn.addEventListener('input', updateDuty)
     // Functions for temps are already added at updateTemp()
@@ -134,7 +150,7 @@ if (subDuty) {
 
 // -- Updating temp input values to show, from fahrenheit to celsius.
 function updateTemp(_ev) {
-  if (subDuty) updateDuty();
+  if (subDuty) updateDuty(), updateFlow();
   const inputField = this.getElementsByTagName('input')[0];
   const spanField = this.getElementsByTagName('span')[0];
   if (inputField == undefined || spanField == undefined) return;

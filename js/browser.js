@@ -47,6 +47,7 @@ const insertBrowserData = (browserData, fuels, data, options) => {
 	}
 
 	if (Object.keys(browserFuels).length !== 0) fuels = browserFuels;
+  return fuels
 }
 
 const outputData = (result, browserData, lang, unitSystem) => {
@@ -76,7 +77,7 @@ const browserProcess = (fuels, data, options, combustion) => {
   options.lang = lang;
 
   const browserData = extractURIdata(window.location.search.substring(1).split('&'));
-  if (browserData !== {}) insertBrowserData(browserData, fuels, data, options);
+  if (browserData !== {}) fuels = insertBrowserData(browserData, fuels, data, options);
   
   if (browserPath[1].includes('_graph') || browserPath[2].includes('_graph')) {
     graphicData(combustion, fuels, options);
