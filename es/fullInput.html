@@ -71,10 +71,14 @@
           <div class="form-div">
             <p id="sub-duty" class="project-info">
               Flujo <input step="1" min="0" name="m_fluid" type="number" value="90"> x10<sup>3</sup> BPD
-              <sub><span>~</span> MBtu/hr</sub>
+              <sub><span>~</span> lb/hr</sub>
             </p>
             <p class="project-info">
               Grav. esp. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled><sub><em>@ 60°F</em></sub>
+            </p>
+            <p class="project-info">
+              Absorción de calor ("duty"): 
+              <span id="span-duty">71.53</span> MBtu/hr
             </p>
           </div>
           
@@ -137,7 +141,7 @@
             <div class="form-block flex-evenly">
 
               <p class="project-info sub-temp">
-                Temp. aire T<sub>a</sub> <input step="1" min="0" name="t_amb" type="number" value="80"> °F
+                Temp. Ambiente T<sub>a</sub> <input step="1" min="0" name="t_amb" type="number" value="80"> °F
                 <sub><span>~</span> °C</sub>
               </p> 
               <p class="project-info">
