@@ -72,7 +72,7 @@ const graphicData = ( comb, fuel, opt ) => {
       // m_flue:     runResult.shld_result.m_flue ? runResult.shld_result.m_flue : 0,
       m_fuel:     runResult.rad_result.m_fuel ? unitConv.kgtolb(runResult.rad_result.m_fuel) : 0,
       efficiency: runResult.rad_result.eff_total ? runResult.rad_result.eff_total : 0,
-      rad_dist:   runResult.rad_result['%'] < 1  ? 100*runResult.rad_result['%'] : 0,
+      rad_dist:   runResult.rad_result['%'] < 1  ? Math.round(1e6*runResult.rad_result['%'])/1e4 : 0,
       // shl_dist:  runResult.shld_result['%'] ? 100*runResult.shld_result['%']: 0,
       // cnv_dist:  runResult.conv_result['%'] ? 100*runResult.conv_result['%']: 0,
 

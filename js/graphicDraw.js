@@ -1,29 +1,40 @@
 
 function draw(data = [], opts = {}) {
   const 
-    svgHeight = window.innerHeight/1.5,
-    svgWidth  = window.innerWidth * (1 -.02);
+    svgHeight = window.innerHeight/1.6,
+    svgWidth  = window.innerWidth * (1 -.03);
+
+  let graphPerRow = 1;
+  if (svgWidth > 1300) graphPerRow = 2;
+  
+  const margin = { top: 100, right: 0, bottom: 80, left: 60 };
+  const innerHeight = (svgHeight -margin.top  -margin.bottom)/graphPerRow;
+  const innerWidth  = (svgWidth  -1.5*margin.left -margin.right)/graphPerRow;
 
   const svg = d3.select("svg")
-    .attr("width" , svgWidth)
-    .attr("height", svgHeight)
+    .attr("width" , svgWidth )
+    .attr("height", 4*svgHeight/(graphPerRow**2))
     .attr("class" , "line-chart")
     .style("border", '1px solid lightgray')
+  
+  
 
-  const margin = { top: 60, right: 40, bottom: 60, left: 60 };
-  const innerHeight = svgHeight -margin.top  -margin.bottom;
-  const innerWidth  = svgWidth  -margin.left -margin.right;
-
-  innerDraw(opts, 'm_fuel',0,0,
+  innerDraw(opts, 'm_fuel', 
+    0, svgHeight*0,
     {svg,data,margin,innerHeight,innerWidth}
   );
-  innerDraw(opts, 'efficiency',0,svgHeight/2,
+  innerDraw(opts, 'efficiency', 
+    graphPerRow == 1 ? 0 : svgWidth/2, 
+    graphPerRow == 1 ? svgHeight*1 : 0,
     {svg,data,margin,innerHeight,innerWidth}
   );
-  innerDraw(opts, 'cnv_tg_out',svgWidth/2,0,
+  innerDraw(opts, 'cnv_tg_out', 0, 
+    graphPerRow == 1 ? svgHeight*2 : svgHeight/2,
     {svg,data,margin,innerHeight,innerWidth}
   );
-  innerDraw(opts, 'rad_dist',svgWidth/2,svgHeight/2,
+  innerDraw(opts, 'rad_dist', 
+    graphPerRow == 1 ? 0 : svgWidth/2,
+    graphPerRow == 1 ? svgHeight*3 : svgHeight/2,
     {svg,data,margin,innerHeight,innerWidth}
   );
 }
@@ -33,8 +44,13 @@ function innerDraw(
   {svg, data, margin, innerHeight, innerWidth}
   ) {
 
-  innerHeight = innerHeight -margin.top  -margin.bottom;
-  innerWidth = innerWidth -margin.left -margin.right;
+    innerWidth = innerWidth -margin.left;
+
+  const xAxisFontSize = innerWidth > 1200 ? 
+    "2.5em" : "2em";
+  const yAxisFontSize = innerHeight *.08;
+  const titleFontSize = innerWidth < 900 ?
+    innerWidth*.062 : innerWidth*.032;
 
   const xValue = d => d[opts.graphVar];
   let xAxisLabel = '', xTitle;
@@ -102,27 +118,28 @@ function innerDraw(
 
   const xExtent  = d3.extent(data, xValue)
   const xScale = d3.scaleLinear()
-    .range([0, innerWidth/2])
+    .range([0, innerWidth])
     .domain(xExtent)
     .nice();
   const yExtent = d3.extent(data, yValue)
   const yScale = d3.scaleLinear()
-    .range([innerHeight/2, 0])
+    .range([innerHeight, 0])
     .domain(yExtent)
     .nice();
 
   const xAxis = d3.axisBottom(xScale)
-    .tickSize(-innerHeight/2)
+    .tickSize(-innerHeight)
     .tickPadding(15);
   const yAxis = d3.axisLeft(yScale)
-    .tickSize(-innerWidth/2)
+    .tickSize(-innerWidth)
     .tickPadding(10);
   
   const graphic = svg.append("g")
-    .attr("transform", `translate(${xDisplace+margin.left},${yDisplace+margin.top})`)
+    .attr("transform", `translate(${xDisplace+margin.left*1.25},${yDisplace+margin.top/2})`)
+
 
   const xAxisG = graphic.append('g').call(xAxis)
-    .attr('transform', `translate(0,${innerHeight/2})`);
+    .attr('transform', `translate(0,${innerHeight})`);
   xAxisG.select('.domain').remove();
   xAxisG.selectAll('.tick').selectAll('line')
     .attr("stroke-dasharray", 3)
@@ -133,9 +150,9 @@ function innerDraw(
   xAxisG.append("text")
     .attr("class", "axis-label")
     .attr("y", -10)
-    .attr("x", innerWidth/4)
+    .attr("x", innerWidth*.5)
     .attr("fill", "#8E8883")
-    .attr("font-size", innerWidth>900 ? innerWidth*.016 : innerWidth*.03)
+    .attr("font-size", xAxisFontSize)
     .text(xAxisLabel)
 
   const yAxisG = graphic.append('g').call(yAxis)
@@ -151,9 +168,9 @@ function innerDraw(
     .attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
     .attr("y", 30)
-    .attr("x", -innerHeight/4)
+    .attr("x", -innerHeight*.5)
     .attr("fill", "#8E8883")
-    .attr("font-size", innerHeight *.055)
+    .attr("font-size", yAxisFontSize)
     .attr('text-anchor', 'middle')
     .text(yAxisLabel)
 
@@ -190,8 +207,8 @@ function innerDraw(
   .attr('class', 'title')
   .attr("fill", "#635F5D")
   .attr('y', -10)
-  .attr('x', innerWidth /4)
-  .attr("font-size", innerWidth *.023)
+  .attr('x', innerWidth*.5)
+  .attr("font-size", titleFontSize)
   .attr('text-anchor', 'middle')
   .text(title);
 }
