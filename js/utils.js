@@ -117,55 +117,6 @@ const newtonRaphson = (f, fp, x0, nrOptions, name, noLog) => {
   return false;
 };
 
-/** Returns a linear function f(x)=y to approximate the value,
- * in case that the value is constant or there isn't data
- * about the changes, it can be called with only "y1"
- * to make a function that always return y1.
- */
-const linearApprox = ({x1,x2,y1,y2}) => {
-  if (typeof y1 !== "number") {
-    logger.error(`call for linearApprox with incorrect value type for y1: ${y1}`)
-    return () => 0;
-  }
-  if (x1 == x2 || x2 == undefined || y2 == undefined) 
-    return () => y1;
-  const m = (y2 - y1) / (x2 - x1);
-  return (x) => m * (x - x1) + y1;
-};
-
-const viscosityApprox = ({t1,t2,v1,v2}) => {
-  if (typeof v1 !== "number") {
-    logger.error(`call for viscosityApprox with incorrect value type for v1: ${v1}`)
-    return () => 0;
-  }
-  if (t1 == t2 || t2 == undefined || v2 == undefined) 
-    return () => v1;
-  const B = Math.log(v1/v2) / (1/t1 - 1/t2)
-  const A = v1 * Math.exp(-B/t1);
-  return (temp) => A * Math.exp(B/temp);
-}
-
-
-/** (Tref1, Tref2, T1, T2, co-current) Returns the value of the
- * Logarithmic mean temperature difference.
- * 
- * counter-current by default, for co-current set the five argument as true.
- * */
-const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
-  
-  let // counter-current (default)
-    delta_t1 = t_hot_in - t_cold_out,
-    delta_t2 = t_hot_out - t_cold_in;
-    
-  if (co_current) { // co-current
-    delta_t1 = t_hot_out - t_cold_in;
-    delta_t2 = t_hot_in - t_cold_out;
-  }
-    
-  // ( (t_hot_in - t_cold_out) - (t_hot_out - t_cold_in) ) / ln( (t_hot_in - t_cold_out) / (t_hot_out-t_cold_in) )
-  return Math.abs((delta_t1 - delta_t2) /Math.log(Math.abs(delta_t1 / delta_t2)) );
-};
-
 const 
   tempToK = 273.15,
   pAtmRef = 101_325,
@@ -354,6 +305,54 @@ const kw_tubes_A312_TP321 = (t) => {
     c2 = -2e-6;
 
   return (c0 + c1*temp + c2*temp**2)*conv_factor;
+};
+
+/** Returns a linear function f(x)=y to approximate the value,
+ * in case that the value is constant or there isn't data
+ * about the changes, it can be called with only "y1"
+ * to make a function that always return y1.
+ */
+const linearApprox = ({x1,x2,y1,y2}) => {
+  if (typeof y1 !== "number") {
+    logger.error(`call for linearApprox with incorrect value type for y1: ${y1}`)
+    return () => 0;
+  }
+  if (x1 == x2 || x2 == undefined || y2 == undefined) 
+    return () => y1;
+  const m = (y2 - y1) / (x2 - x1);
+  return (x) => m * (x - x1) + y1;
+};
+
+const viscosityApprox = ({t1,t2,v1,v2}) => {
+  if (typeof v1 !== "number") {
+    logger.error(`call for viscosityApprox with incorrect value type for v1: ${v1}`)
+    return () => 0;
+  }
+  if (t1 == t2 || t2 == undefined || v2 == undefined) 
+    return () => v1;
+  const B = Math.log(v1/v2) / (1/t1 - 1/t2)
+  const A = v1 * Math.exp(-B/t1);
+  return (temp) => A * Math.exp(B/temp);
+}
+
+/** (Tref1, Tref2, T1, T2, co-current) Returns the value of the
+ * Logarithmic mean temperature difference.
+ * 
+ * counter-current by default, for co-current set the five argument as true.
+ * */
+const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
+  
+  let // counter-current (default)
+    delta_t1 = t_hot_in - t_cold_out,
+    delta_t2 = t_hot_out - t_cold_in;
+    
+  if (co_current) { // co-current
+    delta_t1 = t_hot_out - t_cold_in;
+    delta_t2 = t_hot_in - t_cold_out;
+  }
+    
+  // ( (t_hot_in - t_cold_out) - (t_hot_out - t_cold_in) ) / ln( (t_hot_in - t_cold_out) / (t_hot_out-t_cold_in) )
+  return Math.abs((delta_t1 - delta_t2) /Math.log(Math.abs(delta_t1 / delta_t2)) );
 };
 
 const englishSystem = { //(US Customary)
