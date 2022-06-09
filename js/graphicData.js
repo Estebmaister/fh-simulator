@@ -31,6 +31,10 @@ const graphicData = ( comb, fuel, opt ) => {
       graphVar = 'airExcess';
       opt.graphRange = opt.graphRange*1e-2;
       break;
+    case 'o2_excess':
+      graphVar = 'o2Excess';
+      opt.graphRange = opt.graphRange*1e-2;
+      break;
     case 'm_fluid':
       graphVar = 'mFluid';
       opt.graphRange = unitConv.BPDtolb_h(opt.graphRange*1e3);
@@ -56,7 +60,7 @@ const graphicData = ( comb, fuel, opt ) => {
       // t_in:  unitConv.KtoF(runResult.conv_result.t_in),
       t_out: unitConv.KtoF(runResult.rad_result.t_out),
 
-      // o2_excess:  runResult.flows['O2_%'],
+      o2_excess:  runResult.flows['O2_%'],
       air_excess: runResult.flows['air_excess_%'] > 0 ? runResult.flows['air_excess_%'] : 0,
       humidity:   runResult.debug_data['humidity_%'],
 
@@ -68,7 +72,7 @@ const graphicData = ( comb, fuel, opt ) => {
       // m_flue:     runResult.shld_result.m_flue ? runResult.shld_result.m_flue : 0,
       m_fuel:     runResult.rad_result.m_fuel ? unitConv.kgtolb(runResult.rad_result.m_fuel) : 0,
       efficiency: runResult.rad_result.eff_total ? runResult.rad_result.eff_total : 0,
-      rad_dist:   runResult.rad_result['%'] < 1  ? 100*runResult.rad_result['%'] : 0,
+      rad_dist:   runResult.rad_result['%'] < 1  ? Math.round(1e6*runResult.rad_result['%'])/1e4 : 0,
       // shl_dist:  runResult.shld_result['%'] ? 100*runResult.shld_result['%']: 0,
       // cnv_dist:  runResult.conv_result['%'] ? 100*runResult.conv_result['%']: 0,
 

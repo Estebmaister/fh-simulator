@@ -39,8 +39,8 @@ const shieldSection = (params, noLog) => {
     miu_flue = (temp) => params.miu_flue(temp); //(cP - g/m-s) flue Viscosity.
 
   const // Parameters
-    Rfo = params.Rfo,   // (h-m2-C/kJ) external fouling factor.
-    Rfi = params.Rfi,   // (h-m2-C/kJ) internal fouling factor.
+    Rfo = params.Rfo_shld,// (h-m2-C/kJ) external fouling factor.
+    Rfi = params.Rfi_shld,// (h-m2-C/kJ) internal fouling factor.
     N  = params.N_shld, // - number of shld tubes.
     L  = params.L_shld, // (m) effective tube length.
     Do = params.Do_shld,// (m) external diameter shld section.
@@ -103,11 +103,10 @@ const shieldSection = (params, noLog) => {
 
   let iter = 1;
   const 
-    normalized_error = 1e-5, // 0.001%
+    normalized_error = 1e-3, // 0.1%
     normalized_diff = (tG_out) => Math.abs((Q_flue(tg_in, tG_out) -
       Q_conv(t_in,tg_in,tG_out,Tb(t_in),Tw(Tb(t_in),Tw(Tb(t_in)))) )/ Q_flue(tg_in, tg_out));
   while (normalized_diff(tg_out) - normalized_error > 0) {
-    if (true) break;
     if (t_in_calc) { t_in = t_in_calc; } else {
       logger.error("Invalid t_in_calc at shield sect");
       break;

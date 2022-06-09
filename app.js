@@ -61,6 +61,9 @@ const createParams = (opts) => {
     m_fluid:    m_fluid,    // (kg/h) 
     Rfi: unitConv.RfENtoRfSI(opts.rfi), // (h-m2-C/kJ) int. fouling
     Rfo: unitConv.RfENtoRfSI(opts.rfo), // (h-m2-C/kJ) ext. fouling
+    Rfi_conv: .000, // (h-m2-C/kJ) int. fouling
+    Rfi_shld: .000, // (h-m2-C/kJ) int. fouling
+    Rfo_shld: .000, // (h-m2-C/kJ) ext. fouling
     efficiency: opts.effcy,         // (% *.01)
     duty_rad_dist: opts.radDist,    // (% *.01)
     heat_loss_percent: opts.hLoss,  // (% *.01)
