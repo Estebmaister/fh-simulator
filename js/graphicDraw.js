@@ -50,7 +50,7 @@ function innerDraw(
     "2.5em" : "2em";
   const yAxisFontSize = innerHeight *.08;
   const titleFontSize = innerWidth < 900 ?
-    innerWidth*.062 : innerWidth*.032;
+    innerWidth*.058 : innerWidth*.032;
 
   const xValue = d => d[opts.graphVar];
   let xAxisLabel = '', xTitle;
