@@ -172,7 +172,7 @@ const getOptions = () => {
     humidity:   0,          // %
     o2Excess:   .01 * 0,    // fr
     airExcess:  .01 * 0,    // fr
-    radDist:    .01 * 70,   // % *.01
+    radDist:    .01 * 64,   // % *.01
     hLoss:      .01 * 1.5,  // % *.01
     effcy:      .01 * 80,   // % *.01
     rfi:        0,          // hr.ft².°F/Btu

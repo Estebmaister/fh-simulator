@@ -160,7 +160,7 @@ const externalCycle = (params) => {
       shld: shieldSection(params, noLog),
       conv: convSection(  params, noLog)
     };
-    if (int_rlt.conv.tg_out < int_rlt.conv.t_in) int_rlt.conv.Q_fluid*=2;
+    if (int_rlt.conv.tg_out <= int_rlt.conv.t_in) int_rlt.conv.Q_fluid*=2;
     const duty_calc = Math.abs(int_rlt.rad.Q_fluid) + 
     Math.abs(int_rlt.shld.Q_fluid) + Math.abs(int_rlt.conv.Q_fluid);
 
@@ -168,9 +168,9 @@ const externalCycle = (params) => {
   };
   const convNROptions = {...params.NROptions};
   convNROptions.maxIterations *= 5;
-  // convNROptions.tolerance *= 1e1;
-  // convNROptions.epsilon *= 1e1;
-  // convNROptions.h *= 1e1;
+  convNROptions.tolerance *= 1e-1;
+  convNROptions.epsilon *= 1e-1;
+  convNROptions.h *= 1e-1;
   const rad_dist_final = newtonRaphson(rad_dist, 
     params.duty_rad_dist, convNROptions, 'rad_dist_final');
   if (rad_dist_final >0.1 && rad_dist_final <1) { 
