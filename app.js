@@ -56,6 +56,7 @@ const createParams = (opts) => {
     o2Excess:  opts.o2Excess,  // (% *.01) 
     
     /** Process Variables */
+    sp_grav:   opts.spGrav, // -
     t_in_conv:  t_in,       // (K) global process inlet
     t_out:      t_out,      // (K) global process outlet
     m_fluid:    m_fluid,    // (kg/h) 
@@ -88,15 +89,15 @@ const createParams = (opts) => {
     h_conv: unitConv.hcENtohcSI(1.5),// (kJ/h-m2-C)
     kw_tube: kw_tubes_A312_TP321,    // (kJ/h-m-C)
     Pass_number: 2,          // - number of tube passes
-
-    Burner_number: 13,       // - burner's number
-    Do_Burner:   2.24,       // - burner's outside diameter
     
     Pitch_rad: unitConv.intom(2*8),// (m) NPS * 2
     N_rad:  42,                    // - number of tubes 
     L_rad:  unitConv.fttom(62.094),// (m) tube effective length
     Do_rad: unitConv.intom(8.625), // (m) tube external diameter
     Sch_rad:unitConv.intom(0.322), // (m) Schedule thickness
+
+    Burner_number: 13,            // - burner's number
+    Do_Burner:   2.24,            // (ft) burner's outside diameter
 
     Width_rad:  17.50,            // (ft) width in rad sect
     Length_rad: 64.55,            // (ft) length in rad sect

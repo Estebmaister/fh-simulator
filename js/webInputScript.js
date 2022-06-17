@@ -98,18 +98,23 @@ if (graphDiv && spanShowGraph) {
   spanShowGraph.onclick = showHideGraphDiv;
 }
 const graphButtonID = "graph-action";
+const resultButtonID = "result-action";
 const formElementID = "data-form";
 const graphButton = document.getElementById(graphButtonID);
+const resultButton = document.getElementById(resultButtonID);
 const formElement = document.getElementById(formElementID);
 if (graphButton) graphButton.onmousedown = () => {
   formElement.action = `../${formElement.lang || "en"}_graph/`;
+}
+if (resultButton) resultButton.onmousedown = () => {
+  formElement.action = "./result.html";
 }
 
 formElement.addEventListener('submit', function () {
   const allInputs = formElement.getElementsByTagName('input');
 
-  for (let i = 0; i < allInputs.length; i++) {
-    let input = allInputs[i];
+  for (const element of allInputs) {
+    let input = element;
     if (input.name && !input.value) input.name = '';
   }
 });

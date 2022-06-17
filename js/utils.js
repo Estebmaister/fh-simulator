@@ -122,6 +122,7 @@ const
   pAtmRef = 101_325,
   barrelsToft3 = 5.6145833333,
   ft3Tolb = 62.371, // for Water @60°F
+  spGrav = 0.84, // for current fluid
   tempAmbRef = tempToK + 15.55556; // 288.7 K
 
 const unitConv = {
@@ -135,8 +136,8 @@ const unitConv = {
 
   kgtolb: (n) => n*2.20462,
   lbtokg: (n) => n/2.20462,
-  BPDtolb_h:(n) => n*barrelsToft3*ft3Tolb/24*0.84,
-  lb_htoBPD:(n) => n/barrelsToft3/ft3Tolb*24/0.84,
+  BPDtolb_h:(n) => n*barrelsToft3*ft3Tolb/24*spGrav,
+  lb_htoBPD:(n) => n/barrelsToft3/ft3Tolb*24/spGrav,
 
   kJtoBTU: (n) => n/1.05506,
   BTUtokJ: (n) => n*1.05506,
@@ -162,6 +163,7 @@ const getOptions = () => {
     tempToK,
     tempAmbRef,
     pAtmRef,
+    spGrav,
 
     // Entry default arguments
     runDistCycle: true,     // boolean
