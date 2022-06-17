@@ -311,6 +311,19 @@ const Ar_calc = (prams) => {
     Burners = 13 * (Math.PI/4)*2.24**2;
     
   const Ar  = 2*WallWidth + 2*WallLength + 2*Base - ExitArea - RoofDeclined - Burners;
+  // console.warn(`
+  // ExitArea   : ${ExitArea}
+  // Base       : ${Base      }
+  // WallWidth  : ${WallWidth }
+  // WallLength : ${WallLength}
+  // WidthConv  : ${WidthConv  }
+  // Burners    : ${Burners}
+  // Angle      : ${Math.acos(RoofDeclined_X/RoofDeclined_Z)}
+  // RoofDeclined_X : ${RoofDeclined_X}
+  // RoofDeclined_Z : ${RoofDeclined_Z}
+  // RoofDeclined_Y : ${RoofDeclined_Y}
+  // RoofDeclined   : ${RoofDeclined  }
+  // `)
   // Several references
   // const Ar_calc = 2*(22.7+5.3+1)*prams.Width_rad + 2*WallLength + Base;
   // const Ar_W = 2*WallWidth + 2*wall_length + 1.234*base; //WinHeat

@@ -52,7 +52,7 @@
     <section id="data-sect">
       <h1>Simulador de hornos de proceso de tiro natural</h1>
       <h4>(Diseñado para la instrucción de ingenieros y operadores)</h4>
-      <p>El horno simulado corresponde a un proceso de tratamiento de crudo en una planta de vacío.</p>
+      <p>El horno simulado corresponde a un proceso de tratamiento de residuo  de vacío.</p>
       <p>Para editar más variables hacer click en la opción +DATOS, ubicada en el menú superior.</p>
     </section>
     <form lang="es" id="data-form" method="GET" action="./result.html">
@@ -100,16 +100,16 @@
               </div>
               <div style="width: 100%;">
                 <p class="project-info">
-                  Factor ensuciamiento int. (tubos rad) - Coquización:
+                  Factor de coquización (tubos rad):
                   <span style="white-space: nowrap;">
-                    <input step="0.001" min="0" name="rfi" type="number" value="0.000">
+                    <input step="0.001" min="0" name="rfi" type="number" placeholder="0.000">
                     <sub>hr.ft².°F/Btu</sub> 
                   </span>
                 </p>
                 <p class="project-info">
-                  Factor ensuciamiento externo (tubos convectivos):
+                  Factor ensuciamiento (tubos aletados):
                   <span style="white-space: nowrap;">
-                    <input step="0.001" min="0" name="rfo" type="number" value="0.000">
+                    <input step="0.001" min="0" name="rfo" type="number" placeholder="0.000">
                     <sub>hr.ft².°F/Btu</sub>
                   </span>
                 </p>
@@ -282,7 +282,7 @@
             <p>Sistema de Unidades en Resultados</p>
           </div>
         </div>
-        <button autofocus>Calcular</button>
+        <button id="result-action" autofocus>Calcular</button>
       </div>
 
       <hr>

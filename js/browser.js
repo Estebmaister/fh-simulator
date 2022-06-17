@@ -46,7 +46,7 @@ const insertBrowserData = (browserData, fuels, data, options) => {
 		}
 	}
 
-	if (Object.keys(browserFuels).length !== 0) fuels = browserFuels;
+	if (Object.keys(browserFuels).length !== 0) {fuels = browserFuels}
   return fuels
 }
 

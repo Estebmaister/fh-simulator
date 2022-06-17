@@ -11,7 +11,7 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   
   string += `\n
   m_fuel:   ${unit.mass_flow( result_obj.m_fuel )  }   vs 4477.
-  m_fluid:  ${unit.barrel_flow( result_obj.m_fluid )  } 
+  m_fluid:  ${unit.mass_flow( result_obj.m_fluid )  } 
   t_in:     ${unit.tempC( result_obj.t_in )     }      vs 711.8
   t_out:    ${unit.tempC( result_obj.t_out )    }      vs 772.0
   Tw:       ${unit.tempC( result_obj.Tw )       }      vs 858.2
@@ -284,10 +284,20 @@ Datos de entrada
   Presión parcial de O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
   Cont. húmedo (w):   ${result_obj.debug_data['moisture']}-AireSeco
 
+
+  Temp. entrada residuo: ${unit.tempC(result_obj.conv_result.t_in_given)}
+  Temp. salida residuo:  ${unit.tempC(result_obj.rad_result.t_out)}
+
+  Cp(Tb) residuo: ${result_obj.debug_data.cpFluidTb}
+
+  Gravedad esp, residuo: ${result_obj.debug_data.spGrav}
+  Flujo másico, residuo: ${unit.mass_flow( result_obj.rad_result.m_fluid ) }
+
   Calor requerido: ${unit.heat_flow(result_obj.rad_result.duty_total)}
   Calor calculado: ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
 
   Eficiencia del horno: ${round(result_obj.rad_result.eff_total,2)}% [Q_rls/Q_fluid]
+
 
 Moles de gases de combustión total y porcentajes
 por cada mol de combustible
@@ -340,10 +350,20 @@ Input Data
   Partial Pressure O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
   Moisture content (w): ${result_obj.debug_data['moisture']}-dryAir
 
+
+  Fluid's Inlet Temp.:  ${unit.tempC(result_obj.conv_result.t_in_given)}
+  Fluid's outlet Temp.: ${unit.tempC(result_obj.rad_result.t_out)}
+
+  Fluid's Cp(Tb):    ${result_obj.debug_data.cpFluidTb}
+
+  Fluid's Sp Grav:   ${result_obj.debug_data.spGrav}
+  Fluid's Mass Flow: ${unit.mass_flow( result_obj.rad_result.m_fluid ) }
+
   Fluid heat required: ${unit.heat_flow(result_obj.rad_result.duty_total)}
-  Heat calculated: ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
+  Heat calculated:     ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
   
   Heater Efficiency: ${round(result_obj.rad_result.eff_total,2)}% [Q_rls/Q_fluid]
+
 
 Total flue gas moles and percentage (per fuel mol)
 

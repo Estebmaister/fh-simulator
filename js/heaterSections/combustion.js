@@ -295,6 +295,8 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     "dryAirO2_%": round(dryAirO2Percentage),
     moisture:   units.moist(moistAirWeightRatio(
       params.t_air, params.humidity)),
+    spGrav: params.sp_grav,
+    cpFluidTb: units.cp(params.Cp_fluid((params.t_in_conv + params.t_out) /2)),
     unitSystem: units.system[params.lang]
   };
   const compounds = data.filter((elem, _i, _arr) => elem.Formula in fuels)

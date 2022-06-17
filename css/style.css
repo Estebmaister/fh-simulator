@@ -267,12 +267,14 @@ h3 span {
 }
 
 .fuel-compound {
-  margin: 0;
+  margin: 0.3em;
+  margin-left: 2em;
+  margin-right: 2em;
   padding: 0;
   display: inline-flex;
   align-items: center;
   height: 2em;
-  width: 16em;
+  width: 18em;
 }
 .fuel-name, .fuel-formula, .fuel-input {
   margin: 0;
