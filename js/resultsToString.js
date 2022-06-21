@@ -1,15 +1,15 @@
-const {round, initSystem} = require('./utils');
+const { round, initSystem } = require("./utils");
 
-const stringRadResult =
-    (lang, result_obj, unitSystem) => {
-      const unit = initSystem(unitSystem);
-      let string
-      if (lang == "es") {
-        string = `Resultados sección radiante:`
-      }
-      else {string = `Radiant section results:`}
+const stringRadResult = (lang, result_obj, unitSystem) => {
+  const unit = initSystem(unitSystem);
+  let string;
+  if (lang == "es") {
+    string = `Resultados sección radiante:`;
+  } else {
+    string = `Radiant section results:`;
+  }
 
-      string += `\n
+  string += `\n
   t_in:     ${unit.tempC(result_obj.t_in)}      
   t_out:    ${unit.tempC(result_obj.t_out)}      
   Tw:       ${unit.tempC(result_obj.Tw)}      
@@ -30,7 +30,7 @@ const stringRadResult =
       Q_rad:  ${unit.heat_flow(result_obj.Q_rad)} 
     Q_fluid:  ${unit.heat_flow(result_obj.Q_fluid)} 
 
-  duty_rad:   ${round(100 * result_obj['%'], 2)}%  
+  duty_rad:   ${round(100 * result_obj["%"], 2)}%  
 
   At:       ${unit.area(result_obj.At)}    
   Ar:       ${unit.area(result_obj.Ar)}    
@@ -76,19 +76,19 @@ const stringRadResult =
     Ef. Length:     ${unit.length(result_obj.TUBING.L)}
     
   `;
-      return `\n` + string;
-    }
+  return `\n` + string;
+};
 
-const stringShldResult =
-    (lang, result_obj, unitSystem) => {
-      const unit = initSystem(unitSystem);
-      let string
-      if (lang == "es") {
-        string = `Resultados sección de escudo:`
-      }
-      else {string = `Shield section results:`}
+const stringShldResult = (lang, result_obj, unitSystem) => {
+  const unit = initSystem(unitSystem);
+  let string;
+  if (lang == "es") {
+    string = `Resultados sección de escudo:`;
+  } else {
+    string = `Shield section results:`;
+  }
 
-      string += `\n
+  string += `\n
   t_in:     ${unit.tempC(result_obj.t_in)} 
   t_out:    ${unit.tempC(result_obj.t_out)} 
   Tw:       ${unit.tempC(result_obj.Tw)} 
@@ -109,7 +109,7 @@ const stringShldResult =
     Q_conv:  ${unit.heat_flow(result_obj.Q_conv)} 
   Q_fluid:  ${unit.heat_flow(result_obj.Q_fluid)} 
 
-  duty_shld: ${round(100 * result_obj['%'], 2)}% 
+  duty_shld: ${round(100 * result_obj["%"], 2)}% 
 
   At:    ${unit.area(result_obj.At)}     
   An:     ${unit.area(result_obj.An)}     
@@ -152,19 +152,19 @@ const stringShldResult =
     Ef. Length:     ${unit.length(result_obj.TUBING.L)}
 
   `;
-      return `\n` + string;
-    }
+  return `\n` + string;
+};
 
-const stringConvResult =
-    (lang, result_obj, unitSystem) => {
-      const unit = initSystem(unitSystem);
-      let string
-      if (lang == "es") {
-        string = `Resultados sección convectiva:`
-      }
-      else {string = `Convective section results:`}
+const stringConvResult = (lang, result_obj, unitSystem) => {
+  const unit = initSystem(unitSystem);
+  let string;
+  if (lang == "es") {
+    string = `Resultados sección convectiva:`;
+  } else {
+    string = `Convective section results:`;
+  }
 
-      string += `\n
+  string += `\n
   t_in:     ${unit.tempC(result_obj.t_in)}
   t_out:    ${unit.tempC(result_obj.t_out)}      
   Tw:       ${unit.tempC(result_obj.Tw)}      
@@ -176,8 +176,9 @@ const stringConvResult =
   DeltaA:     ${unit.temp(result_obj.DeltaA)}
   DeltaB:     ${unit.temp(result_obj.DeltaB)}
   DeltaA-B:     ${unit.temp(result_obj.DeltaA - result_obj.DeltaB)}
-  Log(|A/B|):   ${
-          round(Math.log(Math.abs(result_obj.DeltaA / result_obj.DeltaB)))}
+  Log(|A/B|):   ${round(
+    Math.log(Math.abs(result_obj.DeltaA / result_obj.DeltaB))
+  )}
 
   Q_flue:   ${unit.heat_flow(result_obj.Q_flue)}
   Q_conv:   ${unit.heat_flow(result_obj.Q_conv)}   
@@ -185,7 +186,7 @@ const stringConvResult =
 
   Q_stack:  ${unit.heat_flow(result_obj.Q_stack)}
 
-  duty_conv: ${round(100 * result_obj['%'], 2)}% 
+  duty_conv: ${round(100 * result_obj["%"], 2)}% 
 
   At:   ${unit.area(result_obj.At)}        
   An:    ${unit.area(result_obj.An)}         
@@ -235,36 +236,35 @@ const stringConvResult =
     Dens:       ${unit.lengthInv(result_obj.FINING.Dens)},
     Arrange:    ${result_obj.FINING.Arrange}
   `;
-      return `\n` + string;
-    }
+  return `\n` + string;
+};
 
-const stringCombResult =
-    (lang, result_obj, unitSystem) => {
-      const unit = initSystem(unitSystem);
-      let outputString
-      if (lang == 'es') {
-        outputString = `
+const stringCombResult = (lang, result_obj, unitSystem) => {
+  const unit = initSystem(unitSystem);
+  let outputString;
+  if (lang == "es") {
+    outputString = `
 Datos de entrada
   (en caso de no haber sido introducidos, el 
     simulador tomará los valores predeterminado)
 
-  Sistema de unidades:      ${result_obj.debug_data['unitSystem']}
-  Presión atmosférica:      ${result_obj.debug_data['atmPressure']}
-  Temperatura ref:          ${result_obj.debug_data['ambTemperature']}
-  Temperatura aire:         ${result_obj.debug_data['airTemperature']}
-  Temperatura comb:         ${result_obj.debug_data['fuelTemperature']}
+  Sistema de unidades:      ${result_obj.debug_data["unitSystem"]}
+  Presión atmosférica:      ${result_obj.debug_data["atmPressure"]}
+  Temperatura ref:          ${result_obj.debug_data["ambTemperature"]}
+  Temperatura aire:         ${result_obj.debug_data["airTemperature"]}
+  Temperatura comb:         ${result_obj.debug_data["fuelTemperature"]}
 
-  Humedad:                  ${round(result_obj.debug_data['humidity_%'], 3)} %
-  N2 en aire seco:          ${result_obj.debug_data['dryAirN2_%']} %
-  O2 en aire seco:          ${result_obj.debug_data['dryAirO2_%']} %
+  Humedad:                  ${round(result_obj.debug_data["humidity_%"], 3)} %
+  N2 en aire seco:          ${result_obj.debug_data["dryAirN2_%"]} %
+  O2 en aire seco:          ${result_obj.debug_data["dryAirO2_%"]} %
 
-  Presión de aire seco:     ${result_obj.debug_data['dryAirPressure']}
-  Presión de vapor de agua:  ${result_obj.debug_data['waterPressure']}
+  Presión de aire seco:     ${result_obj.debug_data["dryAirPressure"]}
+  Presión de vapor de agua:  ${result_obj.debug_data["waterPressure"]}
 
-  Fracción parcial de H2O: ${result_obj.debug_data['H2OPressure_%']} ÷10²
-  Fracción parcial de N2: ${result_obj.debug_data['N2Pressure_%']} ÷10²
-  Fracción parcial de O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
-  Cont. húmedo (w):   ${result_obj.debug_data['moisture']}-AireSeco
+  Fracción parcial de H2O: ${result_obj.debug_data["H2OPressure_%"]} ÷10²
+  Fracción parcial de N2: ${result_obj.debug_data["N2Pressure_%"]} ÷10²
+  Fracción parcial de O2: ${result_obj.debug_data["O2Pressure_%"]} ÷10²
+  Cont. húmedo (w):   ${result_obj.debug_data["moisture"]}-AireSeco
 
 
   Temp. entrada residuo: ${unit.tempC(result_obj.conv_result.t_in_given)}
@@ -279,74 +279,91 @@ Datos de entrada
   Flujo másico, gases:   ${unit.mass_flow(result_obj.shld_result.m_flue)} 
 
   Calor requerido: ${unit.heat_flow(result_obj.rad_result.duty_total)}
-  Calor calculado: ${
-            unit.heat_flow(result_obj.rad_result.duty +
-                           result_obj.shld_result.duty +
-                           result_obj.conv_result.duty)}
+  Calor calculado: ${unit.heat_flow(
+    result_obj.rad_result.duty +
+      result_obj.shld_result.duty +
+      result_obj.conv_result.duty
+  )}
 
-  Eficiencia del horno: ${
-            round(result_obj.rad_result.eff_total, 2)}% [Q_rls/Q_fluid]
+  Eficiencia del horno: ${round(
+    result_obj.rad_result.eff_total,
+    2
+  )}% [Q_rls/Q_fluid]
 
 
 Moles de gases de combustión total y porcentajes
 por cada mol de combustible
 
-  Flujo total: ${round(result_obj.flows['total_flow'], 3)}
-  Flujo seco:  ${round(result_obj.flows['dry_total_flow'], 3)}
-      ${''}                Porcentajes en base húmeda
-  N2:  ${result_obj.products['N2']}             N2:  ${
-            round(result_obj.flows['N2_%'], 3)} %
-  O2:   ${result_obj.products['O2']}             O2:  ${
-            round(result_obj.flows['O2_%'], 3)} %
-  H2O:  ${result_obj.products['H2O']}             H2O: ${
-            round(result_obj.flows['H2O_%'], 3)} %
-  CO2:  ${result_obj.products['CO2']}             CO2: ${
-            round(result_obj.flows['CO2_%'], 3)} %
-  SO2:  ${result_obj.products['SO2']}             SO2: ${
-            result_obj.flows['SO2_%'] || '0.000'} %
+  Flujo total: ${round(result_obj.flows["total_flow"], 3)}
+  Flujo seco:  ${round(result_obj.flows["dry_total_flow"], 3)}
+      ${""}                Porcentajes en base húmeda
+  N2:  ${result_obj.products["N2"]}             N2:  ${round(
+      result_obj.flows["N2_%"],
+      3
+    )} %
+  O2:   ${result_obj.products["O2"]}             O2:  ${round(
+      result_obj.flows["O2_%"],
+      3
+    )} %
+  H2O:  ${result_obj.products["H2O"]}             H2O: ${round(
+      result_obj.flows["H2O_%"],
+      3
+    )} %
+  CO2:  ${result_obj.products["CO2"]}             CO2: ${round(
+      result_obj.flows["CO2_%"],
+      3
+    )} %
+  SO2:  ${result_obj.products["SO2"]}             SO2: ${
+      result_obj.flows["SO2_%"] || "0.000"
+    } %
 
-  Exceso de aire usado: ${round(result_obj.flows['air_excess_%'], 3)} %
-  Moles O2 req./mol de comb. (teórico): ${
-            round(result_obj.flows['O2_mol_req_theor'], 3)}
+  Exceso de aire usado: ${round(result_obj.flows["air_excess_%"], 3)} %
+  Moles O2 req./mol de comb. (teórico): ${round(
+    result_obj.flows["O2_mol_req_theor"],
+    3
+  )}
 
-  Rel. A/C molar húmeda:  ${round(result_obj.flows['AC'], 3)}
-  Rel. A/C másica húmeda: ${round(result_obj.flows['AC_mass'], 3)}
-  Rel. A/C molar (aire seco, teórica):    ${
-            round(result_obj.flows['AC_theor_dryAir'], 3)}
-  Rel. A/C másica (aire húmedo, teórica): ${
-            round(result_obj.flows['AC_mass_theor_moistAir'], 3)}
+  Rel. A/C molar húmeda:  ${round(result_obj.flows["AC"], 3)}
+  Rel. A/C másica húmeda: ${round(result_obj.flows["AC_mass"], 3)}
+  Rel. A/C molar (aire seco, teórica):    ${round(
+    result_obj.flows["AC_theor_dryAir"],
+    3
+  )}
+  Rel. A/C másica (aire húmedo, teórica): ${round(
+    result_obj.flows["AC_mass_theor_moistAir"],
+    3
+  )}
 
-  Peso molecular del comb. ${result_obj.flows['fuel_MW']}
-  Cp(t_comb) del comb.  ${result_obj.flows['Cp_fuel']}
-  NCV: ${result_obj.flows['NCV']}
+  Peso molecular del comb. ${result_obj.flows["fuel_MW"]}
+  Cp(t_comb) del comb.  ${result_obj.flows["Cp_fuel"]}
+  NCV: ${result_obj.flows["NCV"]}
 
-  Peso mol. de los gases de comb. ${result_obj.flows['flue_MW']}
-  Cp(t_amb) de los gases de comb. ${result_obj.flows['Cp_flue']}
+  Peso mol. de los gases de comb. ${result_obj.flows["flue_MW"]}
+  Cp(t_amb) de los gases de comb. ${result_obj.flows["Cp_flue"]}
 `;
-      }
-      else {
-        outputString = `
+  } else {
+    outputString = `
 Input Data 
   (in case of no input, 
   default values will be taken)
 
-  Unit System:          ${result_obj.debug_data['unitSystem']}
-  Atmospheric Pressure: ${result_obj.debug_data['atmPressure']}
-  Ref Temperature:      ${result_obj.debug_data['ambTemperature']}
-  Air Temperature:      ${result_obj.debug_data['airTemperature']}
-  Fuel Temperature:     ${result_obj.debug_data['fuelTemperature']}
+  Unit System:          ${result_obj.debug_data["unitSystem"]}
+  Atmospheric Pressure: ${result_obj.debug_data["atmPressure"]}
+  Ref Temperature:      ${result_obj.debug_data["ambTemperature"]}
+  Air Temperature:      ${result_obj.debug_data["airTemperature"]}
+  Fuel Temperature:     ${result_obj.debug_data["fuelTemperature"]}
 
-  Humidity:             ${round(result_obj.debug_data['humidity_%'], 3)} %
-  N2 en aire seco:      ${result_obj.debug_data['dryAirN2_%']} %
-  O2 en aire seco:      ${result_obj.debug_data['dryAirO2_%']} %
+  Humidity:             ${round(result_obj.debug_data["humidity_%"], 3)} %
+  N2 en aire seco:      ${result_obj.debug_data["dryAirN2_%"]} %
+  O2 en aire seco:      ${result_obj.debug_data["dryAirO2_%"]} %
 
-  Dry Air Pressure:     ${result_obj.debug_data['dryAirPressure']}
-  Water Vapor Pressure:  ${result_obj.debug_data['waterPressure']}
+  Dry Air Pressure:     ${result_obj.debug_data["dryAirPressure"]}
+  Water Vapor Pressure:  ${result_obj.debug_data["waterPressure"]}
 
-  Partial Fraction H2O: ${result_obj.debug_data['H2OPressure_%']} ÷10²
-  Partial Fraction N2: ${result_obj.debug_data['N2Pressure_%']} ÷10²
-  Partial Fraction O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
-  Moisture content (w): ${result_obj.debug_data['moisture']}-dryAir
+  Partial Fraction H2O: ${result_obj.debug_data["H2OPressure_%"]} ÷10²
+  Partial Fraction N2: ${result_obj.debug_data["N2Pressure_%"]} ÷10²
+  Partial Fraction O2: ${result_obj.debug_data["O2Pressure_%"]} ÷10²
+  Moisture content (w): ${result_obj.debug_data["moisture"]}-dryAir
 
 
   Fluid's Inlet Temp.:  ${unit.tempC(result_obj.conv_result.t_in_given)}
@@ -361,56 +378,74 @@ Input Data
   Gases's Mass Flow: ${unit.mass_flow(result_obj.shld_result.m_flue)} 
 
   Fluid heat required: ${unit.heat_flow(result_obj.rad_result.duty_total)}
-  Heat calculated:     ${
-            unit.heat_flow(result_obj.rad_result.duty +
-                           result_obj.shld_result.duty +
-                           result_obj.conv_result.duty)}
+  Heat calculated:     ${unit.heat_flow(
+    result_obj.rad_result.duty +
+      result_obj.shld_result.duty +
+      result_obj.conv_result.duty
+  )}
   
-  Heater Efficiency: ${
-            round(result_obj.rad_result.eff_total, 2)}% [Q_rls/Q_fluid]
+  Heater Efficiency: ${round(
+    result_obj.rad_result.eff_total,
+    2
+  )}% [Q_rls/Q_fluid]
 
 
 Total flue gas moles and percentage (per fuel mol)
 
-  Flow total: ${round(result_obj.flows['total_flow'], 3)}
-  Dry total:  ${round(result_obj.flows['dry_total_flow'], 3)}
-  ${''}                      Moist basis percentage
-  N2:  ${result_obj.products['N2']}             N2:  ${
-            round(result_obj.flows['N2_%'], 3)} %
-  O2:  ${result_obj.products['O2']}              O2:  ${
-            round(result_obj.flows['O2_%'], 3)} %
-  H2O: ${result_obj.products['H2O']}              H2O: ${
-            round(result_obj.flows['H2O_%'], 3)} %
-  CO2: ${result_obj.products['CO2']}              CO2: ${
-            round(result_obj.flows['CO2_%'], 3)} %
-  SO2: ${result_obj.products['SO2']}              SO2: ${
-            result_obj.flows['SO2_%'] || '0.000'} %
+  Flow total: ${round(result_obj.flows["total_flow"], 3)}
+  Dry total:  ${round(result_obj.flows["dry_total_flow"], 3)}
+  ${""}                      Moist basis percentage
+  N2:  ${result_obj.products["N2"]}             N2:  ${round(
+      result_obj.flows["N2_%"],
+      3
+    )} %
+  O2:  ${result_obj.products["O2"]}              O2:  ${round(
+      result_obj.flows["O2_%"],
+      3
+    )} %
+  H2O: ${result_obj.products["H2O"]}              H2O: ${round(
+      result_obj.flows["H2O_%"],
+      3
+    )} %
+  CO2: ${result_obj.products["CO2"]}              CO2: ${round(
+      result_obj.flows["CO2_%"],
+      3
+    )} %
+  SO2: ${result_obj.products["SO2"]}              SO2: ${
+      result_obj.flows["SO2_%"] || "0.000"
+    } %
 
-  Air excess used : ${round(result_obj.flows['air_excess_%'], 3)} %
-  Moles O2 required/fuel-mol (theor): ${
-            round(result_obj.flows['O2_mol_req_theor'], 3)}
+  Air excess used : ${round(result_obj.flows["air_excess_%"], 3)} %
+  Moles O2 required/fuel-mol (theor): ${round(
+    result_obj.flows["O2_mol_req_theor"],
+    3
+  )}
 
-  A/C molar moist relation:   ${round(result_obj.flows['AC'], 3)}
-  A/C mass moist relation:    ${round(result_obj.flows['AC_mass'], 3)}
-  A/C molar relation (dry air, theor):   ${
-            round(result_obj.flows['AC_theor_dryAir'], 3)}
-  A/C mass relation (moist air, theor):  ${
-            round(result_obj.flows['AC_mass_theor_moistAir'], 3)}
+  A/C molar moist relation:   ${round(result_obj.flows["AC"], 3)}
+  A/C mass moist relation:    ${round(result_obj.flows["AC_mass"], 3)}
+  A/C molar relation (dry air, theor):   ${round(
+    result_obj.flows["AC_theor_dryAir"],
+    3
+  )}
+  A/C mass relation (moist air, theor):  ${round(
+    result_obj.flows["AC_mass_theor_moistAir"],
+    3
+  )}
 
-  Fuel mol weight: ${result_obj.flows['fuel_MW']}
-  Fuel Cp(t_fuel): ${result_obj.flows['Cp_fuel']}
-  NCV:             ${result_obj.flows['NCV']} 
+  Fuel mol weight: ${result_obj.flows["fuel_MW"]}
+  Fuel Cp(t_fuel): ${result_obj.flows["Cp_fuel"]}
+  NCV:             ${result_obj.flows["NCV"]} 
 
-  Flue gas mol weight: ${result_obj.flows['flue_MW']}
-  Flue gas Cp(t_amb):  ${result_obj.flows['Cp_flue']}
+  Flue gas mol weight: ${result_obj.flows["flue_MW"]}
+  Flue gas Cp(t_amb):  ${result_obj.flows["Cp_flue"]}
 `;
-      }
-      return outputString;
-    }
+  }
+  return outputString;
+};
 
-                                      module.exports = {
-      stringRadResult,
-      stringShldResult,
-      stringConvResult,
-      stringCombResult
-    };
+module.exports = {
+  stringRadResult,
+  stringShldResult,
+  stringConvResult,
+  stringCombResult,
+};
