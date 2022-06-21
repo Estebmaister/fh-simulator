@@ -4,14 +4,12 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   const unit = initSystem(unitSystem);
   let string
   if (lang == "es") {
-    string = `Resultados para sección radiante:`
+    string = `Resultados sección radiante:`
   } else {
     string = `Radiant section results:`
   }
   
   string += `\n
-  m_fuel:   ${unit.mass_flow( result_obj.m_fuel )  }   
-  m_fluid:  ${unit.mass_flow( result_obj.m_fluid )  } 
   t_in:     ${unit.tempC( result_obj.t_in )     }      
   t_out:    ${unit.tempC( result_obj.t_out )    }      
   Tw:       ${unit.tempC( result_obj.Tw )       }      
@@ -32,9 +30,7 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
       Q_rad:  ${unit.heat_flow( result_obj.Q_rad )   } 
     Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } 
 
-  duty_total: ${unit.heat_flow(result_obj.duty_total)}
   duty_rad:   ${round(100*result_obj['%'],2)       }%  
-  duty_flux:  ${unit.heat_flux(result_obj.duty_flux)  }
 
   At:       ${unit.area(result_obj.At)            }    
   Ar:       ${unit.area(result_obj.Ar)            }    
@@ -87,19 +83,16 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   const unit = initSystem(unitSystem);
   let string
   if (lang == "es") {
-    string = `Resultados para sección de escudo:`
+    string = `Resultados sección de escudo:`
   } else {
     string = `Shield section results:`
   }
   
   string += `\n
-  m_flue:   ${unit.mass_flow( result_obj.m_flue)} 
-  t_in_sup: ${unit.tempC( result_obj.t_in_sup ) }
   t_in:     ${unit.tempC( result_obj.t_in )     } 
   t_out:    ${unit.tempC( result_obj.t_out )    } 
   Tw:       ${unit.tempC( result_obj.Tw )       } 
   
-  Tb_g:     ${unit.tempC( result_obj.Tb_g )     }
   tg_in:      ${unit.tempC( result_obj.tg_in )  } 
   tg_out:     ${unit.tempC( result_obj.tg_out ) } 
 
@@ -110,14 +103,13 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   Log(A/B):   ${round(Math.log(result_obj.DeltaA/result_obj.DeltaB))}
 
   Q_flue:   ${unit.heat_flow( result_obj.Q_flue )  } 
-    M_fuel x Cp x (Tg_in - Tg_out)
+    M_fuel xCp x(Tg_in-Tg_out)
   Q_Shield: ${unit.heat_flow( result_obj.Q_R )     } 
     Q_rad:   ${unit.heat_flow( result_obj.Q_rad )  } 
     Q_conv:  ${unit.heat_flow( result_obj.Q_conv ) } 
   Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } 
 
-  duty_shld: ${round(100*result_obj['%'],2)      }%  
-  duty_flux: ${unit.heat_flux(result_obj.duty_flux)}
+  duty_shld: ${round(100*result_obj['%'],2)      }% 
 
   At:    ${unit.area(result_obj.At)    }     
   An:     ${unit.area(result_obj.An)   }     
@@ -167,20 +159,17 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   const unit = initSystem(unitSystem);
   let string
   if (lang == "es") {
-    string = `Resultados para sección convectiva:`
+    string = `Resultados sección convectiva:`
   } else {
     string = `Convective section results:`
   }
 
   string += `\n
-  t_fin:    ${unit.tempC( result_obj.t_fin )  }      
-  t_in_data:${unit.tempC( result_obj.t_in_given)}
   t_in:     ${unit.tempC( result_obj.t_in )   }
   t_out:    ${unit.tempC( result_obj.t_out )  }      
   Tw:       ${unit.tempC( result_obj.Tw )     }      
   
-  Tb_g:     ${unit.tempC( result_obj.Tb_g )}
-  tg_in:      ${unit.tempC( result_obj.tg_in )   }   
+  tg_in:      ${unit.tempC( result_obj.tg_in )  }   
   tg_stack:   ${unit.tempC( result_obj.tg_out)  }    
 
   LMTD:     ${unit.temp(result_obj.LMTD)      }      
@@ -192,10 +181,10 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   Q_flue:   ${unit.heat_flow( result_obj.Q_flue )}
   Q_conv:   ${unit.heat_flow( result_obj.Q_conv )}   
   Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid)}   
-  Q_stack:  ${unit.heat_flow( result_obj.Q_stack )}
 
-  duty_conv: ${round(100*result_obj['%'],2)      }%  
-  duty_flux: ${unit.heat_flux(result_obj.duty_flux)}
+  Q_stack:  ${unit.heat_flow( result_obj.Q_stack)}
+
+  duty_conv: ${round(100*result_obj['%'],2)      }% 
 
   At:   ${unit.area(result_obj.At)          }        
   An:    ${unit.area(result_obj.An)        }         
@@ -215,10 +204,7 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   hr:   ${unit.convect(result_obj.hr)            }
   ho:   ${unit.convect(result_obj.ho)            }   
   hc:   ${unit.convect(result_obj.hc)            }
-  he:   ${unit.convect(result_obj.he)            }   
-
-  gr:   ${round(result_obj.gr,6) }
-  j:    ${round(result_obj.j, 6)            }        
+  he:   ${unit.convect(result_obj.he)            }      
 
   kw_fin:   ${ unit.thermal( result_obj.kw_fin )   } 
   kw_tube:  ${ unit.thermal( result_obj.kw_tube )  }
@@ -237,22 +223,16 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   Re_fluid: ${result_obj.Reynolds}
 
   TUBING:
-    Material:       ${result_obj.TUBING.Material}
-    No Tubes Wide:  ${result_obj.TUBING.Nt}
-    No Tubes:       ${result_obj.TUBING.N}
-    Wall Thickness: ${unit.lengthC(result_obj.TUBING.Sch)}
-    Outside Di:     ${unit.lengthC(result_obj.TUBING.Do)}
-    Tran Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
-    Long Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
-    Ef. Length:     ${unit.length(result_obj.TUBING.L)}
+    No Tubes:    ${result_obj.TUBING.N}
+    Other props: Same as shield
 
   FINNING: 
-    Material:       ${result_obj.FINING.Material}
-    Type:           ${result_obj.FINING.Type}
-    Height:         ${unit.lengthC(result_obj.FINING.Height)}
-    Thickness:      ${unit.lengthC(result_obj.FINING.Thickness)}
-    Dens:           ${unit.lengthInv(result_obj.FINING.Dens)},
-    Arrange:        ${result_obj.FINING.Arrange}
+    Material:   ${result_obj.FINING.Material}
+    Type:       ${result_obj.FINING.Type}
+    Height:     ${unit.lengthC(result_obj.FINING.Height)}
+    Thickness:  ${unit.lengthC(result_obj.FINING.Thickness)}
+    Dens:       ${unit.lengthInv(result_obj.FINING.Dens)},
+    Arrange:    ${result_obj.FINING.Arrange}
   `;
   return `\n` + string;
 }
@@ -293,6 +273,9 @@ Datos de entrada
   Gravedad esp, residuo: ${result_obj.debug_data.spGrav}
   Flujo másico, residuo: ${unit.mass_flow( result_obj.rad_result.m_fluid ) }
 
+  Flujo másico, comb.:   ${unit.mass_flow( result_obj.rad_result.m_fuel )  }   
+  Flujo másico, gases:   ${unit.mass_flow( result_obj.shld_result.m_flue)} 
+
   Calor requerido: ${unit.heat_flow(result_obj.rad_result.duty_total)}
   Calor calculado: ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
 
@@ -304,7 +287,7 @@ por cada mol de combustible
 
   Flujo total: ${round(result_obj.flows['total_flow'],3)}
   Flujo seco:  ${round(result_obj.flows['dry_total_flow'],3)}
-      ${''              }                 Porcentajes en base húmeda
+      ${''              }                Porcentajes en base húmeda
   N2:  ${result_obj.products['N2']  }             N2:  ${round(result_obj.flows['N2_%'],3) } %
   O2:   ${result_obj.products['O2'] }             O2:  ${round(result_obj.flows['O2_%'],3)} %
   H2O:  ${result_obj.products['H2O']}             H2O: ${round(result_obj.flows['H2O_%'],3)} %
@@ -358,6 +341,9 @@ Input Data
 
   Fluid's Sp Grav:   ${result_obj.debug_data.spGrav}
   Fluid's Mass Flow: ${unit.mass_flow( result_obj.rad_result.m_fluid ) }
+
+  Comb's  Mass Flow: ${unit.mass_flow( result_obj.rad_result.m_fuel )}   
+  Gases's Mass Flow: ${unit.mass_flow( result_obj.shld_result.m_flue)} 
 
   Fluid heat required: ${unit.heat_flow(result_obj.rad_result.duty_total)}
   Heat calculated:     ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
