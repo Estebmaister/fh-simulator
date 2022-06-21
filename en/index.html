@@ -52,65 +52,21 @@
     <section id="data-sect">
       <h1>Fire heater natural draft simulator</h1>
       <h4>(Designed to instruct engineers and operators)</h4>
-      <p>Testing page, a simple view for the input and output.</p>
     </section>
 
     <form lang="en" id="data-form" method="GET" action="./result.html">
 
-      
-      <div class="form-div">
-        <div class="form-block">
-          <hr>
-          <h3>Project data inputs</h3>
-          <div class="form-div">
-            <div class="form-div">
-              <p class="project-info">
-                Title: <input name="project_title" type="text" value="fh_simulation" required> <span class="validity"></span>
-              </p>
-              <p class="project-info">
-                Case:    <input name="project_n" value="base">
-              </p>
-            </div>
-            <div class="form-div">
-              <p class="project-info">
-                  Date :       <input name="date" id="date" type="date">
-                  <script>
-                    const date = new Date(new Date().toLocaleDateString()).toISOString().substring(0, 10)
-                    document.getElementById("date").value = date;
-                  </script>
-              </p>
-            </div>
-          </div>
-        </div>
-      
-        <div class="form-block">
-          <hr>
-          <h3>Process Deficiency</h3>
-          <div class="form-div">
-            <p class="project-info">Heat Loss <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
-            </p>
-            <p class="project-info">Rad. Dist. <input step="0.1" min="40" max="100" name="rad_dist" type="number" placeholder="70.0"> %
-            </p>
-            <!-- <p class="project-info">Efficiency <input step="0.1" min="0" name="efficiency" type="number" value="80.0" disabled> %
-            </p> -->
-            <p class="project-info">R<sub>fi</sub> radiant <input step="0.001" min="0" name="rfi" type="number" value="0.000">
-              <sub>hr.ft².°F/Btu</sub>
-            </p>
-            <p class="project-info">R<sub>fo</sub> convect <input step="0.001" min="0" name="rfo" type="number" value="0.000">
-              <sub>hr.ft².°F/Btu</sub>
-            </p>
-          </div>
-        </div>
-      </div>
+      <p class="project-info">
+        Case: <input name="project_title" type="text" value="base" required> <span class="validity"></span>
+      </p>
 
       <hr>
-      <h3>Process Fluid</h3>
+      <h3>Design conditions</h3>
       <div class="form-div">
         <p id="sub-duty" class="project-info">
-          Input stream <input step="1" min="0" name="m_fluid" type="number" value="90"> x10<sup>3</sup> BPD 
+          Input flow <input step="1" min="0" name="m_fluid" type="number" value="90"> x10<sup>3</sup> BPD 
           <sub><span>~</span> lb/hr</sub>
         </p>
-        <br class="hidden">
         <p class="project-info">
           Spec. Grav. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled> <sub><em>@ 60°F</em></sub>
         </p>
@@ -169,6 +125,19 @@
       </div>
 
       <div class="form-div">
+        <p class="project-info">R<sub>fi</sub> radiant <input step="0.001" min="0" name="rfi" type="number" value="0.000">
+          <sub>hr.ft².°F/Btu</sub>
+        </p>
+        <p class="project-info">R<sub>fo</sub> convect <input step="0.001" min="0" name="rfo" type="number" value="0.000">
+          <sub>hr.ft².°F/Btu</sub>
+        </p>
+        <p class="project-info">Heat Loss <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
+        </p>
+        <p class="project-info">Fixed Rad. Dist. <input step="0.1" min="40" max="100" name="rad_dist" type="number" placeholder="0.0"> %
+        </p>
+      </div>
+
+      <div class="form-div">
         <div class="form-block">
           <hr>
           <h3>Air</h3>
@@ -198,7 +167,10 @@
           </h3>
   
           <div class="form-div"> 
-            <p class="project-info">Flue gas O<sub>2</sub> Excess <input id="o2_excess" name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %</p>
+            <p class="project-info">Flue gas O<sub>2</sub> Excess <input id="o2_excess" name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %
+              <br>
+              <span><em><sub>[If this value is set, it overwrites air excess ]</sub></em></span>
+            </p>
             <p class="project-info">Oxygen sampling basis <select disabled name="o2_basis">
               <option value="wet">wet basis</option>
               <option value="dry">dry basis</option>

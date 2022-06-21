@@ -52,165 +52,119 @@
     <section id="data-sect">
       <h1>Simulador de hornos de proceso de tiro natural</h1>
       <h4>(Diseñado para la instrucción de ingenieros y operadores)</h4>
-      <p>El horno simulado corresponde a un proceso de tratamiento de residuo  de vacío.</p>
     </section>
     <form lang="es" id="data-form" method="GET" action="./result.html">
 
+      <p class="project-info">
+        Caso de simulación: 
+        <input name="project_title" type="text" value="base" required> 
+        <span class="validity"></span>
+      </p>
+
+      <hr>
+      <h3>Condiciones de diseño</h3>
+      <div class="form-div">
+        <p id="sub-duty" class="project-info">
+          Flujo <input step="1" min="0" name="m_fluid" type="number" value="90"> x10<sup>3</sup> BPD
+          <sub><span>~</span> lb/hr</sub>
+        </p>
+        <p class="project-info">
+          Grav. esp. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled><sub><em>@ 60°F</em></sub>
+        </p>
+        <p class="project-info">
+          Absorción de calor ("duty"): 
+          <span id="span-duty">71.53</span> MBtu/hr
+        </p>
+      </div>
+      
+      <div class="form-div">
+        <div class="form-block">
+          <div class="form-div"> 
+            <div class="form-block flex-evenly"> 
+              <p class="project-info sub-temp">
+                Temp. entrada T<sub>in</sub> <input id="t_in" step="1" min="200" name="t_in" type="number" value="678"> °F
+                <sub><span>~</span> °C</sub>
+              </p>
+              <p class="project-info sub-temp">
+                Temp. salida T<sub>out</sub> <input id="t_out"step="1" min="300" name="t_out"type="number" value="772"> °F
+                <sub><span>~</span> °C</sub>
+              </p>
+            </div>
+            <div class="form-block flex-evenly"> 
+              <p class="project-info">
+                Cap. calorífica Cp<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" disabled value="0.676"> 
+                <sub>Btu/lb-°F</sub>
+              </p>
+              <p class="project-info">
+                Cap. calorífica Cp<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" disabled value="0.703"> 
+                <sub>Btu/lb-°F</sub>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="form-block">
+          <div class="form-div">
+            <div class="form-block flex-evenly"> 
+              <p class="project-info">
+                Viscosidad μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" disabled value="1.45"> cp
+              <p class="project-info">
+                Viscosidad μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" disabled value="0.96"> cp
+              </p>
+            </div>
+            <div class="form-block flex-evenly">
+              <p class="project-info">
+                Cond. térmica k<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" disabled value="0.038">
+              <sub>Btu/h.ft.°F</sub>
+              </p>
+              <p class="project-info">
+                Cond. térmica k<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" disabled value="0.035">
+              <sub>Btu/h.ft.°F</sub>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="form-div">
         <p class="project-info">
-          Nombre para la simulación: 
-          <input name="project_title" type="text" value="fh_simulation" required> 
-          <span class="validity"></span>
+          R<sub>fi</sub> radiante <input step="0.001" min="0" name="rfi" type="number" value="0.000">
+          <sub>hr.ft².°F/Btu</sub>
+        </p>
+        <p class="project-info">
+          R<sub>fo</sub> convect. <input step="0.001" min="0" name="rfo" type="number" value="0.000">
+          <sub>hr.ft².°F/Btu</sub>
+        </p>
+        <p class="project-info">
+          Pérdidas <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
         </p>
       </div>
 
-      <div class="form-div">
-        <div class="form-block">
-          <hr>
-          <h3>Variables del fluido</h3>
-          <div class="form-div">
-            <p id="sub-duty" class="project-info">
-              Flujo <input step="1" min="0" name="m_fluid" type="number" value="90"> x10<sup>3</sup> BPD
-              <sub><span>~</span> lb/hr</sub>
-            </p>
-            <p class="project-info">
-              Grav. esp. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled><sub><em>@ 60°F</em></sub>
-            </p>
-            <p class="project-info">
-              Absorción de calor ("duty"): 
-              <span id="span-duty">71.53</span> MBtu/hr
-            </p>
-          </div>
-          
+      <hr>
+      <h3>Condiciones de combustión</h3>
 
-          <div class="form-div">
-            <div class="form-block">
-              <div class="form-div"> 
-                <div class="form-block flex-evenly"> 
-                  <p class="project-info sub-temp">
-                    Temp. entrada T<sub>in</sub> <input id="t_in" step="1" min="200" name="t_in" type="number" value="678"> °F
-                    <sub><span>~</span> °C</sub>
-                  </p>
-                  <p class="project-info sub-temp">
-                    Temp. salida T<sub>out</sub> <input id="t_out"step="1" min="300" name="t_out"type="number" value="772"> °F
-                    <sub><span>~</span> °C</sub>
-                  </p>
-                </div>
-                <div class="form-block flex-evenly"> 
-                  <p class="project-info">
-                    Cap. calorífica Cp<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" disabled value="0.676"> 
-                    <sub>Btu/lb-°F</sub>
-                  </p>
-                  <p class="project-info">
-                    Cap. calorífica Cp<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" disabled value="0.703"> 
-                    <sub>Btu/lb-°F</sub>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="form-block">
-              <div class="form-div">
-                <div class="form-block flex-evenly"> 
-                  <p class="project-info">
-                    Viscosidad μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" disabled value="1.45"> cp
-                  <p class="project-info">
-                    Viscosidad μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" disabled value="0.96"> cp
-                  </p>
-                </div>
-                <div class="form-block flex-evenly">
-                  <p class="project-info">
-                    Cond. térmica k<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" disabled value="0.038">
-                  <sub>Btu/h.ft.°F</sub>
-                  </p>
-                  <p class="project-info">
-                    Cond. térmica k<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" disabled value="0.035">
-                  <sub>Btu/h.ft.°F</sub>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="form-block">
-          <hr>
-          <h3>Variables externas</h3>
-  
-          <div class="form-div">
-            <div class="form-block flex-evenly">
-
-              <p class="project-info sub-temp">
-                Temp. Ambiente T<sub>a</sub> <input step="1" min="0" name="t_amb" type="number" value="80"> °F
-                <sub><span>~</span> °C</sub>
-              </p> 
-              <p class="project-info">
-                Humedad relativa RH <input step="0.1" min="0" name="humidity" type="number" value="50.0"> %
-              </p>
-              <p class="project-info">
-                Presión atmosférica <input step="0.01" min="0" name="p_atm" type="number" placeholder="1.00"> 
-                <sub>atm</sub>
-              </p>
-              <p class="project-info">
-                Exceso de aire <input step="0.01" min="0" name="air_excess" type="number" value="20.0"> %
-              </p>
-
-
-
-            </div>
-            <div class="form-block flex-evenly">
-
-              <p class="project-info">
-                R<sub>fi</sub> radiante <input step="0.001" min="0" name="rfi" type="number" value="0.000">
-                <sub>hr.ft².°F/Btu</sub>
-              </p>
-              <p class="project-info">
-                R<sub>fo</sub> convect. <input step="0.001" min="0" name="rfo" type="number" value="0.000">
-                <sub>hr.ft².°F/Btu</sub>
-              </p>
-              <p class="project-info">
-                Exceso de O<sub>2</sub> gases de comb. <input id="o2_excess" name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %
-                <br>
-                <span><em><sub>[Al definir este valor el exceso de aire sería calculado]</sub></em></span>
-              </p>
-
-              <p class="project-info">
-                Pérdidas <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
-              </p>
-              <p class="project-info">
-                Dist. Rad. <input step="0.1" min="50" max="90" name="rad_dist" type="number" placeholder="70.0"> %
-              </p>
-              <p class="project-info hidden">
-                Eficiencia <input step="0.1" min="0" name="efficiency" type="number" value="80.0" disabled> %
-              </p>
-
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="form-div">
-        
-  
-        <!-- <div class="form-block hidden">
-          <hr>
-          <h3>Gases de Combustión (GC) 
-            <br> <span><em><sub>(Para una combustión adecuada de combustible gaseoso, se recomienda alcanzar 3% de O2 en GC a base seca.)</sub> </em></span>
-          </h3>
-  
-          <div class="form-div"> 
-            <p class="project-info">Exceso de O<sub>2</sub> en GC <input id="o2_excess" name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %</p>
-            <p class="project-info">Base de muestreo de O2 <select name="o2_basis">
-              <option value="wet">base húmeda</option>
-              <option value="dry">base seca</option>
-            </select></p> 
-          </div>
-        </div> -->
+      <div class="form-div flex-evenly">
+          <p class="project-info sub-temp">
+            Temp. Ambiente T<sub>a</sub> <input step="1" min="0" name="t_amb" type="number" value="80"> °F
+            <sub><span>~</span> °C</sub>
+          </p> 
+          <p class="project-info">
+            Humedad relativa RH <input step="0.1" min="0" name="humidity" type="number" value="50.0"> %
+          </p>
+          <p class="project-info">
+            Presión atmosférica <input step="0.01" min="0" name="p_atm" type="number" placeholder="1.00"> 
+            <sub>atm</sub>
+          </p>
+          <p class="project-info">
+            Exceso de aire <input step="0.01" min="0" name="air_excess" type="number" value="20.0"> %
+          </p>
+          <p class="project-info">
+            Exceso de O<sub>2</sub> gases de comb. <input id="o2_excess" name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %
+            <br>
+            <span><em><sub>[Al definir este valor el exceso de aire sería calculado]</sub></em></span>
+          </p>
       </div>
 
       <hr>
-
       <h3>Combustible <span id="show-hide-fuel">[editar]</span></h3>
 
       <div id="fuel-div">
