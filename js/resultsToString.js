@@ -4,56 +4,52 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   const unit = initSystem(unitSystem);
   let string
   if (lang == "es") {
-    string = `Resultados para sección radiante:`
+    string = `Resultados sección radiante:`
   } else {
     string = `Radiant section results:`
   }
   
   string += `\n
-  m_fuel:   ${unit.mass_flow( result_obj.m_fuel )  }   vs 4477.
-  m_fluid:  ${unit.mass_flow( result_obj.m_fluid )  } 
-  t_in:     ${unit.tempC( result_obj.t_in )     }      vs 711.8
-  t_out:    ${unit.tempC( result_obj.t_out )    }      vs 772.0
-  Tw:       ${unit.tempC( result_obj.Tw )       }      vs 858.2
+  t_in:     ${unit.tempC( result_obj.t_in )     }      
+  t_out:    ${unit.tempC( result_obj.t_out )    }      
+  Tw:       ${unit.tempC( result_obj.Tw )       }      
 
-  tg_out:   ${unit.tempC( result_obj.tg_out )    }     vs 1495.
+  tg_out:   ${unit.tempC( result_obj.tg_out )    }     
 
   Q_in:     ${unit.heat_flow( result_obj.Q_in )     } 
-    Q_rls:    ${unit.heat_flow( result_obj.Q_rls )   } vs 88.00
-    Q_air:    ${unit.heat_flow( result_obj.Q_air )  }  vs .4069
-    Q_fuel:   ${unit.heat_flow( result_obj.Q_fuel)  }  vs 0
+    Q_rls:    ${unit.heat_flow( result_obj.Q_rls )   } 
+    Q_air:    ${unit.heat_flow( result_obj.Q_air )  }  
+    Q_fuel:   ${unit.heat_flow( result_obj.Q_fuel)  }  
 
   Q_out:    ${unit.heat_flow( result_obj.Q_out )    } 
-    Q_flue:   ${unit.heat_flow( result_obj.Q_flue )  } vs 36.22
-    Q_losses: ${unit.heat_flow( result_obj.Q_losses)}  vs .7712
-    Q_shld:   ${unit.heat_flow( result_obj.Q_shld ) }  vs 5.680
+    Q_flue:   ${unit.heat_flow( result_obj.Q_flue )  } 
+    Q_losses: ${unit.heat_flow( result_obj.Q_losses)}  
+    Q_shld:   ${unit.heat_flow( result_obj.Q_shld ) }  
     Q_R:      ${unit.heat_flow( result_obj.Q_R )     } 
-      Q_conv: ${unit.heat_flow( result_obj.Q_conv ) }  vs 5.629
-      Q_rad:  ${unit.heat_flow( result_obj.Q_rad )   } vs ${round(45.783 -4.369 -1.311,2)}
-    Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } vs 45.78
+      Q_conv: ${unit.heat_flow( result_obj.Q_conv ) }  
+      Q_rad:  ${unit.heat_flow( result_obj.Q_rad )   } 
+    Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } 
 
-  duty_total: ${unit.heat_flow(result_obj.duty_total)}
-  duty_rad:   ${round(100*result_obj['%'],2)       }%  vs  ${round(45_78.337/71.530,2)}%
-  duty_flux:  ${unit.heat_flux(result_obj.duty_flux)  }
+  duty_rad:   ${round(100*result_obj['%'],2)       }%  
 
-  At:       ${unit.area(result_obj.At)            }    vs 5888
-  Ar:       ${unit.area(result_obj.Ar)            }    vs 5820
-  Acp:      ${unit.area(result_obj.Acp)           }    vs 3969
-  αAcp:     ${unit.area(result_obj.aAcp)          }    vs 3590
-  Aw:       ${unit.area(result_obj.Aw)            }    vs 2229
-  Aw/αAcp:  ${round(result_obj.Aw_aAcp)    }           vs .621
-  Alpha:    ${round(result_obj.Alpha)      }           vs .904
-  Acp_sh:   ${unit.area(result_obj.Acp_sh)       }     vs NR
-  Ai:        ${unit.area(result_obj.Ai)         }      vs NR
+  At:       ${unit.area(result_obj.At)            }    
+  Ar:       ${unit.area(result_obj.Ar)            }    
+  Acp:      ${unit.area(result_obj.Acp)           }    
+  αAcp:     ${unit.area(result_obj.aAcp)          }    
+  Aw:       ${unit.area(result_obj.Aw)            }    
+  Aw/αAcp:  ${round(result_obj.Aw_aAcp)    }           
+  Alpha:    ${round(result_obj.Alpha)      }           
+  Acp_sh:   ${unit.area(result_obj.Acp_sh)       }     
+  Ai:        ${unit.area(result_obj.Ai)         }      
 
-  hi:     ${unit.convect(result_obj.hi)            } vs 146.4
-  h_conv:   ${unit.convect(result_obj.h_conv)        } vs NR
+  hi:     ${unit.convect(result_obj.hi)            } 
+  h_conv:   ${unit.convect(result_obj.h_conv)        } 
 
-  MBL:      ${result_obj.MBL                     } ft vs 20.45
-  GPpres:   ${round(result_obj.Pco2*1+result_obj.Ph2o*1)} atm vs 0.250
-  PL:       ${result_obj.PL                  } atm-ft vs 5.107
-  GEmiss:   ${result_obj.emiss                      } vs 0.580
-  F:        ${result_obj.F                          } vs 0.635
+  MBL:      ${result_obj.MBL                     } ft 
+  GPpres:   ${round(result_obj.Pco2*1+result_obj.Ph2o*1)} atm 
+  PL:       ${result_obj.PL                  } atm-ft 
+  GEmiss:   ${result_obj.emiss                      } 
+  F:        ${result_obj.F                          } 
 
   kw_tube:  ${unit.thermal( result_obj.kw_tube )}
   kw_fluid: ${unit.thermal( result_obj.kw_fluid )}
@@ -87,49 +83,45 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   const unit = initSystem(unitSystem);
   let string
   if (lang == "es") {
-    string = `Resultados para sección de escudo:`
+    string = `Resultados sección de escudo:`
   } else {
     string = `Shield section results:`
   }
   
   string += `\n
-  m_flue:   ${unit.mass_flow( result_obj.m_flue)} vs 88088
-  t_in_sup: ${unit.tempC( result_obj.t_in_sup ) }
-  t_in:     ${unit.tempC( result_obj.t_in )     } vs 695.6
-  t_out:    ${unit.tempC( result_obj.t_out )    } vs 711.8
-  Tw:       ${unit.tempC( result_obj.Tw )       } vs 763.8
+  t_in:     ${unit.tempC( result_obj.t_in )     } 
+  t_out:    ${unit.tempC( result_obj.t_out )    } 
+  Tw:       ${unit.tempC( result_obj.Tw )       } 
   
-  Tb_g:     ${unit.tempC( result_obj.Tb_g )     }
-  tg_in:      ${unit.tempC( result_obj.tg_in )  } vs 1495.
-  tg_out:     ${unit.tempC( result_obj.tg_out ) } vs 1246.
+  tg_in:      ${unit.tempC( result_obj.tg_in )  } 
+  tg_out:     ${unit.tempC( result_obj.tg_out ) } 
 
-  LMTD:     ${unit.temp(result_obj.LMTD)     }    vs 660.2
+  LMTD:     ${unit.temp(result_obj.LMTD)     }    
   DeltaA:     ${unit.temp(result_obj.DeltaA) }
   DeltaB:     ${unit.temp(result_obj.DeltaB) }
   DeltaA-B:   ${unit.temp(result_obj.DeltaA - result_obj.DeltaB)}
   Log(A/B):   ${round(Math.log(result_obj.DeltaA/result_obj.DeltaB))}
 
   Q_flue:   ${unit.heat_flow( result_obj.Q_flue )  } 
-    M_fuel x Cp x (Tg_in - Tg_out)
-  Q_Shield: ${unit.heat_flow( result_obj.Q_R )     } vs 12.542
-    Q_rad:   ${unit.heat_flow( result_obj.Q_rad )  } vs  ${4.369+1.312}
-    Q_conv:  ${unit.heat_flow( result_obj.Q_conv ) } vs  ${3.745+2.931}
-  Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } vs 12.357
+    M_fuel xCp x(Tg_in-Tg_out)
+  Q_Shield: ${unit.heat_flow( result_obj.Q_R )     } 
+    Q_rad:   ${unit.heat_flow( result_obj.Q_rad )  } 
+    Q_conv:  ${unit.heat_flow( result_obj.Q_conv ) } 
+  Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid ) } 
 
-  duty_shld: ${round(100*result_obj['%'],2)      }%  vs  ${round(12_35.743/71.530,1)}%
-  duty_flux: ${unit.heat_flux(result_obj.duty_flux)}
+  duty_shld: ${round(100*result_obj['%'],2)      }% 
 
-  At:    ${unit.area(result_obj.At)    }     vs 1708.
-  An:     ${unit.area(result_obj.An)   }     vs ${round(88_088.02/0.1138/3600,1)}
+  At:    ${unit.area(result_obj.At)    }     
+  An:     ${unit.area(result_obj.An)   }     
   Ai:      ${unit.area(result_obj.Ai)}
-  Gn:    ${round(result_obj.Gn/3600)} lb/sec-ft² vs .1138
+  Gn:    ${round(result_obj.Gn/3600)} lb/sec-ft² 
 
-  Uo:    ${unit.convect(result_obj.Uo)    } vs 5.92
+  Uo:    ${unit.convect(result_obj.Uo)    } 
   R_int: ${round(result_obj.R_int, 6)}
   R_tub: ${round(result_obj.R_tube, 6)}
   R_ext: ${round(result_obj.R_ext, 6)}
 
-  hi: ${unit.convect(result_obj.hi)       } vs 215.8
+  hi: ${unit.convect(result_obj.hi)       } 
   hr:   ${unit.convect(result_obj.hr)}
   ho:   ${unit.convect(result_obj.ho)}
   hc:   ${unit.convect(result_obj.hc)}
@@ -167,60 +159,54 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   const unit = initSystem(unitSystem);
   let string
   if (lang == "es") {
-    string = `Resultados para sección convectiva:`
+    string = `Resultados sección convectiva:`
   } else {
     string = `Convective section results:`
   }
 
   string += `\n
-  t_fin:    ${unit.tempC( result_obj.t_fin )  }      vs 688.0
-  t_in_data:${unit.tempC( result_obj.t_in_given)}
   t_in:     ${unit.tempC( result_obj.t_in )   }
-  t_out:    ${unit.tempC( result_obj.t_out )  }      vs 695.6
-  Tw:       ${unit.tempC( result_obj.Tw )     }      vs 681.9
+  t_out:    ${unit.tempC( result_obj.t_out )  }      
+  Tw:       ${unit.tempC( result_obj.Tw )     }      
   
-  Tb_g:     ${unit.tempC( result_obj.Tb_g )}
-  tg_in:      ${unit.tempC( result_obj.tg_in )   }   vs 1246.
-  tg_stack:   ${unit.tempC( result_obj.tg_out)  }    vs 719.9
+  tg_in:      ${unit.tempC( result_obj.tg_in )  }   
+  tg_stack:   ${unit.tempC( result_obj.tg_out)  }    
 
-  LMTD:     ${unit.temp(result_obj.LMTD)      }      vs 197.5
+  LMTD:     ${unit.temp(result_obj.LMTD)      }      
   DeltaA:     ${unit.temp(result_obj.DeltaA)  }
   DeltaB:     ${unit.temp(result_obj.DeltaB)  }
   DeltaA-B:     ${unit.temp(result_obj.DeltaA - result_obj.DeltaB)}
   Log(|A/B|):   ${round(Math.log(Math.abs(result_obj.DeltaA/result_obj.DeltaB)))}
 
   Q_flue:   ${unit.heat_flow( result_obj.Q_flue )}
-  Q_conv:   ${unit.heat_flow( result_obj.Q_conv )}   vs 13.640
-  Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid)}   vs 13.439
-  Q_stack:  ${unit.heat_flow( result_obj.Q_stack )}
+  Q_conv:   ${unit.heat_flow( result_obj.Q_conv )}   
+  Q_fluid:  ${unit.heat_flow( result_obj.Q_fluid)}   
 
-  duty_conv: ${round(100*result_obj['%'],2)      }%  vs  ${round(13_43.901/71.530,2)}%
-  duty_flux: ${unit.heat_flux(result_obj.duty_flux)}
+  Q_stack:  ${unit.heat_flow( result_obj.Q_stack)}
 
-  At:   ${unit.area(result_obj.At)          }        vs 52448
-  An:    ${unit.area(result_obj.An)        }         vs ${round(88_088.02/0.1281/3600,1)}
-  Ao:     ${unit.area(result_obj.Ao)       }         vs NR
-  Afo:    ${unit.area(result_obj.Afo)      }         vs NR
-  Apo:    ${unit.area(result_obj.Apo)     }          vs NR
-  Ai:     ${unit.area(result_obj.Ai)      }          vs NR
-  F_eff:  ${round(result_obj.Ef, 6)      }           vs NR
-  Gn:    ${round(result_obj.Gn/3600) } lb/sec-ft²    vs .1281
+  duty_conv: ${round(100*result_obj['%'],2)      }% 
 
-  Uo:    ${ unit.convect(result_obj.Uo)           }  vs 1.296
+  At:   ${unit.area(result_obj.At)          }        
+  An:    ${unit.area(result_obj.An)        }         
+  Ao:     ${unit.area(result_obj.Ao)       }         
+  Afo:    ${unit.area(result_obj.Afo)      }         
+  Apo:    ${unit.area(result_obj.Apo)     }          
+  Ai:     ${unit.area(result_obj.Ai)      }          
+  F_eff:  ${round(result_obj.Ef, 6)      }           
+  Gn:    ${round(result_obj.Gn/3600) } lb/sec-ft²    
+
+  Uo:    ${ unit.convect(result_obj.Uo)           }  
   R_int: ${ round(result_obj.R_int, 6)  }
   R_tub: ${ round(result_obj.R_tube,6)  }
   R_ext: ${ round(result_obj.R_ext, 6)  }
 
-  hi:   ${unit.convect(result_obj.hi)              } vs 211.89
+  hi:   ${unit.convect(result_obj.hi)              } 
   hr:   ${unit.convect(result_obj.hr)            }
-  ho:   ${unit.convect(result_obj.ho)            }   vs 1.7126
+  ho:   ${unit.convect(result_obj.ho)            }   
   hc:   ${unit.convect(result_obj.hc)            }
-  he:   ${unit.convect(result_obj.he)            }   vs 1.5013
+  he:   ${unit.convect(result_obj.he)            }      
 
-  gr:   ${round(result_obj.gr,6) }
-  j:    ${round(result_obj.j, 6)            }        vs .0055 esteem
-
-  kw_fin:   ${ unit.thermal( result_obj.kw_fin )   } vs 16.08
+  kw_fin:   ${ unit.thermal( result_obj.kw_fin )   } 
   kw_tube:  ${ unit.thermal( result_obj.kw_tube )  }
   kw_fluid: ${ unit.thermal( result_obj.kw_fluid ) }
   kw_flue:  ${ unit.thermal( result_obj.kw_flue )  }
@@ -237,22 +223,16 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   Re_fluid: ${result_obj.Reynolds}
 
   TUBING:
-    Material:       ${result_obj.TUBING.Material}
-    No Tubes Wide:  ${result_obj.TUBING.Nt}
-    No Tubes:       ${result_obj.TUBING.N}
-    Wall Thickness: ${unit.lengthC(result_obj.TUBING.Sch)}
-    Outside Di:     ${unit.lengthC(result_obj.TUBING.Do)}
-    Tran Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
-    Long Pitch:     ${unit.lengthC(result_obj.TUBING.S_tube)}
-    Ef. Length:     ${unit.length(result_obj.TUBING.L)}
+    No Tubes:    ${result_obj.TUBING.N}
+    Other props: Same as shield
 
   FINNING: 
-    Material:       ${result_obj.FINING.Material}
-    Type:           ${result_obj.FINING.Type}
-    Height:         ${unit.lengthC(result_obj.FINING.Height)}
-    Thickness:      ${unit.lengthC(result_obj.FINING.Thickness)}
-    Dens:           ${unit.lengthInv(result_obj.FINING.Dens)},
-    Arrange:        ${result_obj.FINING.Arrange}
+    Material:   ${result_obj.FINING.Material}
+    Type:       ${result_obj.FINING.Type}
+    Height:     ${unit.lengthC(result_obj.FINING.Height)}
+    Thickness:  ${unit.lengthC(result_obj.FINING.Thickness)}
+    Dens:       ${unit.lengthInv(result_obj.FINING.Dens)},
+    Arrange:    ${result_obj.FINING.Arrange}
   `;
   return `\n` + string;
 }
@@ -279,9 +259,9 @@ Datos de entrada
   Presión de aire seco:     ${result_obj.debug_data['dryAirPressure']}
   Presión de vapor de agua:  ${result_obj.debug_data['waterPressure']}
 
-  Presión parcial de H2O: ${result_obj.debug_data['H2OPressure_%']} ÷10²
-  Presión parcial de N2: ${result_obj.debug_data['N2Pressure_%']} ÷10²
-  Presión parcial de O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
+  Fracción parcial de H2O: ${result_obj.debug_data['H2OPressure_%']} ÷10²
+  Fracción parcial de N2: ${result_obj.debug_data['N2Pressure_%']} ÷10²
+  Fracción parcial de O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
   Cont. húmedo (w):   ${result_obj.debug_data['moisture']}-AireSeco
 
 
@@ -292,6 +272,9 @@ Datos de entrada
 
   Gravedad esp, residuo: ${result_obj.debug_data.spGrav}
   Flujo másico, residuo: ${unit.mass_flow( result_obj.rad_result.m_fluid ) }
+
+  Flujo másico, comb.:   ${unit.mass_flow( result_obj.rad_result.m_fuel )  }   
+  Flujo másico, gases:   ${unit.mass_flow( result_obj.shld_result.m_flue)} 
 
   Calor requerido: ${unit.heat_flow(result_obj.rad_result.duty_total)}
   Calor calculado: ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
@@ -304,7 +287,7 @@ por cada mol de combustible
 
   Flujo total: ${round(result_obj.flows['total_flow'],3)}
   Flujo seco:  ${round(result_obj.flows['dry_total_flow'],3)}
-      ${''              }                 Porcentajes en base húmeda
+      ${''              }                Porcentajes en base húmeda
   N2:  ${result_obj.products['N2']  }             N2:  ${round(result_obj.flows['N2_%'],3) } %
   O2:   ${result_obj.products['O2'] }             O2:  ${round(result_obj.flows['O2_%'],3)} %
   H2O:  ${result_obj.products['H2O']}             H2O: ${round(result_obj.flows['H2O_%'],3)} %
@@ -345,9 +328,9 @@ Input Data
   Dry Air Pressure:     ${result_obj.debug_data['dryAirPressure']}
   Water Vapor Pressure:  ${result_obj.debug_data['waterPressure']}
 
-  Partial Pressure H2O: ${result_obj.debug_data['H2OPressure_%']} ÷10²
-  Partial Pressure N2: ${result_obj.debug_data['N2Pressure_%']} ÷10²
-  Partial Pressure O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
+  Partial Fraction H2O: ${result_obj.debug_data['H2OPressure_%']} ÷10²
+  Partial Fraction N2: ${result_obj.debug_data['N2Pressure_%']} ÷10²
+  Partial Fraction O2: ${result_obj.debug_data['O2Pressure_%']} ÷10²
   Moisture content (w): ${result_obj.debug_data['moisture']}-dryAir
 
 
@@ -358,6 +341,9 @@ Input Data
 
   Fluid's Sp Grav:   ${result_obj.debug_data.spGrav}
   Fluid's Mass Flow: ${unit.mass_flow( result_obj.rad_result.m_fluid ) }
+
+  Comb's  Mass Flow: ${unit.mass_flow( result_obj.rad_result.m_fuel )}   
+  Gases's Mass Flow: ${unit.mass_flow( result_obj.shld_result.m_flue)} 
 
   Fluid heat required: ${unit.heat_flow(result_obj.rad_result.duty_total)}
   Heat calculated:     ${unit.heat_flow(result_obj.rad_result.duty + result_obj.shld_result.duty + result_obj.conv_result.duty)}
@@ -386,7 +372,7 @@ Total flue gas moles and percentage (per fuel mol)
 
   Fuel mol weight: ${result_obj.flows['fuel_MW']}
   Fuel Cp(t_fuel): ${result_obj.flows['Cp_fuel']}
-  NCV:             ${result_obj.flows['NCV']} vs ${round(87_998_730/4_477)}
+  NCV:             ${result_obj.flows['NCV']} 
 
   Flue gas mol weight: ${result_obj.flows['flue_MW']}
   Flue gas Cp(t_amb):  ${result_obj.flows['Cp_flue']}
