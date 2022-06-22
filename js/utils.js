@@ -120,7 +120,8 @@ const newtonRaphson = (f, fp, x0, nrOptions, name, noLog) => {
 const 
   tempToK = 273.15,
   pAtmRef = 101_325,
-  barrelsToft3 = 5.6145833333,
+  /* ATT: Changes here must be done at webInput too. */
+  barrelsToft3 = 5.6145833333, 
   ft3Tolb = 62.371, // for Water @60°F
   spGrav = 0.84, // for current fluid
   tempAmbRef = tempToK + 15.55556; // 288.7 K

@@ -122,16 +122,17 @@ formElement.addEventListener('submit', function () {
 // -- Updating duty value to show in MBtu/h.
 const 
   barrelsToft3 = 5.6145833333,
-  ft3Tolb = 62.371*0.84, // for crude oil @60°F
-  BPDtolb_h = barrelsToft3*ft3Tolb/24;
+  ft3Tolb = 62.371, // for Water @60°F
+  spGrav = 0.84, // for current fluid
+  BPDtolb_h = barrelsToft3*ft3Tolb*spGrav/24;
 
 const updateDuty = () => spanDutyField.innerHTML = Math.round(
     +inputFlow.value*BPDtolb_h *
     (+tOut.value-tIn.value) *(+cpOut.value+ +cpIn.value)/2
-    /10
+    /10_000
   ) /100;
 const updateFlow = () => spanFlowField.innerHTML = Math.round(
-  +inputFlow.value*BPDtolb_h*1e3 ).toLocaleString();
+  +inputFlow.value*BPDtolb_h ).toLocaleString();
 
 const tIn = document.getElementById(tInElementID);
 const tOut = document.getElementById(tOutElementID);
