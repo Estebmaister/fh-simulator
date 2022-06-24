@@ -68,8 +68,8 @@ const createParams = (opts) => {
     efficiency: opts.effcy,         // (% *.01)
     duty_rad_dist: opts.radDist,    // (% *.01)
     heat_loss_percent: opts.hLoss,  // (% *.01)
-    max_duty: unitConv.BTUtokJ(71.5276*1e3),// (kJ/h)
-    miu_fluid: viscosityApprox({
+    max_duty: unitConv.BTUtokJ(71.5276*1e3),// (kJ/h) unused
+    miu_fluid: viscosityApprox({ //[ ]: Fixed values & interpolation
       t1: unitConv.FtoK(678), v1: miu_fluid_in,
       t2: unitConv.FtoK(772), v2: miu_fluid_out
     }),                     // (cP)
@@ -161,7 +161,7 @@ const externalCycle = (params) => {
       shld: shieldSection(params, noLog),
       conv: convSection(  params, noLog)
     };
-    if (int_rlt.conv.tg_out <= int_rlt.conv.t_in) int_rlt.conv.Q_fluid*=2;
+    //HACK: if (int_rlt.conv.tg_out <= int_rlt.conv.t_in) int_rlt.conv.Q_fluid*=2;
     const duty_calc = Math.abs(int_rlt.rad.Q_fluid) + 
     Math.abs(int_rlt.shld.Q_fluid) + Math.abs(int_rlt.conv.Q_fluid);
 

@@ -180,6 +180,8 @@ function innerDraw(
       .attr("fill", "red")
       .attr("opacity", "0.3")
       .attr('cy', d => yScale(yValue(d)))
+      .attr('y', d => yValue(d)) // reference
+      .attr('x', d => xValue(d)) // reference
     .transition().duration(500).delay((_d, i) => i*10)
       .attr('cx', d => xScale(xValue(d)))
       .attr('r', circleRadius);
