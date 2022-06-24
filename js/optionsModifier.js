@@ -50,7 +50,7 @@ const optionsModifierFluid = (key, browserData, options) => {
         options.tOut = optValue;
       break;
     case 'sp':
-      // TODO: include fouling resistance
+      // TODO: include additional parameters
       break;
     case 'miu_in':
       

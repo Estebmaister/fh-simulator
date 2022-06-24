@@ -98,7 +98,7 @@ const shieldSection = (params, noLog) => {
   const tg_out_func = (tG_out) => Q_flue(tg_in, tG_out) + Q_rad - Q_fluid(t_in, t_out);
   const Tin_sh_func = (tIn) => Q_fluid(tIn) - Q_R(tIn, tg_in, tg_out, Tb(tIn), Tw( Tb(tIn),Tw(Tb(tIn)) ));
   // -------- 1st estimation of tg_out   #.#.#.#.#
-  tg_out = newtonRaphson(tg_out_func, (tg_in - 200), params.NROptions, "Tg_out_shield-1",noLog);
+  tg_out = newtonRaphson(tg_out_func, (tg_in - 100), params.NROptions, "Tg_out_shield-1",noLog);
   t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-1",noLog);
 
   let iter = 1;

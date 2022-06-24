@@ -33,7 +33,7 @@ const dryAir = {
   H2O: 0
 };
 
-//TODO: expanse the use of the error in result dictionary
+//[ ]: expand the use of the error in result dictionary or delete it
 /** Check if the percentages of the fuels sums 100%.
  * In case of check fail an error will be attached to the result.
 */
