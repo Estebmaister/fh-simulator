@@ -197,8 +197,13 @@ const combustionCycle = (params, fuels) => {
 
     return Math.round(combO2.flows['O2_%']*1e5 -params.o2Excess*1e7);
   }
-  const airExcess = newtonRaphson(comb_o2,.5,
-    params.NROptions, 'o2_excess_to_air');
+  const convNROptions = {...params.NROptions};
+  convNROptions.maxIterations *= 5;
+  convNROptions.tolerance *= 1e-1;
+  convNROptions.epsilon *= 1e-1;
+  convNROptions.h *= 1e-1;
+  const airExcess = newtonRaphson(comb_o2,.05,
+    convNROptions, 'o2_excess_to_air');
 
   if (airExcess) params.airExcess = airExcess;
   logger.info(`'air_excess': ${round(100*airExcess,2)}, `+
