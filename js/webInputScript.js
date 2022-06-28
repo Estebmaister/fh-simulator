@@ -18,6 +18,7 @@ const tInElementID = "t_in";
 const tOutElementID = "t_out";
 const cpInElementID = "cp_in";
 const cpOutElementID = "cp_out";
+const spGravElementID = "sp-grav";
 const totalElementID = "total";
 const subDutyElementID = "sub-duty";
 
@@ -123,23 +124,24 @@ formElement.addEventListener('submit', function () {
 const 
   barrelsToft3 = 5.6145833333,
   ft3Tolb = 62.371, // for Water @60°F
-  spGrav = 0.84, // for current fluid
-  BPDtolb_h = barrelsToft3*ft3Tolb*spGrav/24;
+  BPDtolb_h = (SG) => barrelsToft3*ft3Tolb*SG/24;
 
 const updateDuty = () => spanDutyField.innerHTML = Math.round(
-    +inputFlow.value*BPDtolb_h *
+    +inputFlow.value*BPDtolb_h(+spGrav.value) *
     (+tOut.value-tIn.value) *(+cpOut.value+ +cpIn.value)/2
     /10_000
   ) /100;
 const updateFlow = () => spanFlowField.innerHTML = Math.round(
-  +inputFlow.value*BPDtolb_h ).toLocaleString();
+  +inputFlow.value*BPDtolb_h(+spGrav.value) ).toLocaleString();
 
 const tIn = document.getElementById(tInElementID);
 const tOut = document.getElementById(tOutElementID);
 const cpIn = document.getElementById(cpInElementID);
 const cpOut = document.getElementById(cpOutElementID);
-
+const spGrav = document.getElementById(spGravElementID);
 const subDuty = document.getElementById(subDutyElementID);
+console.log(spGrav)
+
 let inputFlow, spanFlowField;
 const spanDutyField = document.getElementById('span-duty');
 if (subDuty) {
@@ -150,6 +152,7 @@ if (subDuty) {
     inputFlow.addEventListener('input', updateFlow)
     cpOut.addEventListener('input', updateDuty)
     cpIn.addEventListener('input', updateDuty)
+    spGrav.addEventListener('input', updateDuty)
     // Functions for temps are already added at updateTemp()
   }
 }

@@ -34,15 +34,18 @@ const {browserProcess} = require('./js/browser');
 
 const createParams = (opts) => {
   const
-    m_fluid = unitConv.lbtokg(opts.mFluid), // kg/h
+    m_fluid = unitConv.BPDtolb_h(
+      unitConv.lbtokg(opts.mFluid),
+      opts.spGrav
+    ), // kg/h
     t_in  = unitConv.FtoK(opts.tIn), // (K)
-    t_out = unitConv.FtoK(opts.tOut), // (K)
-    miu_fluid_in = 1.45, // (cp)
-    miu_fluid_out= 0.96, // (cp)
-    cp_fluid_in = unitConv.CpENtoCpSI(0.676), // (kJ/kg-C)
-    cp_fluid_out= unitConv.CpENtoCpSI(0.702), // (kJ/kg-C) 
-    kw_fluid_in = unitConv.kwENtokwSI(0.038), // (kJ/h-m-C)
-    kw_fluid_out= unitConv.kwENtokwSI(0.035); // (kJ/h-m-C)
+    t_out = unitConv.FtoK(opts.tOut),// (K)
+    miu_fluid_in = opts.miuFluidIn,  // (cp)
+    miu_fluid_out= opts.miuFluidOut, // (cp)
+    cp_fluid_in = unitConv.CpENtoCpSI(opts.cpFluidIn), // (kJ/kg-C)
+    cp_fluid_out= unitConv.CpENtoCpSI(opts.cpFluidOut),// (kJ/kg-C) 
+    kw_fluid_in = unitConv.kwENtokwSI(opts.kwFluidIn), // (kJ/h-m-C)
+    kw_fluid_out= unitConv.kwENtokwSI(opts.kwFluidOut);// (kJ/h-m-C)
 
   return {
     runDistCycle: opts.runDistCycle,
@@ -60,26 +63,26 @@ const createParams = (opts) => {
     t_in_conv:  t_in,       // (K) global process inlet
     t_out:      t_out,      // (K) global process outlet
     m_fluid:    m_fluid,    // (kg/h) 
-    Rfi: unitConv.RfENtoRfSI(opts.rfi), // (h-m2-C/kJ) int. fouling
-    Rfo: unitConv.RfENtoRfSI(opts.rfo), // (h-m2-C/kJ) ext. fouling
-    Rfi_conv: .000, // (h-m2-C/kJ) int. fouling
-    Rfi_shld: .000, // (h-m2-C/kJ) int. fouling
-    Rfo_shld: .000, // (h-m2-C/kJ) ext. fouling
+    Rfi: unitConv.RfENtoRfSI(opts.rfi), // (h-m2-C/kJ) int. fouling rad
+    Rfo: unitConv.RfENtoRfSI(opts.rfo), // (h-m2-C/kJ) ext. fouling cnv
+    Rfi_conv: .000, // (h-m2-C/kJ) int. fouling conv sect
+    Rfi_shld: .000, // (h-m2-C/kJ) int. fouling shld sect
+    Rfo_shld: .000, // (h-m2-C/kJ) ext. fouling shld sect
     efficiency: opts.effcy,         // (% *.01)
     duty_rad_dist: opts.radDist,    // (% *.01)
     heat_loss_percent: opts.hLoss,  // (% *.01)
     max_duty: unitConv.BTUtokJ(71.5276*1e3),// (kJ/h) unused
-    miu_fluid: viscosityApprox({ //[ ]: Fixed values & interpolation
-      t1: unitConv.FtoK(678), v1: miu_fluid_in,
-      t2: unitConv.FtoK(772), v2: miu_fluid_out
+    miu_fluid: viscosityApprox({
+      t1: t_in,  v1: miu_fluid_in,
+      t2: t_out, v2: miu_fluid_out
     }),                     // (cP)
     Cp_fluid: linearApprox({
-      x1: unitConv.FtoK(678), y1: cp_fluid_in,
-      x2: unitConv.FtoK(772), y2: cp_fluid_out
+      x1: t_in,  y1: cp_fluid_in,
+      x2: t_out, y2: cp_fluid_out
     }),                     // (kJ/kg-C) 
     kw_fluid: linearApprox({
-      x1: unitConv.FtoK(678), y1: kw_fluid_in,
-      x2: unitConv.FtoK(772), y2: kw_fluid_out
+      x1: t_in,  y1: kw_fluid_in,
+      x2: t_out, y2: kw_fluid_out
     }),                     // (kJ/h-m-C)
 
     // m_fuel: 100,         // (kg/h)

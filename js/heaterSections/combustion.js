@@ -287,9 +287,9 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   const debug_data = {
     err: "",
     atmPressure:     units.pressure(params.p_atm),
-    fuelTemperature: units.tempC(params.t_fuel),
-    ambTemperature:  units.tempC(params.t_amb),
-    airTemperature:  units.tempC(params.t_air),
+    fuelTemperature: units.tempC(params.t_fuel,0),
+    ambTemperature:  units.tempC(params.t_amb,0),
+    airTemperature:  units.tempC(params.t_air,0),
     "humidity_%": params.humidity,
     "dryAirN2_%": round(dryAirN2Percentage),
     "dryAirO2_%": round(dryAirO2Percentage),
@@ -397,7 +397,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   flows.flue_MW  = units["mass/mol"](flows.flue_MW);
 
   params.NCV = -ncv(normalFuel, products, compounds, params.t_amb)/MW_multicomp(normalFuel); // kJ/kg
-  flows.NCV = units["energy/mass"](params.NCV);
+  flows.NCV = units["energy/mass"](params.NCV,0);
 
   params.adFlame = newtonRaphson(
     adFlame(normalFuel, products, params.t_amb, o2excess),
