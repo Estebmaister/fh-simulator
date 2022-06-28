@@ -68,29 +68,30 @@
       <div class="form-div">
         <div class="form-block flex-evenly"> 
 
-            <h3>Condiciones de diseño</h3>
+            <h3>Condiciones de Diseño</h3>
 
             <div class="form-div full-width">
               <div class="full-width">
                 <p><strong>Residuo atmosférico</strong></p>
 
                 <p id="sub-duty" class="project-info">
-                  Flujo <input step="1" min="50000" max="110000" name="m_fluid" type="number" value="90000"> BPD
+                  Flujo volumétrico <input step="1" min="50000" max="110000" name="m_fluid" type="number" value="90000"> BPD
                   <sub class="hidden"><span>~</span> lb/hr</sub>
                 </p>
                 <p class="project-info">
-                  Grav. esp. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled><sub><em>@ 60°F</em></sub>
+                  Gravedad específica <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" min="0" value="0.84">
+                  <sub><em>@ 60°F</em></sub>
                 </p>
               </div>
               <div class="full-width">
                 <p class="project-info sub-temp">
-                  Temp. entrada T<sub>in</sub> <input id="t_in" step="1" min="650" max="700" name="t_in" type="number" value="678"> °F
-                  <sub><span>~</span> °C</sub>
+                  Temperatura entrada <input id="t_in" step="1" min="600" max="699" name="t_in" type="number" value="678"> °F
+                  <sub class="hidden"><span>~</span> °C</sub>
                 </p>
                 <br>
                 <p class="project-info sub-temp">
-                  Temp. salida T<sub>out</sub> <input id="t_out"step="1" min="725" max="795" name="t_out"type="number" value="772"> °F
-                  <sub><span>~</span> °C</sub>
+                  Temperatura salida <input id="t_out"step="1" min="700" max="800" name="t_out"type="number" value="772"> °F
+                  <sub class="hidden"><span>~</span> °C</sub>
                 </p>
 
                 <p class="project-info hidden">
@@ -105,7 +106,7 @@
 
                 <p class="project-info">
                   Absorción de calor ('duty'): 
-                  <span id="span-duty">71.53</span> MBtu/hr
+                  <span id="span-duty">71.53</span> MMBtu/hr
                 </p>
               </div>
             </div>
@@ -133,33 +134,35 @@
           </div>
 
           <div class="form-block flex-evenly"> 
-            <h3>Condiciones de combustion</h3>
+            <h3>Condiciones de Combustión</h3>
 
             <div class="form-div">
               <p class="project-info">
                 Exceso de aire <input step="0.01" min="0" name="air_excess" type="number" value="20.0"> %
               </p>
               <p class="project-info">
-                Exceso de O<sub>2</sub> gases de comb. <input id="o2_excess" name="o2_excess" type="number" min="0" max="30" step="0.1" placeholder="0.0"> %
+                Exceso de O<sub>2</sub>
+                <input id="o2_excess" min="0" max="30" step="0.1" name="o2_excess" type="number" placeholder="0.0"> %
                 <br>
-                <span><em><sub>[Al definir este valor el exceso de aire sería calculado]</sub></em></span>
+                <span><em><sub>[El dato de exceso de O2 prevalece sobre el exceso de aire]</sub></em></span>
               </p>
               <p class="project-info">
-                Pérdidas por radiación <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
+                Pérdidas por radiación <input step="0.1" min="0" max="5" name="heat_loss" type="number" value="1.5"> %
               </p>
-              <p class="project-info sub-temp">Temp. ingreso comb. T<sub>f</sub> <input name="t_fuel" value="80" step="1" type="number"> °F
+              <!-- <p class="project-info sub-temp">
+                Temp. ingreso combustión <input step="1" min="0" max="100" name="t_fuel" type="number" value="80"> °F
                 <sub><span>~</span> °C</sub> 
-              </p>
+              </p> -->
               <p class="project-info sub-temp">
-                Temp. aire amb. T<sub>a</sub> <input step="1" min="0" name="t_amb" type="number" value="80"> °F
+                Temp. aire ambiental <input step="1" min="0" max="100" name="t_amb" type="number" value="80"> °F
                 <sub><span>~</span> °C</sub>
               </p> 
               <p class="project-info">
-                Humedad relativa RH <input step="0.1" min="0" name="humidity" type="number" value="50.0"> %
+                Humedad relativa <input step="0.1" min="0" max="100" name="humidity" type="number" value="50.0"> %
               </p>
 
               <p class="project-info hidden">
-                Presión atmosférica <input step="0.01" min="0" name="p_atm" type="number" placeholder="1.00"> 
+                Presión atmosférica <input step="0.01" min="0" max="2" name="p_atm" type="number" placeholder="1.00"> 
                 <sub>atm</sub>
               </p>
             </div>
@@ -169,12 +172,12 @@
 
       <hr>
 
-      <h3>Combustible <span id="show-hide-fuel">[editar]</span></h3>
+      <h3>Características del Combustible <span id="show-hide-fuel">[editar]</span></h3>
 
       <div id="fuel-div">
-        
+        <p>Combustible: Gas de Refinería</p>
         <div class="form-div comp"> 
-          <p class="project-info">Composición molar/volumétrica - Total <span id="total" style="font-weight: bold;"> 0 </span> %</p>
+          <p class="project-info">Composición molar - Total <span id="total" style="font-weight: bold;"> 0 </span> %</p>
         </div> 
 
         <div class="form-div comp-div">
@@ -195,7 +198,7 @@
             <p class="fuel-name">i-Butano      </p><p class="fuel-formula">C<sub>4</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="iC4H10" id="iC4H10" placeholder="0.00" type="number" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Monóx. Carbono</p><p class="fuel-formula">CO                      </p> <p class="fuel-input"><input max="100" min="0.00" name="CO"     id="CO"     placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Monóxido de Carbono</p><p class="fuel-formula">CO                      </p> <p class="fuel-input"><input max="100" min="0.00" name="CO"     id="CO"     placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
           </div>
           <div class="fuel-compound">
             <p class="fuel-name">Hidrógeno     </p><p class="fuel-formula">H<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="H2"     id="H2"     placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
@@ -204,7 +207,7 @@
             <p class="fuel-name">Nitrógeno     </p><p class="fuel-formula">N<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="N2"     id="N2"     placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Dióx. Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="100" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Dióxido de Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="100" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
           </div>
         <div class="fuel-compound">
           <p class="fuel-name">Etileno        </p><p class="fuel-formula">C<sub>2</sub>H<sub>4</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H4"   id="C2H4"   placeholder="0.00" type="number" class="inp" step="0.0001"></p>
@@ -269,7 +272,7 @@
 			</a>
 		</p>
     <p>
-      v1.1.0<em> - Calculos realizados en el motor del navegador, registros disponibles en la consola</em>
+      v1.3.0<em> - Calculos realizados en el motor del navegador, registros disponibles en la consola</em>
     </p>
 	</footer>
 </body>

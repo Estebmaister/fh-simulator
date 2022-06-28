@@ -5,17 +5,7 @@ const optionsModifierGraph = (key, browserData, options) => {
   let optValue;
   switch (key) {
     case 'graph_var':
-      switch (browserData[key]) {
-        case 'humidity':
-          options.graphVar = 'humidity';
-          break;
-        case 'air_excess':
-          options.graphVar = 'air_excess';
-          break;
-        case 'm_fluid':
-          options.graphVar = 'm_fluid';
-          break;
-      }
+      options.graphVar = browserData[key]
       break;
     case 'graph_range':
       optValue = parseFloat(browserData[key])
@@ -32,43 +22,38 @@ const optionsModifierGraph = (key, browserData, options) => {
 
 // Logic to modified default options for process fluid with data from browser
 const optionsModifierFluid = (key, browserData, options) => {
-  let optValue;
+  let optValue = parseFloat(browserData[key]);
+  if (optValue <= 0) return; // every value here should be greater than 0
   switch (key) {
     case 'm_fluid':
-      optValue = parseFloat(browserData[key])
-      if (optValue > 0 && optValue < 175) 
-        options.mFluid = unitConv.BPDtolb_h(optValue*1e3);
+      options.mFluid = optValue;
       break;
     case 't_in':
-      optValue = parseFloat(browserData[key])
-      if (optValue > 0) 
-        options.tIn = optValue;
+      options.tIn = optValue;
       break;
     case 't_out':
-      optValue = parseFloat(browserData[key])
-      if (optValue > 0) 
-        options.tOut = optValue;
+      options.tOut = optValue;
       break;
-    case 'sp':
-      // TODO: include additional parameters
+    case 'sp_grav':
+      options.spGrav = optValue;
       break;
     case 'miu_in':
-      
+      options.miuFluidIn = optValue;
       break;
     case 'miu_out':
-      
+      options.miuFluidOut = optValue;
       break;
     case 'kw_in':
-      
+      options.kwFluidIn = optValue;
       break;
     case 'kw_out':
-    
+      options.kwFluidOut = optValue;
       break;
     case 'cp_in':
-      
+      options.cpFluidIn = optValue;
       break;
     case 'cp_out':
-    
+      options.cpFluidOut = optValue;
       break;
     default:
       break;
@@ -83,7 +68,8 @@ const optionsModifierAmbient = (key, browserData, options) => {
     maxHumidity = 100,
     maxO2Excess = 30,
     maxTamb = 1e2,
-    maxPatm = 2;
+    maxPatm = 2,
+    minPatm = 1e-2;
   let optValue;
   switch (key) {
     case 't_amb':
@@ -98,7 +84,7 @@ const optionsModifierAmbient = (key, browserData, options) => {
       break;
     case 'p_atm':
       optValue = parseFloat(browserData[key])
-      if (optValue > 1e-3 && optValue < maxPatm) 
+      if (optValue >= minPatm && optValue < maxPatm) 
         options.pAtm = optValue *options.pAtmRef;
       break;
     case 'air_excess':
@@ -112,7 +98,7 @@ const optionsModifierAmbient = (key, browserData, options) => {
         options.o2Excess = optValue * .01;
       break;
     case 'o2_basis':
-      
+      // Not configured
       break;
     default:
       break;
@@ -121,53 +107,41 @@ const optionsModifierAmbient = (key, browserData, options) => {
 
 // Logic to modified default options with data from browser
 const optionsModifier = (key, browserData, options) => {
+  const
+    minRadDist = 40,
+    maxRadDist = 100,
+    maxHeatLosses = 5;
   let optValue;
   switch (key) {
     case 'project_title':
-      if (browserData[key] != '') options.title = browserData[key]
-      break;
-    case 'project_n':
-      if (browserData[key] != '') options.case = browserData[key]
-      break;
-    case 'revision_n':
-      break;
-    case 'date':
-      if (browserData[key] != '') options.date = browserData[key]
+      if (browserData[key]) options.title = browserData[key]
       break;
     case 'fuel_percent':
+      // Not configured
       break;
     case 'heat_loss':
       optValue = parseFloat(browserData[key])
-      if (optValue <= 15) 
+      if (optValue <= maxHeatLosses) 
         options.hLoss = optValue*1e-2;
-      break;
-    case 'efficiency':
-      optValue = parseFloat(browserData[key])
-      if (optValue >= 50) 
-        options.effcy = optValue*1e-2;
       break;
     case 'rad_dist':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 40) {
+      if (optValue >= minRadDist && optValue <= maxRadDist) {
         options.radDist = optValue*1e-2;
         options.runDistCycle = false;
       }
       break;
     case 'rfi':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0) {
-        options.rfi = optValue;
-      }
+      if (optValue >= 0) options.rfi = optValue;
       break;
     case 'rfo':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0) {
-        options.rfo = optValue;
-      }
+      if (optValue >= 0) options.rfo = optValue;
       break;
     case 't_fuel':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0 && optValue) 
+      if (optValue >= 0) 
         options.tFuel = unitConv.FtoK(optValue);
       break;
     case 'unit_system':

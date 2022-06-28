@@ -37,7 +37,7 @@ const graphicData = ( comb, fuel, opt ) => {
       break;
     case 'm_fluid':
       graphVar = 'mFluid';
-      opt.graphRange = unitConv.BPDtolb_h(opt.graphRange*1e3);
+      opt.graphRange = opt.graphRange*1e3;
       break;
     default:
       graphVar = 'tOut';

@@ -190,16 +190,21 @@ const radSection = (params, noLog) => {
   params.tg_rad   = tg_out;
   params.duty     = duty_total;
   params.m_flue   = m_flue(m_fuel);
+  params.m_air    = m_air(m_fuel);
   params.t_w_rad  = Tw( Tb(t_out), Tw(Tb(t_out)) );
   params.q_rad_sh = Q_shld(tg_out, params.t_w_rad);
 
   const rad_result = {
+    m_air:    m_air(),
+    m_flue:   m_flue(),
     m_fuel:   m_fuel,
     m_fluid:  m_fluid,
     t_in:     t_in,
     t_out:    t_out,
     Tw:       params.t_w_rad,
     tg_out:   tg_out,
+
+    rfi:      Rfi,
 
     Q_in:     Q_in(m_fuel),
     Q_rls:    Q_rls(m_fuel),

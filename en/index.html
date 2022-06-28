@@ -68,7 +68,7 @@
           <sub><span>~</span> lb/hr</sub>
         </p>
         <p class="project-info">
-          Spec. Grav. SG <input step="0.01" min="0" name="sg" type="number" value="0.84" disabled> <sub><em>@ 60°F</em></sub>
+          Spec. Grav. SG <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" value="0.84"> <sub><em>@ 60°F</em></sub>
         </p>
         <p class="project-info">
           Heat absorption ("duty"): 
@@ -91,11 +91,11 @@
             </div>
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Heat capacity Cp<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" disabled value="0.676"> 
+                Heat capacity Cp<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" value="0.676"> 
                 <sub>Btu/lb-°F</sub>
               </p>
               <p class="project-info">
-                Heat capacity Cp<sub>out</sub> <input id="cp_out"step="0.001"min="0"name="cp_out" type="number" disabled value="0.703"> 
+                Heat capacity Cp<sub>out</sub> <input id="cp_out"step="0.001"min="0"name="cp_out" type="number" value="0.703"> 
                 <sub>Btu/lb-°F</sub>
               </p>
             </div>
@@ -105,18 +105,18 @@
           <div class="form-div">
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Viscosity - μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" disabled value="1.45"> cp
+                Viscosity - μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" value="1.45"> cp
               <p class="project-info">
-                Viscosity - μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" disabled value="0.96"> cp
+                Viscosity - μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" value="0.96"> cp
               </p>
             </div>
             <div class="form-block flex-evenly">
               <p class="project-info">
-                Therm. cond. k<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" disabled value="0.038">
+                Therm. cond. k<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" value="0.038">
               <sub>Btu/h.ft.°F</sub>
               </p>
               <p class="project-info">
-                Therm. cond k<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" disabled value="0.035">
+                Therm. cond k<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" value="0.035">
               <sub>Btu/h.ft.°F</sub>
               </p>
             </div>
@@ -131,7 +131,7 @@
         <p class="project-info">R<sub>fo</sub> convect <input step="0.001" min="0" name="rfo" type="number" value="0.000">
           <sub>hr.ft².°F/Btu</sub>
         </p>
-        <p class="project-info">Heat Loss <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
+        <p class="project-info">Heat Loss <input step="0.1" min="0" max="5" name="heat_loss" type="number" value="1.5"> %
         </p>
         <p class="project-info">Fixed Rad. Dist. <input step="0.1" min="40" max="100" name="rad_dist" type="number" placeholder="0.0"> %
         </p>
@@ -144,14 +144,14 @@
   
           <div class="form-div"> 
             <p class="project-info sub-temp">
-              Ambient Temp T<sub>a</sub> <input step="1" name="t_amb" type="number" value="80"> °F
+              Ambient Temp T<sub>a</sub> <input step="1" min="0" max="100" name="t_amb" type="number" value="80"> °F
               <sub><span>~</span> °C</sub> 
             </p> 
             <p class="project-info">
-              Relative Humidity RH <input step="0.1" min="0" name="humidity" type="number" value="50.0"> %
+              Relative Humidity RH <input step="0.1" min="0" max="100" name="humidity" type="number" value="50.0"> %
             </p>
             <p class="project-info">
-              Atmospheric Pressure <input step="0.01" min="0" name="p_atm" type="number" placeholder="1.00"> 
+              Atmospheric Pressure <input step="0.01" min="0" max="2" name="p_atm" type="number" placeholder="1.00"> 
               <sub>atm</sub>
             </p>
             <p class="project-info">
@@ -186,7 +186,7 @@
       <div id="fuel-div">
         <div class="form-div comp"> 
           <p class="project-info sub-temp">
-            Temp T<sub>f</sub> <input name="t_fuel" step="1" value="80" type="number"> °F 
+            Temp T<sub>f</sub> <input step="1" min="0" max="100" name="t_fuel" type="number" value="80"> °F 
             <sub><span>~</span> °C</sub> 
           </p>
           <p class="project-info">Fuel gas Specified as <select name="fuel_percent" disabled>
@@ -349,7 +349,7 @@
 			</a>
 		</p>
     <p>
-      v1.1.0<em> - Calculations performed at web browser engine, logs can be seen at the console</em>
+      v1.3.0<em> - Calculations performed at web browser engine, logs can be seen at the console</em>
     </p>
 	</footer>
 </body>

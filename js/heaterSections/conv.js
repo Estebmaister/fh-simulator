@@ -167,6 +167,9 @@ const convSection = (params, noLog) => {
     tg_in:        tg_in,
     Tb_g:         Tb(tg_in, tg_out),
 
+    rfi:          Rfi,
+    rfo:          Rfo,
+
     LMTD:         LMTD_Tin(t_in),
     DeltaA:       (tg_in - t_out),
     DeltaB:       (tg_out - t_in),

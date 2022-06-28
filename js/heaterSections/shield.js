@@ -145,6 +145,9 @@ const shieldSection = (params, noLog) => {
     DeltaA:   (tg_in - t_out),
     DeltaB:   (tg_out - t_in),
 
+    rfi:          Rfi,
+    rfo:          Rfo,
+
     Q_flue:   Q_flue(tg_in, tg_out),
     Q_fluid:  Q_fluid(t_in),
     Q_R:      Q_R( t_in, tg_in, tg_out, Tb(t_in), Tw(Tb(t_in)) ),
