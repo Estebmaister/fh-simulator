@@ -75,12 +75,12 @@
                 <p><strong>Residuo atmosférico</strong></p>
 
                 <p id="sub-duty" class="project-info">
-                  Flujo volumétrico <input step="1" min="50000" max="110000" name="m_fluid" type="number" value="90000"> BPD
+                  Flujo volumétrico <input step="1" min="60000" max="120000" name="m_fluid" type="number" value="90000"> BPD
                   <sub class="hidden"><span>~</span> lb/hr</sub>
                 </p>
                 <p class="project-info">
-                  Gravedad específica <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" min="0" value="0.84">
-                  <sub><em>@ 60°F</em></sub>
+                  Gravedad específica <em>@ 60°F</em> <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" min="0" value="0.84">
+                  
                 </p>
               </div>
               <div class="full-width">
@@ -142,7 +142,7 @@
               </p>
               <p class="project-info">
                 Exceso de O<sub>2</sub>
-                <input id="o2_excess" min="0" max="30" step="0.1" name="o2_excess" type="number" placeholder="0.0"> %
+                <input id="o2_excess" min="0" max="11" step="0.1" name="o2_excess" type="number" placeholder="0.0"> %
                 <br>
                 <span><em><sub>[El dato de exceso de O2 prevalece sobre el exceso de aire]</sub></em></span>
               </p>
@@ -155,7 +155,7 @@
               </p> -->
               <p class="project-info sub-temp">
                 Temp. aire ambiental <input step="1" min="0" max="100" name="t_amb" type="number" value="80"> °F
-                <sub><span>~</span> °C</sub>
+                <sub class="hidden"><span>~</span> °C</sub>
               </p> 
               <p class="project-info">
                 Humedad relativa <input step="0.1" min="0" max="100" name="humidity" type="number" value="50.0"> %
