@@ -224,7 +224,8 @@ const getOptions = () => {
 const options = getOptions();
 if (options.verbose) logger.debug(`"options","args":${JSON.stringify(options, null, 2)}`);
 
-const round = (number, dec = 3) => (Math.round(number*10**dec)/10**dec).toFixed(dec);
+const round = (number, dec = 3) => (+(Math.round(number*10**dec)/10**dec)
+.toFixed(dec)).toLocaleString();
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
     if(!isNaN(value) && value !== "") object[key] = round(value);
@@ -381,7 +382,7 @@ const englishSystem = { //(US Customary)
   tempC:    (n,dec) => round(unitConv.CtoF(n-tempToK),dec)+" °F",
   pressure: (n) => round(n * 0.0001450377)     + " psi",
   mass:     (n) => round(n * 2.2046244202e-3)  + " lb",
-  mass_flow:(n,dec) => round(unitConv.kgtolb(n,dec))+ " lb/h",
+  mass_flow:(n,dec) => round(unitConv.kgtolb(n),dec)+ " lb/h",
   barrel_flow:(n, spG = spGrav) => 
     round( unitConv.kgtolb(n)/
       unitConv.BPDtolb_h(1,spG) /1000 ) + " x10³ BPD",
@@ -403,7 +404,7 @@ const siSystem = {
   "mass/mol":     (n) => round(n * 1) + " kg/kmol",
   heat_flow:      (n) => round(n*1e-6)+ " MJ/h",
   heat_flux:      (n) => round(n * 1) + " W/m²",
-  fouling_factor: (n) => round(n * 1) + " m²-K/W",
+  fouling_factor: (n,dec) => round(n*1e3,dec) + " ÷10³ m²-K/W",
 
   "energy/mass":  (n,dec) => round(n,dec) + " kJ/kg",
   "energy/vol":   (n) => round(n * 1) + " kJ/m³",

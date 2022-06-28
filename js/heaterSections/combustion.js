@@ -291,8 +291,8 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     ambTemperature:  units.tempC(params.t_amb,0),
     airTemperature:  units.tempC(params.t_air,0),
     "humidity_%": params.humidity,
-    "dryAirN2_%": round(dryAirN2Percentage),
-    "dryAirO2_%": round(dryAirO2Percentage),
+    "dryAirN2_%": round(dryAirN2Percentage,2),
+    "dryAirO2_%": round(dryAirO2Percentage,2),
     moisture:   units.moist(moistAirWeightRatio(
       params.t_air, params.humidity)),
     spGrav: params.sp_grav,
