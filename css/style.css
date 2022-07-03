@@ -240,7 +240,7 @@ h1 {
   justify-content: space-around;
 }
 .form-block {
-  min-width: 20rem;
+  min-width: 22rem;
   width: 50%;
 }
 .form-block:last-child {

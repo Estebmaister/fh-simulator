@@ -140,7 +140,6 @@ const cpIn = document.getElementById(cpInElementID);
 const cpOut = document.getElementById(cpOutElementID);
 const spGrav = document.getElementById(spGravElementID);
 const subDuty = document.getElementById(subDutyElementID);
-console.log(spGrav)
 
 let inputFlow, spanFlowField;
 const spanDutyField = document.getElementById('span-duty');
@@ -178,6 +177,14 @@ for (const element of subTemps) {
   element.updateTemp = updateTemp.bind(element);
   element.updateTemp()
   inputField.addEventListener('input', element.updateTemp)
+}
+
+const AmbTempInput = document.getElementById("t_amb")
+const FuelTempInput = document.getElementById("t_fuel")
+if (AmbTempInput) {
+  AmbTempInput.addEventListener('input', () => 
+    FuelTempInput.value = AmbTempInput.value
+  );
 }
 
 window.addEventListener('keydown',function(e){

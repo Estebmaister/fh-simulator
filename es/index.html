@@ -149,12 +149,12 @@
               <p class="project-info">
                 Pérdidas por radiación <input step="0.1" min="0" max="5" name="heat_loss" type="number" value="1.5"> %
               </p>
-              <!-- <p class="project-info sub-temp">
-                Temp. ingreso combustión <input step="1" min="0" max="100" name="t_fuel" type="number" value="80"> °F
+              <p class="project-info sub-temp hidden">
+                Temp. ingreso combustión <input id="t_fuel" step="1" min="0" max="100" name="t_fuel" type="number" value="80"> °F
                 <sub><span>~</span> °C</sub> 
-              </p> -->
+              </p>
               <p class="project-info sub-temp">
-                Temp. aire ambiental <input step="1" min="0" max="100" name="t_amb" type="number" value="80"> °F
+                Temp. aire ambiental <input id="t_amb" step="1" min="0" max="100" name="t_amb" type="number" value="80"> °F
                 <sub class="hidden"><span>~</span> °C</sub>
               </p> 
               <p class="project-info">
@@ -175,9 +175,8 @@
       <h3>Características del Combustible <span id="show-hide-fuel">[editar]</span></h3>
 
       <div id="fuel-div">
-        <p>Combustible: Gas de Refinería</p>
         <div class="form-div comp"> 
-          <p class="project-info">Composición molar - Total <span id="total" style="font-weight: bold;"> 0 </span> %</p>
+          <p class="project-info">Combustible: Gas de Refinería - Composición molar</p>
         </div> 
 
         <div class="form-div comp-div">
@@ -198,6 +197,12 @@
             <p class="fuel-name">i-Butano      </p><p class="fuel-formula">C<sub>4</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="iC4H10" id="iC4H10" placeholder="0.00" type="number" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
+            <p class="fuel-name">Etileno        </p><p class="fuel-formula">C<sub>2</sub>H<sub>4</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H4"   id="C2H4"   placeholder="0.00" type="number" class="inp" step="0.0001"></p>
+          </div>
+          <div class="fuel-compound">
+            <p class="fuel-name">Propileno      </p><p class="fuel-formula">C<sub>3</sub>H<sub>6</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C3H6"   id="C3H6"   placeholder="0.00" type="number" class="inp" step="0.0001"></p>
+          </div>
+          <div class="fuel-compound">
             <p class="fuel-name">Monóxido de Carbono</p><p class="fuel-formula">CO                      </p> <p class="fuel-input"><input max="100" min="0.00" name="CO"     id="CO"     placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
           </div>
           <div class="fuel-compound">
@@ -209,13 +214,10 @@
           <div class="fuel-compound">
             <p class="fuel-name">Dióxido de Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="100" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
           </div>
-        <div class="fuel-compound">
-          <p class="fuel-name">Etileno        </p><p class="fuel-formula">C<sub>2</sub>H<sub>4</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H4"   id="C2H4"   placeholder="0.00" type="number" class="inp" step="0.0001"></p>
-        </div>
-        <div class="fuel-compound">
-          <p class="fuel-name">Propileno      </p><p class="fuel-formula">C<sub>3</sub>H<sub>6</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C3H6"   id="C3H6"   placeholder="0.00" type="number" class="inp" step="0.0001"></p>
-        </div>
 
+        </div>
+        <div class="form-div comp"> 
+          <p class="project-info">Total <span id="total" style="font-weight: bold;"> 0 </span> %</p>
         </div>
       </div>
 
