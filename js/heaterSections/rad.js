@@ -233,11 +233,12 @@ const radSection = (params, noLog) => {
     hi:       hi( Tb(t_out), params.t_w_rad ),
     h_conv:   h_conv,
 
-    duty_total:duty_total,
-    duty:      duty_rad,
-    "%":       duty_rad/duty_total,
-    eff_total: duty_total/Q_rls(m_fuel) > 1 ? 100 : 100*duty_total/Q_rls(m_fuel),
-    duty_flux: duty_rad/At,
+    duty_total: duty_total,
+    duty:       duty_rad,
+    "%":        duty_rad/duty_total,
+    eff_total:  duty_total/Q_rls(m_fuel) > 1 ? 100 : 100*duty_total/Q_rls(m_fuel),
+    eff_thermal:(Q_stack)=>100 *(Q_in(m_fuel) - Q_losses(m_fuel) - Q_stack) /Q_in(m_fuel),
+    duty_flux:  duty_rad/At,
 
     Alpha:    alpha,
     MBL:      round(MBL),

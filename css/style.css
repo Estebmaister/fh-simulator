@@ -26,6 +26,12 @@
   text-rendering: optimizeLegibility;
 }
 
+@media screen and (max-width: 570px) {
+  :root {
+    font-size: 12px;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
@@ -240,7 +246,7 @@ h1 {
   justify-content: space-around;
 }
 .form-block {
-  min-width: 20rem;
+  min-width: 22rem;
   width: 50%;
 }
 .form-block:last-child {

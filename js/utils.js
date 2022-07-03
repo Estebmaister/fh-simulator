@@ -127,34 +127,34 @@ const
   tempAmbRef = tempToK + 15.55556; // 288.7 K
 
 const unitConv = {
-  RtoK: (n) => n*(5/9),
-  KtoR: (n) => n*(9/5),
-  KtoF: (n) => n*(9/5) - 459.67,
-  CtoK: (n) => n+tempToK,
-  CtoF: (n) => n*(9/5) + 32,
-  FtoC: (n) => (n-32)*(5/9),
-  FtoK: (n) => (n-32)*(5/9)+tempToK,
+  RtoK: (n=1) => n*(5/9),
+  KtoR: (n=1) => n*(9/5),
+  KtoF: (n=1) => n*(9/5) - 459.67,
+  CtoK: (n=1) => n+tempToK,
+  CtoF: (n=1) => n*(9/5) + 32,
+  FtoC: (n=1) => (n-32)*(5/9),
+  FtoK: (n=1) => (n-32)*(5/9)+tempToK,
 
-  kgtolb: (n) => n*2.20462,
-  lbtokg: (n) => n/2.20462,
-  BPDtolb_h:(n,spG=spGrav) => n*barrelsToft3*ft3Tolb/24*spG,
-  lb_htoBPD:(n,spG=spGrav) => n/barrelsToft3/ft3Tolb*24/spG,
+  kgtolb: (n=1) => n*2.20462,
+  lbtokg: (n=1) => n/2.20462,
+  BPDtolb_h:(n=1,spG=spGrav) => n*barrelsToft3*ft3Tolb/24*spG,
+  lb_htoBPD:(n=1,spG=spGrav) => n/barrelsToft3/ft3Tolb*24/spG,
 
-  kJtoBTU: (n) => n/1.05506,
-  BTUtokJ: (n) => n*1.05506,
+  kJtoBTU: (n=1) => n/1.05506,
+  BTUtokJ: (n=1) => n*1.05506,
 
-  fttom:  (n) => n/3.28084,
-  ft2tom2:(n) => n/(3.28084**2),
-  mtoft:  (n) => n*3.28084,
-  m2toft2:(n) => n*(3.28084**2),
-  intom:  (n) => n/39.3701,
-  mtoin:  (n) => n*39.3701,
+  fttom:  (n=1) => n/3.28084,
+  ft2tom2:(n=1) => n/(3.28084**2),
+  mtoft:  (n=1) => n*3.28084,
+  m2toft2:(n=1) => n*(3.28084**2),
+  intom:  (n=1) => n/39.3701,
+  mtoin:  (n=1) => n*39.3701,
 
-  CpENtoCpSI: (n) => n*1.05506/(5/9)*2.20462,     // (kJ/kg-C)
-  kwENtokwSI: (n) => n*1.05506/(5/9)*3.28084,     // (kJ/h-m-C)
-  RfENtoRfSI: (n) => n/(1.05506/(5/9)*3.28084**2),// (h-m2-C/kJ)
-  hcENtohcSI: (n) => n*1.05506/(5/9)*3.28084**2,  // (kJ/h-m2-C)
-  BtuHtoW: (n) => n/3.4121416331,
+  CpENtoCpSI: (n=1) => n*1.05506/(5/9)*2.20462,     // (kJ/kg-C)
+  kwENtokwSI: (n=1) => n*1.05506/(5/9)*3.28084,     // (kJ/h-m-C)
+  RfENtoRfSI: (n=1) => n/(1.05506/(5/9)*3.28084**2),// (h-m2-C/kJ)
+  hcENtohcSI: (n=1) => n*1.05506/(5/9)*3.28084**2,  // (kJ/h-m2-C)
+  BtuHtoW: (n=1) => n/3.4121416331,
 };
 
 /** Example call from terminal: node . false ENGLISH 26.6667 50 0 20 1.01325e5 */ 
@@ -366,18 +366,22 @@ const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
 };
 
 const englishSystem = { //(US Customary)
-  "energy/mol":   (n) => round(unitConv.kJtoBTU(n)) + " Btu/mol",
-  "mass/mol":     (n) => round(n) + " lb/lbmol",
-  heat_flow :     (n) => round(unitConv.kJtoBTU(n)*1e-6) + " MMBtu/h",
-  heat_flux:      (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**2) + " Btu/h-ft²",
-  fouling_factor: (n) => round(n * 10.763910417*1.8/0.94781712) + " h-ft²-°F/Btu",
-  "energy/mass":  (n,dec) => round(unitConv.kJtoBTU(n)/unitConv.kgtolb(1),dec) + " Btu/lb",
-  "energy/vol":   (n) => round(unitConv.kJtoBTU(n)/unitConv.mtoft(1)**3) + " Btu/ft³",
+  "energy/mol":   (n) => round(n*unitConv.kJtoBTU())      + " Btu/mol",
+  "mass/mol":     (n) => round(n)                         + " lb/lbmol",
+  heat_flow :     (n) => round(n*unitConv.kJtoBTU()*1e-6) + " MMBtu/h",
+  heat_flux:      (n) => round(n*
+    unitConv.kJtoBTU() / unitConv.m2toft2())              + " Btu/h-ft²",
+  fouling_factor: (n) => round(n * 
+    unitConv.m2toft2()*unitConv.KtoR()/unitConv.kJtoBTU())+ " h-ft²-°F/Btu",
+  "energy/mass":  (n,dec) => round(n*
+    unitConv.kJtoBTU() / unitConv.kgtolb() ,dec)          + " Btu/lb",
+  "energy/vol":   (n) => round(n*
+    unitConv.kJtoBTU() / unitConv.mtoft()**3)             + " Btu/ft³",
 
   area:     (n) => round(n * 10.763910417)     + " ft²",
   length:   (n) => round(unitConv.mtoft(n))    + " ft",
   lengthC:  (n) => round(unitConv.mtoin(n))    + " in",
-  lengthInv:(n) => round(n /unitConv.mtoft(1)) + " 1/ft",
+  lengthInv:(n) => round(n /unitConv.mtoft()) + " 1/ft",
   temp:     (n) => round(unitConv.KtoR(n))     + " °R",
   tempC:    (n,dec) => round(unitConv.CtoF(n-tempToK),dec)+" °F",
   pressure: (n) => round(n * 0.0001450377)     + " psi",
@@ -386,15 +390,15 @@ const englishSystem = { //(US Customary)
   barrel_flow:(n, spG = spGrav) => 
     round( unitConv.kgtolb(n)/
       unitConv.BPDtolb_h(1,spG) /1000 ) + " x10³ BPD",
-  vol_flow: (n) => round(n*unitConv.mtoft(1)**3)+" ft³/h",
+  vol_flow: (n) => round(n*unitConv.mtoft()**3)+" ft³/h",
   cp:       (n) => round(n * 0.238845896627)   + " Btu/lb-°F",
   cp_mol:   (n) => round(n * 0.238845896627)   + " Btu/lb-mol-°F",
   power:    (n) => round(n * 3.4121416331)     + " Btu/h",
   moist:    (n) => round(n * 1e3)              + " ÷10³ lb H2O/lb",
-  thermal:  (n) => round(n *unitConv.kJtoBTU(1)/
-    unitConv.KtoR(1)/unitConv.mtoft(1) )       + " BTU/h-ft-°F",
-  convect:  (n) => round(n *unitConv.kJtoBTU(1)/
-    unitConv.KtoR(1)/(unitConv.mtoft(1)**2) )  + " BTU/h-ft²-°F",
+  thermal:  (n) => round(n *unitConv.kJtoBTU()/
+    unitConv.KtoR()/unitConv.mtoft() )         + " BTU/h-ft-°F",
+  convect:  (n) => round(n *unitConv.kJtoBTU()/
+    unitConv.KtoR()/(unitConv.mtoft()**2) )    + " BTU/h-ft²-°F",
   viscosity:(n) => round(n * 1)                + " cP",
   system:   {en: "English", es: "Inglés"}
 };
@@ -404,7 +408,7 @@ const siSystem = {
   "mass/mol":     (n) => round(n * 1) + " kg/kmol",
   heat_flow:      (n) => round(n*1e-6)+ " MJ/h",
   heat_flux:      (n) => round(n * 1) + " W/m²",
-  fouling_factor: (n,dec) => round(n*1e3,dec) + " ÷10³ m²-K/W",
+  fouling_factor: (n,dec) => round(n*3600,dec) + " ÷10³ m²-K/W",
 
   "energy/mass":  (n,dec) => round(n,dec) + " kJ/kg",
   "energy/vol":   (n) => round(n * 1) + " kJ/m³",
