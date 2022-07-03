@@ -73,7 +73,7 @@
         </p>
         <p class="project-info">
           Absorción de calor ("duty"): 
-          <span id="span-duty">71.53</span> MBtu/hr
+          <span id="span-duty">71.53</span> MMBtu/hr
         </p>
       </div>
       
@@ -82,21 +82,21 @@
           <div class="form-div"> 
             <div class="form-block flex-evenly"> 
               <p class="project-info sub-temp">
-                Temp. entrada T<sub>in</sub> <input id="t_in" step="1" min="200" name="t_in" type="number" value="678"> °F
+                Temp. entrada <input id="t_in" step="1" min="200" name="t_in" type="number" value="678"> °F
                 <sub><span>~</span> °C</sub>
               </p>
               <p class="project-info sub-temp">
-                Temp. salida T<sub>out</sub> <input id="t_out"step="1" min="300" name="t_out"type="number" value="772"> °F
+                Temp. salida <input id="t_out"step="1" min="300" name="t_out"type="number" value="772"> °F
                 <sub><span>~</span> °C</sub>
               </p>
             </div>
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Cap. calorífica Cp<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" value="0.676"> 
+                Cap. calorífica (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" value="0.676"> 
                 <sub>Btu/lb-°F</sub>
               </p>
               <p class="project-info">
-                Cap. calorífica Cp<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" value="0.703"> 
+                Cap. calorífica (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" value="0.703"> 
                 <sub>Btu/lb-°F</sub>
               </p>
             </div>
@@ -106,18 +106,18 @@
           <div class="form-div">
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Viscosidad μ<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" value="1.45"> cp
+                Viscosidad (μ)<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" value="1.45"> cp
               <p class="project-info">
-                Viscosidad μ<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" value="0.96"> cp
+                Viscosidad (μ)<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" value="0.96"> cp
               </p>
             </div>
             <div class="form-block flex-evenly">
               <p class="project-info">
-                Cond. térmica k<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" value="0.038">
+                Cond. térmica (k)<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" value="0.038">
               <sub>Btu/h.ft.°F</sub>
               </p>
               <p class="project-info">
-                Cond. térmica k<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" value="0.035">
+                Cond. térmica (k)<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" value="0.035">
               <sub>Btu/h.ft.°F</sub>
               </p>
             </div>
@@ -135,7 +135,7 @@
           <sub>hr.ft².°F/Btu</sub>
         </p>
         <p class="project-info">
-          Pérdidas <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
+          Pérdidas por radiación <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
         </p>
       </div>
 
@@ -155,7 +155,7 @@
             <sub>atm</sub>
           </p>
           <p class="project-info">
-            Exceso de aire <input step="0.01" min="0" name="air_excess" type="number" value="20.0"> %
+            Exceso de aire <input step="0.1" min="0" name="air_excess" type="number" value="20.0"> %
           </p>
           <p class="project-info">
             Exceso de O<sub>2</sub> gases de comb. 
@@ -177,11 +177,11 @@
         </div> -->
         
         <div class="form-div comp"> 
+          <p class="project-info">Composición molar</p>
           <p class="project-info sub-temp">Temp. ingreso comb. T<sub>f</sub> 
             <input step="1" min="0" max="100" type="number" name="t_fuel" value="80"> °F
             <sub><span>~</span> °C</sub> 
           </p>
-          <p class="project-info">Composición molar - Total <span id="total" style="font-weight: bold;"> 0 </span> %</p>
         </div> 
 
         <div class="form-div comp-div">
@@ -280,6 +280,9 @@
           <p class="fuel-name">Agua          </p><p class="fuel-formula">H<sub>2</sub>O             </p> <p class="fuel-input"><input max="100" min="0.00" name="H2Ol"   id="H2Ol"   placeholder="0.00" type="number" class="inp" step="0.0001"></p> 
         </div>
 
+        </div>
+        <div class="form-div comp"> 
+          <p>Total <span id="total" style="font-weight: bold;"> 0 </span> %</p>
         </div>
       </div>
 
