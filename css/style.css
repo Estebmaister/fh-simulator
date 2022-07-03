@@ -26,6 +26,12 @@
   text-rendering: optimizeLegibility;
 }
 
+@media screen and (max-width: 570px) {
+  :root {
+    font-size: 12px;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
