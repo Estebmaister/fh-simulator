@@ -1,0 +1,25 @@
+.tg  {
+    font-family:Arial;
+    margin: auto;
+    border-collapse:collapse;
+    border-spacing:0;
+}
+
+.tg td{
+    overflow:hidden;
+    padding:1% 10px;
+    word-break:normal;
+}
+
+.tg th{
+    overflow:hidden;
+    padding:0px 5%;
+    word-break:normal;
+    text-align:left;
+    font-weight:normal;
+}
+
+.tg .tg-mqa1{
+    font-weight:bold;
+    text-align:center
+}

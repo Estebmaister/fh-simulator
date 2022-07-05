@@ -27,6 +27,7 @@
 	<meta name="twitter:card" content="summary_large_image" />
 
 	<link rel="stylesheet" href="../css/style.css" />
+	<link rel="stylesheet" href="../css/table.css" />
 	<link rel="stylesheet" href="../css/loader.css" />
   <script src="../js/webResultScript.js" defer></script>
 </head>
@@ -34,7 +35,7 @@
   <header id="header">
     <a class="logo"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" onclick="history.back()"/></a>
 
-    <!-- <nav id="navbar">
+    <nav id="navbar">
       <ul id="nav-list">
         <li class="nav-sec">
           <a class="nav-link" href="./">Datos</a>
@@ -46,24 +47,23 @@
           <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Proyecto</a>
         </li>
       </ul>
-    </nav> -->
-    <a id="lang" onclick="window.location.href = window.location.href.replace('/es/','/en/')">EN | <span>ES</span></a>
+    </nav>
+    <!-- <a id="lang" onclick="window.location.href = window.location.href.replace('/es/','/en/')">EN | <span>ES</span></a> -->
   </header>
   <main>
     <section id="data-sect">
-      <h1>Simulador de hornos de proceso de tiro natural</h1>
-      <p>Vista simple de los resultados.</p>
+      <h1>Simulador de horno de proceso</h1>
+      <h3>Tiro natural - Tipo cabina</h3>
+      <h4>Página de Resumen de Resultados</h4>
     </section>
     <section id="output-sect">
       <div id="loader-wrapper">
         <div class="loader"></div><div class="shadow"></div>
       </div>
-      <pre>
-        <code id="output-combustion"></code>
-        <code id="output-radiant"></code>
-        <code id="output-shield"></code>
-        <code id="output-convective"></code>
-      </pre>
+      <div id="output-compact"></div>
+      <!-- <pre>
+        <code id="output-compact"></code>
+      </pre> -->
     </section>
   </main>
 	<footer>

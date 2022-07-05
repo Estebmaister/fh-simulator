@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" href="../img/fav.png" />
 
-	<title>Fire Heater Sim</title>
-	<meta name="description" content="Fire heater natural draft simulator" />
+	<title>Simulador de hornos</title>
+	<meta name="description" content="Simulador de Hornos de Proceso de Tiro Natural" />
 	<meta name="author" content="Esteban Camargo" />
 	<meta name="keywords" content="simulator" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 	<!-- WhatsApp Description -->
-	<meta property="og:title" content="Fire heater natural draft simulator" />
-	<meta property="og:description" content="Simulator developed for thesis requirement at the USB." />
+	<meta property="og:title" content="Simulador de Hornos de Proceso de Tiro Natural" />
+	<meta property="og:description" content="Simulador desarrollado como tesis de grado en la USB" />
 	<meta property="og:image" content="../img/logo.png" />
 	<meta property="og:url" content="#" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Fire Heater Sim" />
+	<meta property="og:site_name" content="Simulador de horno de procesos" />
 
 	<meta name="twitter:title" content="Esteban Camargo (Remoter)" />
 	<meta name="twitter:image" content="../img/logo.png" />
@@ -27,33 +27,36 @@
 	<meta name="twitter:card" content="summary_large_image" />
 
 	<link rel="stylesheet" href="../css/style.css" />
-	<link rel="stylesheet" href="../css/loaderForms.css" />
+	<link rel="stylesheet" href="../css/loader.css" />
   <script src="../js/webResultScript.js" defer></script>
 </head>
 <body>
   <header id="header">
     <a class="logo"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" onclick="history.back()"/></a>
-    <!-- <nav id="navbar">
+
+    <nav id="navbar">
       <ul id="nav-list">
-        <li class="nav-sec"> <a class="nav-link" href="./">Data</a> </li>
-        <li class="nav-sec"> <a class="nav-link" href="">Result</a> </li>
-        <li class="nav-sec"> <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Project</a> </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="./fullInput.html">Datos</a>
+        </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="">Resultados</a>
+        </li>
+        <li class="nav-sec">
+          <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Proyecto</a>
+        </li>
       </ul>
-    </nav> -->
-    <a id="lang" onclick="window.location.href = window.location.href.replace('/en','/es')"><span>EN</span> | ES</a>
+    </nav>
+    <a id="lang" onclick="window.location.href = window.location.href.replace('/es/','/en/')">EN | <span>ES</span></a>
   </header>
   <main>
     <section id="data-sect">
-      <h1>Fire heater natural draft simulator</h1>
-      <p>A simple view for the output.</p>
+      <h1>Simulador de hornos de proceso de tiro natural</h1>
+      <p>Vista simple de los resultados.</p>
     </section>
     <section id="output-sect">
-      <div id="loader-wrapper" style="display: flex;">
-        <!-- Floating Loader <div class="loader"></div> <div class="shadow"></div> <!---->
-        <!-- loaderForms .css -->
-        <div class="loader"> <svg viewBox="0 0 80 80"> <circle id="test" cx="40" cy="40" r="32"></circle> </svg> </div>
-        <div class="loader triangle"> <svg viewBox="0 0 86 80"> <polygon points="43 8 79 72 7 72"></polygon> </svg> </div>
-        <div class="loader"> <svg viewBox="0 0 80 80"> <rect x="8" y="8" width="64" height="64"></rect> </svg> </div> <!-- -->
+      <div id="loader-wrapper">
+        <div class="loader"></div><div class="shadow"></div>
       </div>
       <pre>
         <code id="output-combustion"></code>
@@ -70,7 +73,7 @@
 			</a>
 		</p>
     <p>
-      v1.3.0<em> - Calculations performed at web browser engine, logs can be seen at the console</em>
+      v1.3.0<em> - Cálculos realizados en el motor del navegador, registros disponibles en consola</em>
     </p>
 	</footer>
 </body>

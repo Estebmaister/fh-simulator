@@ -107,8 +107,8 @@ const formElement = document.getElementById(formElementID);
 if (graphButton) graphButton.onmousedown = () => {
   formElement.action = `../${formElement.lang || "en"}_graph/`;
 }
-if (resultButton) resultButton.onmousedown = () => {
-  formElement.action = "./result.html";
+if (graphButton && resultButton) resultButton.onmousedown = () => {
+  formElement.action = "./fullResult.html";
 }
 
 formElement.addEventListener('submit', function () {
