@@ -370,7 +370,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     AC_mass_theor_moistAir: o2required / air.O2 * 
       MW_multicomp(air)/MW_multicomp(normalFuel),
 
-    fuel_MW: units["mass/mol"](MW_multicomp(normalFuel)),
+    fuel_MW: MW_multicomp(normalFuel),
     Cp_fuel: units.cp(Cp_multicomp(normalFuel)(params.t_fuel)),
 
     flue_MW: MW_multicomp(products,onlyO2),

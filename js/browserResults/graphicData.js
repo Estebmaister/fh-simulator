@@ -1,4 +1,4 @@
-const {logger, unitConv} = require('./utils');
+const {logger, unitConv} = require('./../utils');
 
 const graphicData = ( comb, fuel, opt ) => {
 

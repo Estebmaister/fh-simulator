@@ -1,4 +1,4 @@
-const {round, initSystem} = require('./utils');
+const {round, initSystem} = require('./../utils');
 
 const stringRadResult = (lang, result_obj, unitSystem) => {
   const unit = initSystem(unitSystem);
@@ -173,6 +173,7 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   t_in:     ${unit.tempC( result_obj.t_in )   }
   t_out:    ${unit.tempC( result_obj.t_out )  }      
   Tw:       ${unit.tempC( result_obj.Tw )     }      
+  t_fin:    ${unit.tempC( result_obj.t_fin )  }  
   
   tg_in:      ${unit.tempC( result_obj.tg_in )  }   
   tg_stack:   ${unit.tempC( result_obj.tg_out)  }    
@@ -322,11 +323,14 @@ Moles de gases de combustión por mol de combustible
   Flujo másico (gases):       ${unit.mass_flow( result_obj.rad_result.m_flue,1)} 
   Flujo másico (aire):        ${unit.mass_flow( result_obj.rad_result.m_air,1)} 
 
-  Peso molecular (combustible): ${result_obj.flows['fuel_MW']}
+  Peso molecular (combustible): ${unit["mass/mol"](result_obj.flows['fuel_MW'])}
   Peso molecular (gases):       ${result_obj.flows['flue_MW']}
   
   Calor específico (Cp) combustible: ${result_obj.flows['Cp_fuel']}
   Calor específico (Cp) gases:       ${result_obj.flows['Cp_flue']}
+
+  Emisiones de CO2 (t/año): ${round(result_obj.products['CO2']*44.01/result_obj.flows['fuel_MW']*
+  result_obj.rad_result.m_fuel *(1e-3*24*365),2)}
 `;
   } else {
     outputString = `
@@ -399,20 +403,271 @@ Flue gas moles and components (per mol of fuel)
   Flue Gas Mass Flow:       ${unit.mass_flow( result_obj.shld_result.m_flue,1)}
   Combustion Air Mass Flow: ${unit.mass_flow( result_obj.rad_result.m_air,1)} 
 
-  Fuel MW:             ${result_obj.flows['fuel_MW']}
+  Fuel MW:             ${unit["mass/mol"](result_obj.flows['fuel_MW'])}
   Fuel Sp. Heat, Cp:   ${result_obj.flows['Cp_fuel']}
   Fuel Net Calorific Value, NCV: ${result_obj.flows['NCV']} 
 
   Flue MW:             ${result_obj.flows['flue_MW']}
   Flue Sp. Heat, Cp:   ${result_obj.flows['Cp_flue']}
+
+  CO2 Emissions (t/year): ${round(result_obj.products['CO2']*44.01/result_obj.flows['fuel_MW']*
+  result_obj.rad_result.m_fuel *(1e-3*24*365),2)}
 `;
   }
   return outputString;
+}
+
+const stringCompactResult = (_lang, result_obj, opt, opt2= {}) => {
+  const unit = initSystem(opt.unitSystem);
+  return `<table class="tg">
+<thead>
+  <tr>
+    <th>(${result_obj.debug_data['unitSystem']}) <b>Caso</b></th>
+    <th>${opt.title.toUpperCase()}</th>
+    <th>${opt2.title ? opt2.title.toUpperCase() : ''}</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-mqa1" colspan="3">Condiciones de Diseno</td>
+  </tr>
+  <tr>
+    <td class="tg-simple" colspan="3">Residuo atmosférico</td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Flujo volumétrico</td>
+    <td class="tg-simple">${opt.mFluid.toLocaleString()} BPD</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Temperatura de entrada</td>
+    <td class="tg-simple">${unit.tempC(result_obj.conv_result.t_in_given,0)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Temperatura de salida</td>
+    <td class="tg-simple">${unit.tempC(result_obj.rad_result.t_out,0)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Gravedad específica</td>
+    <td class="tg-simple">${result_obj.debug_data.spGrav}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Rfi (interno) radiante</td>
+    <td class="tg-simple">${unit.fouling_factor( result_obj.rad_result.rfi)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Rfo externo escudo/convectivo</td>
+    <td class="tg-simple">${unit.fouling_factor( result_obj.conv_result.rfo )}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-mqa1" colspan="3">Condiciones de Combustión</td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Exceso de Oxígeno</td>
+    <td class="tg-simple">${round(result_obj.flows['O2_%'],2)} % (BH)</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Exceso de aire</td>
+    <td class="tg-simple">${round(result_obj.flows['air_excess_%'],2)} %</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Temperatura del aire de combustión</td>
+    <td class="tg-simple">${result_obj.debug_data['airTemperature']}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Humedad relativa</td>
+    <td class="tg-simple">${round(result_obj.debug_data['humidity_%'],0)} %</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Pérdidas por radiación al ambiente</td>
+    <td class="tg-simple">${round(opt.hLoss*100,1)} %</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-mqa1" colspan="3">Características del Combustible</td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Peso molecular</td>
+    <td class="tg-simple">${unit["mass/mol"](result_obj.flows['fuel_MW'])}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Calor específico (Cp)</td>
+    <td class="tg-simple">${result_obj.flows['Cp_fuel']}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Poder Calorífico Neto (NCV)</td>
+    <td class="tg-simple">${result_obj.flows['NCV']}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">Emisión de CO2 (t/año)</td>
+    <td class="tg-simple">${round(result_obj.products['CO2']*44.01/result_obj.flows['fuel_MW']*
+      result_obj.rad_result.m_fuel *(1e-3*24*365),2)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr><td colspan="3"></td></tr> 
+  <tr>
+    <td colspan="3">▪ Flujos másicos</td>
+  </tr>
+  <tr>
+    <td class="tg-simple">· Residuo atmosférico</td>
+    <td class="tg-simple">${unit.mass_flow( result_obj.rad_result.m_fluid,1 ) }</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">· Combustible</td>
+    <td class="tg-simple">${unit.mass_flow( result_obj.rad_result.m_fuel,1 )}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">· Gases de combustión</td>
+    <td class="tg-simple">${unit.mass_flow( result_obj.rad_result.m_flue,1)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr><td colspan="3"></td></tr>
+  <tr>
+    <td class="tg-simple">▪ Humedad del aire</td>
+    <td class="tg-simple">${result_obj.debug_data['moisture']} aire seco</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ (A/C) Masa BH</td>
+    <td class="tg-simple">${round(result_obj.flows['AC_mass'],3)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ (A/C) Volumen BH</td>
+    <td class="tg-simple">${round(result_obj.flows['AC'],3)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ (A/C) Masa estequiométrica BH</td>
+    <td class="tg-simple">${round(result_obj.flows['AC_mass_theor_moistAir'],3)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ (A/C) Volumen estequiométrica BS</td>
+    <td class="tg-simple">${round(result_obj.flows['AC_theor_dryAir'],3)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Suministro Térmico Combustible</td>
+    <td class="tg-simple">${unit.heat_flow(result_obj.rad_result.Q_rls)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Suministro Térmico Total</td>
+    <td class="tg-simple">${unit.heat_flow( result_obj.rad_result.Q_in ) }</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Absorción total de calor</td>
+    <td class="tg-simple">${unit.heat_flow(result_obj.rad_result.duty_total)}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Absorción Sección Radiante</td>
+    <td class="tg-simple">${unit.heat_flow(result_obj.rad_result.duty)} - ${round(100*result_obj.rad_result['%'],2)}% del total</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Absorción Sección Escudo</td>
+    <td class="tg-simple">${unit.heat_flow(result_obj.shld_result.duty)} - ${round(100*result_obj.shld_result['%'],2)}% del total</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Absorción Sección Convectiva</td>
+    <td class="tg-simple">${unit.heat_flow(result_obj.conv_result.duty)} - ${round(100*result_obj.conv_result['%'],2)}% del total</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Temperatura de pared de tubos radiantes</td>
+    <td class="tg-simple">${unit.tempC( result_obj.rad_result.Tw )}</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Temperatura arco radiante</td>
+    <td class="tg-simple">${unit.tempC( result_obj.rad_result.tg_out ) }</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Temperatura de Chimenea</td>
+    <td class="tg-simple">${unit.tempC( result_obj.conv_result.tg_out ) }</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Temperatura de las aletas</td>
+    <td class="tg-simple">${unit.tempC( result_obj.conv_result.t_fin ) }</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr><td colspan="3"></td></tr>
+  <tr>
+    <td class="tg-simple">▪ Análisis de gases de combustión (BH)</td>
+    <td class="tg-simple"></td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">· CO2</td>
+    <td class="tg-simple">${round(result_obj.flows['CO2_%'])} %</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">· N2</td>
+    <td class="tg-simple">${round(result_obj.flows['N2_%']) } %</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">· O2</td>
+    <td class="tg-simple">${round(result_obj.flows['O2_%'],2)} %</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">· H2O</td>
+    <td class="tg-simple">${round(result_obj.flows['H2O_%'])} %</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Pérdidas de calor por chimenea</td>
+    <td class="tg-simple">${unit.heat_flow(result_obj.conv_result.Q_stack)} - % del total</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Pérdidas de calor al ambiente</td>
+    <td class="tg-simple">${unit.heat_flow(result_obj.rad_result.Q_losses)} - % del total</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Eficiencia Térmica NHV (API-560)</td>
+    <td class="tg-simple">${round(result_obj.rad_result.eff_total,2)} %</td>
+    <td class="tg-simple"></td>
+  </tr>
+  <tr>
+    <td class="tg-simple">▪ Eficiencia Térmica GHV (API-560)</td>
+    <td class="tg-simple">${round(result_obj.rad_result.eff_thermal(result_obj.conv_result.Q_stack),2)} %</td>
+    <td class="tg-simple"></td>
+  </tr>
+</tbody>
+</table>`;
 }
 
 module.exports = {
 	stringRadResult,
   stringShldResult,
   stringConvResult,
-  stringCombResult
+  stringCombResult,
+  stringCompactResult
 };
