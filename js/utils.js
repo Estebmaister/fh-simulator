@@ -179,7 +179,10 @@ const getOptions = () => {
     hLoss:      .01 * 1.5,  // % *.01
     effcy:      .01 * 80,   // % *.01
     rfi:        0.000,      // hr.ft².°F/Btu
-    rfo:        0.000,      // hr.ft².°F/Btu
+    rfiConv:    0.000,      // hr.ft².°F/Btu
+    rfoConv:    0.000,      // hr.ft².°F/Btu
+    rfiShld:    0.000,      // hr.ft².°F/Btu
+    rfoShld:    0.000,      // hr.ft².°F/Btu
     tIn:        678,        // F
     tOut:       772,        // F
     mFluid:     90e3,       // BPD

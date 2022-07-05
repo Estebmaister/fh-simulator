@@ -137,7 +137,26 @@ const optionsModifier = (key, browserData, options) => {
       break;
     case 'rfo':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0) options.rfo = optValue;
+      if (optValue >= 0) {
+        options.rfoConv = optValue;
+        options.rfoShld = optValue;
+      }
+      break;
+    case 'rfi_conv':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) options.rfiConv = optValue;
+      break;
+    case 'rfo_conv':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) options.rfoConv = optValue;
+      break;
+    case 'rfi_shld':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) options.rfiShld = optValue;
+      break;
+    case 'rfo_shld':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) options.rfoShld = optValue;
       break;
     case 't_fuel':
       optValue = parseFloat(browserData[key])

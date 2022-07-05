@@ -231,6 +231,14 @@ h1 {
   flex-wrap: wrap;
   margin: 0.5em;
 }
+.form-factor {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: auto;
+}
 .form-div > .form-div {
   margin: 0;
 }

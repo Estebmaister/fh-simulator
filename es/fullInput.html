@@ -65,11 +65,11 @@
       <h3>Condiciones de diseño</h3>
       <div class="form-div">
         <p id="sub-duty" class="project-info">
-          Flujo <input step="1" min="0" name="m_fluid" type="number" value="90000"> BPD
+          Flujo Vol. <input step="1" min="0" name="m_fluid" type="number" value="90000"> BPD
           <sub><span>~</span> lb/hr</sub>
         </p>
         <p class="project-info">
-          Grav. esp. SG <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" value="0.84"><sub><em>@ 60°F</em></sub>
+          Gravedad Esp. (SG) <em>@ 60°F</em> <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" value="0.84">
         </p>
         <p class="project-info">
           Absorción de calor ("duty"): 
@@ -82,21 +82,21 @@
           <div class="form-div"> 
             <div class="form-block flex-evenly"> 
               <p class="project-info sub-temp">
-                Temp. entrada <input id="t_in" step="1" min="200" name="t_in" type="number" value="678"> °F
+                Temperatura (T)<sub>in</sub> <input id="t_in" step="1" min="200" name="t_in" type="number" value="678"> °F
                 <sub><span>~</span> °C</sub>
               </p>
               <p class="project-info sub-temp">
-                Temp. salida <input id="t_out"step="1" min="300" name="t_out"type="number" value="772"> °F
+                Temperatura (T)<sub>out</sub> <input id="t_out"step="1" min="300" name="t_out"type="number" value="772"> °F
                 <sub><span>~</span> °C</sub>
               </p>
             </div>
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Cap. calorífica (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" value="0.676"> 
+                Calor Esp. (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" value="0.676"> 
                 <sub>Btu/lb-°F</sub>
               </p>
               <p class="project-info">
-                Cap. calorífica (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" value="0.703"> 
+                Calor Esp. (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" value="0.703"> 
                 <sub>Btu/lb-°F</sub>
               </p>
             </div>
@@ -126,17 +126,42 @@
       </div>
 
       <div class="form-div">
-        <p class="project-info">
-          R<sub>fi</sub> radiante <input step="0.001" min="0" name="rfi" type="number" value="0.000">
-          <sub>hr.ft².°F/Btu</sub>
-        </p>
-        <p class="project-info">
-          R<sub>fo</sub> convect. <input step="0.001" min="0" name="rfo" type="number" value="0.000">
-          <sub>hr.ft².°F/Btu</sub>
-        </p>
+        
         <p class="project-info">
           Pérdidas por radiación <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
         </p>
+        <div class="form-div full-width">
+          <h4 class="full-width">Factores de Ensuciamiento por Sección</h4>
+          <div class="form-factor">
+            <h5>RADIANTE</h5>
+            <p class="project-info">
+              R<sub>fi</sub> <input step="0.001" min="0" name="rfi" type="number" value="0.000">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+          </div>
+          <div class="form-factor">
+            <h5>ESCUDO</h5>
+            <p class="project-info">
+              R<sub>fi</sub> <input step="0.001" min="0" name="rfi_shld" type="number" value="0.000">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+            <p class="project-info">
+              R<sub>fo</sub> <input step="0.001" min="0" name="rfo_shld" type="number" value="0.001">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+          </div>
+          <div class="form-factor">
+            <h5>CONVECTIVA</h5>
+            <p class="project-info">
+              R<sub>fi</sub> <input step="0.001" min="0" name="rfi_conv" type="number" value="0.000">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+            <p class="project-info">
+              R<sub>fo</sub> <input step="0.001" min="0" name="rfo_conv" type="number" value="0.001">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+          </div>
+        </div>
       </div>
 
       <hr>

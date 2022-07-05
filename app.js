@@ -64,10 +64,10 @@ const createParams = (opts) => {
     t_out:      t_out,      // (K) global process outlet
     m_fluid:    m_fluid,    // (kg/h) 
     Rfi: unitConv.RfENtoRfSI(opts.rfi), // (h-m2-C/kJ) int. fouling rad
-    Rfo: unitConv.RfENtoRfSI(opts.rfo), // (h-m2-C/kJ) ext. fouling cnv
-    Rfi_conv: .000, // (h-m2-C/kJ) int. fouling conv sect
-    Rfi_shld: .000, // (h-m2-C/kJ) int. fouling shld sect
-    Rfo_shld: .000, // (h-m2-C/kJ) ext. fouling shld sect
+    Rfo: unitConv.RfENtoRfSI(opts.rfoConv), // (h-m2-C/kJ) ext. fouling cnv
+    Rfi_conv: unitConv.RfENtoRfSI(opts.rfiConv), // (h-m2-C/kJ) int. fouling conv sect
+    Rfi_shld: unitConv.RfENtoRfSI(opts.rfiShld), // (h-m2-C/kJ) int. fouling shld sect
+    Rfo_shld: unitConv.RfENtoRfSI(opts.rfoShld), // (h-m2-C/kJ) ext. fouling shld sect
     efficiency: opts.effcy,         // (% *.01)
     duty_rad_dist: opts.radDist,    // (% *.01)
     heat_loss_percent: opts.hLoss,  // (% *.01)
