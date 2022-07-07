@@ -7,7 +7,7 @@ window.onload = function(){
         scriptElement.src = "../js/bundle.js";
 
         // Before appending the script, calls attention to see the console in case of a failure in the script
-        const outputElement = document.getElementById("output-combustion");
+        const outputElement = document.getElementById("output-com");
         if (outputElement) {
             outputElement.textContent = 'Is this taking too long? check the console log for debugging.';
         }

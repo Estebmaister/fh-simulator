@@ -371,7 +371,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
       MW_multicomp(air)/MW_multicomp(normalFuel),
 
     fuel_MW: MW_multicomp(normalFuel),
-    Cp_fuel: units.cp(Cp_multicomp(normalFuel)(params.t_fuel)),
+    Cp_fuel: Cp_multicomp(normalFuel),
 
     flue_MW: MW_multicomp(products,onlyO2),
     Cp_flue: Cp_multicomp(products,false,onlyO2)
@@ -393,11 +393,14 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   params.Cp_flue = flows.Cp_flue;
   params.miu_flue= flueViscosity( data, products );
   params.kw_flue = flueThermalCond(data, products);
+  flows.Cp_fuel_val  = flows.Cp_fuel(params.t_fuel);
+  flows.Cp_fuel  = units.cp(flows.Cp_fuel_val);
   flows.Cp_flue  = units.cp(flows.Cp_flue(params.t_air));
   flows.flue_MW  = units["mass/mol"](flows.flue_MW);
 
   params.NCV = -ncv(normalFuel, products, compounds, params.t_amb)/MW_multicomp(normalFuel); // kJ/kg
   flows.NCV = units["energy/mass"](params.NCV,0);
+  flows.NCV_val = params.NCV;
 
   params.adFlame = newtonRaphson(
     adFlame(normalFuel, products, params.t_amb, o2excess),

@@ -3,76 +3,43 @@ const {
 } = require('./resultsToString');
 const {logger} = require('./../utils');
 
-const compactResult = ( comb, fuel, opt ) => {
+const compactResult = ( comb, fuel, opt, defaultOpt ) => {
 
-    // Checking local storage to avoid repeating calculations
-    let prevResult;
-    let localResult = JSON.parse(localStorage.getItem(`${opt.title}`));
-    if (localResult) {
-        prevResult = localResult[`${window.location.search}`];
-        if (Object.keys(localResult).length > 5)
-            localStorage.clear();
+    const result = comb(fuel, opt);
+
+    localStorage.setItem(`${opt.title}`, JSON.stringify({result, opt}));
+
+    let baseResult, modResult;
+    let baseOpt, modOpt;
+    let localResult;
+    switch (opt.title) {
+        case 'base':
+            baseOpt = opt;
+            baseResult = result;
+            localResult = JSON.parse(localStorage.getItem(`modified`));
+            modOpt = localResult ? localResult.opt : {};
+            modResult = localResult ? localResult.result : {};
+            break;
+        default:
+            modOpt = opt;
+            modResult = result;
+            localResult = JSON.parse(localStorage.getItem(`base`));
+            if (!localResult) {
+                const defaultResult = comb(fuel, defaultOpt);
+                localResult = {result:defaultResult, opt:defaultOpt};
+            }
+            baseOpt = localResult ? localResult.opt : {};
+            baseResult = localResult ? localResult.result : {};
+            break;
     }
 
-    if (prevResult) {draw(prevResult, opt);} else {
-        prevResult = comb(fuel, opt);
-    }
-    const browserResult = [];
 
     
     const loader = document.getElementById('loader-wrapper');
     if (loader) loader.remove();
 
-
-
-    const outComb = document.getElementById('output-compact');
-    if (outComb) outComb.innerHTML = stringCompactResult(opt.lang, prevResult, opt);
-
-
-
-//   for (let index = 0; index < points; index++) {
-//     opt[graphVar] = initVar + index*range/points;
-//     const runResult = comb(fuel, opt);
-//     browserResult[index] = {
-
-//       // --- Input vars
-//       m_fluid:    unitConv.lb_htoBPD(unitConv.kgtolb(runResult.rad_result.m_fluid))*1e-3,
-//       duty_total: runResult.rad_result.duty_total,
-
-//       // t_in:  unitConv.KtoF(runResult.conv_result.t_in),
-//       t_out: unitConv.KtoF(runResult.rad_result.t_out),
-
-//       o2_excess:  runResult.flows['O2_%'],
-//       air_excess: runResult.flows['air_excess_%'] > 0 ? runResult.flows['air_excess_%'] : 0,
-//       humidity:   runResult.debug_data['humidity_%'],
-
-//       // --- Output vars
-//       // rad_tg_out: runResult.rad_result.tg_out,
-//       // shl_tg_out: runResult.shld_result.tg_out,
-//       cnv_tg_out: unitConv.KtoF(runResult.conv_result.tg_out),
-
-//       // m_flue:     runResult.shld_result.m_flue ? runResult.shld_result.m_flue : 0,
-//       m_fuel:     runResult.rad_result.m_fuel ? unitConv.kgtolb(runResult.rad_result.m_fuel) : 0,
-//       efficiency: runResult.rad_result.eff_total ? runResult.rad_result.eff_total : 0,
-//       rad_dist:   runResult.rad_result['%'] < 1  ? Math.round(1e5*runResult.rad_result['%'])/1e3 : 0,
-//       // shl_dist:  runResult.shld_result['%'] ? 100*runResult.shld_result['%']: 0,
-//       // cnv_dist:  runResult.conv_result['%'] ? 100*runResult.conv_result['%']: 0,
-
-//       // rad_duty:  runResult.rad_result.duty,
-//       // shl_duty:  runResult.shld_result.duty,
-//       // cnv_duty:  runResult.conv_result.duty,
-
-//       // rad_alpha: runResult.rad_result.Alpha,
-//       // rad_t_in:  runResult.rad_result.t_in,
-//       // shl_t_in:  runResult.shld_result.t_in,
-//     }
-//   }
-  
-//   if (!localResult) localResult = {};
-//   localResult[`${window.location.search}`] = browserResult;
-//   localStorage.setItem(`${opt.title}`, JSON.stringify(localResult));
-//   console.log(browserResult);
-//   draw(browserResult, opt);
+    const outComb = document.getElementById('output-com');
+    if (outComb) outComb.innerHTML = stringCompactResult(opt.unitSystem, baseResult, baseOpt, modResult, modOpt);
 }
 
 module.exports = {

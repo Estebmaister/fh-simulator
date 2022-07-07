@@ -50,6 +50,7 @@ const insertBrowserData = (browserData, fuels, data, options) => {
 // Process the data and start the combustion algorithm
 const browserProcess = (fuels, data, options, combustion) => {
 
+  const defaultOpt = {...options};
   let lang = 'en';  
   const browserPath = window.location.pathname.split('/'); // ex ',fh-simulator,en,result.html'}
   if (browserPath.length > 0) browserPath.forEach(item => {
@@ -62,11 +63,11 @@ const browserProcess = (fuels, data, options, combustion) => {
   
   if (browserPath[1].includes('_graph') || browserPath[2].includes('_graph')) {
     graphicData(combustion, fuels, options);
-  } else if (browserPath[1].includes('fullResult') || browserPath[2].includes('fullResult')) {
+  } else if (browserPath.includes('fullResult') || browserPath.includes('fullResult.html')) {
     const result = combustion(fuels, options);
     outputFullData(result, browserData, lang, options.unitSystem);
   } else {
-    compactResult(combustion, fuels, options);
+    compactResult(combustion, fuels, options, defaultOpt);
   }
 };
 
