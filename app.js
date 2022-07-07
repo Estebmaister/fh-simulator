@@ -145,9 +145,12 @@ const heaterFunc = (fuels, opts) => {
 
   if (params.runDistCycle) externalCycle(params);
 
-  heat_result.rad_result = radSection(params)
-  heat_result.shld_result = shieldSection(params)
-  heat_result.conv_result = convSection(params)
+  heat_result.rad_result = radSection(params);
+  heat_result.shld_result = shieldSection(params);
+  heat_result.conv_result = convSection(params);
+  heat_result.rad_result.eff_thermal_val = 
+    heat_result.rad_result.eff_thermal(heat_result.conv_result.Q_stack);
+
   return heat_result
 }
 

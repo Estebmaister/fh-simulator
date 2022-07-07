@@ -11,7 +11,7 @@ const outputFullData = (result, browserData, lang, unitSystem) => {
     const loader = document.getElementById('loader-wrapper');
     if (loader) loader.remove();
 
-    const outComb = document.getElementById('output-combustion');
+    const outComb = document.getElementById('output-com');
     if (outComb) outComb.textContent = stringCombResult(lang, result, unitSystem);
 
     const outRad = document.getElementById('output-radiant');

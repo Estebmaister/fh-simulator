@@ -172,9 +172,9 @@ const getOptions = () => {
     tAmb:       tempAmbRef, // K
     tAir:       tempAmbRef, // K
     tFuel:      tempAmbRef, // K
-    humidity:   0.0,        // %
+    humidity:   50.0,       // %
     o2Excess:   .01 * 0,    // fr
-    airExcess:  .01 * 0,    // fr
+    airExcess:  .01 * 20,   // fr
     radDist:    .01 * 64,   // % *.01
     hLoss:      .01 * 1.5,  // % *.01
     effcy:      .01 * 80,   // % *.01
@@ -195,7 +195,7 @@ const getOptions = () => {
     pAtm:       pAtmRef,    // Pa
     unitSystem: "SI",       // string SI or EN
     lang:       "en",       // string EN or ES
-    title:      "simple",     // string
+    title:      "base",     // string
     graphVar:   "t_out",    // string one of four
     graphRange: 50,         // uInt
     graphPoints:100,        // uInt
@@ -227,8 +227,8 @@ const getOptions = () => {
 const options = getOptions();
 if (options.verbose) logger.debug(`"options","args":${JSON.stringify(options, null, 2)}`);
 
-const round = (number, dec = 3) => (+(Math.round(number*10**dec)/10**dec)
-.toFixed(dec)).toLocaleString();
+const round = (number, dec = 3) => number !== undefined ? (number).
+  toLocaleString(undefined,{minimumFractionDigits: dec, maximumFractionDigits: dec}) : NaN;
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
     if(!isNaN(value) && value !== "") object[key] = round(value);
