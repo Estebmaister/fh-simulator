@@ -438,7 +438,7 @@ const stringCompactResult = (uSystem, baseResult, opt, modResult = {}, modOpt = 
   <tr>
     <td class="tg-simple">▪ Flujo volumétrico</td>
     <td class="tg-simple">${opt.mFluid.toLocaleString()} BPD</td>
-    <td class="tg-simple">${validMod ? modOpt.mFluid.toLocaleString() :''} BPD</td>
+    <td class="tg-simple">${validMod ? modOpt.mFluid.toLocaleString()+' BPD' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">▪ Temperatura de entrada</td>
@@ -471,12 +471,12 @@ const stringCompactResult = (uSystem, baseResult, opt, modResult = {}, modOpt = 
   <tr>
     <td class="tg-simple">Exceso de Oxígeno</td>
     <td class="tg-simple">${round(baseResult.flows['O2_%'],2)} % (BH)</td>
-    <td class="tg-simple">${validMod ? round(modResult.flows['O2_%'],2) :''} % (BH)</td>
+    <td class="tg-simple">${validMod ? round(modResult.flows['O2_%'],2)+' % (BH)' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">Exceso de aire</td>
     <td class="tg-simple">${round(baseResult.flows['air_excess_%'],2)} %</td>
-    <td class="tg-simple">${validMod ? round(modResult.flows['air_excess_%'],2) :''} %</td>
+    <td class="tg-simple">${validMod ? round(modResult.flows['air_excess_%'],2)+' %' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">Temperatura del aire de combustión</td>
@@ -486,12 +486,12 @@ const stringCompactResult = (uSystem, baseResult, opt, modResult = {}, modOpt = 
   <tr>
     <td class="tg-simple">Humedad relativa</td>
     <td class="tg-simple">${round(baseResult.debug_data['humidity_%'],0)} %</td>
-    <td class="tg-simple">${validMod ? round(modResult.debug_data['humidity_%'],0) :''} %</td>
+    <td class="tg-simple">${validMod ? round(modResult.debug_data['humidity_%'],0)+' %' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">Pérdidas por radiación al ambiente</td>
     <td class="tg-simple">${round(opt.hLoss*100,1)} %</td>
-    <td class="tg-simple">${validMod ? round(modOpt.hLoss*100,1) :''} %</td>
+    <td class="tg-simple">${validMod ? round(modOpt.hLoss*100,1)+' %' :''}</td>
   </tr>
   <tr>
     <td class="tg-mqa1" colspan="3">Características del Combustible</td>
@@ -541,7 +541,7 @@ const stringCompactResult = (uSystem, baseResult, opt, modResult = {}, modOpt = 
   <tr>
     <td class="tg-simple">▪ Humedad del aire</td>
     <td class="tg-simple">${baseResult.debug_data['moisture']} aire seco</td>
-    <td class="tg-simple">${validMod ? modResult.debug_data['moisture'] :''} aire seco</td>
+    <td class="tg-simple">${validMod ? modResult.debug_data['moisture']+' aire seco' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">▪ (A/C) Masa BH</td>
@@ -581,17 +581,17 @@ const stringCompactResult = (uSystem, baseResult, opt, modResult = {}, modOpt = 
   <tr>
     <td class="tg-simple">▪ Absorción Sección Radiante</td>
     <td class="tg-simple">${unit.heat_flow(baseResult.rad_result.duty)} - ${round(100*baseResult.rad_result['%'],2)}%</td>
-    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.rad_result.duty) :''} - ${validMod ? round(100*modResult.rad_result['%'],2) :''}%</td>
+    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.rad_result.duty)+' - '+round(100*modResult.rad_result['%'],2)+'%' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">▪ Absorción Sección Escudo</td>
     <td class="tg-simple">${unit.heat_flow(baseResult.shld_result.duty)} - ${round(100*baseResult.shld_result['%'],2)}%</td>
-    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.shld_result.duty) :''} - ${validMod ? round(100*modResult.shld_result['%'],2) :''}%</td>
+    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.shld_result.duty)+' - '+round(100*modResult.shld_result['%'],2)+'%' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">▪ Absorción Sección Convectiva</td>
     <td class="tg-simple">${unit.heat_flow(baseResult.conv_result.duty)} - ${round(100*baseResult.conv_result['%'],2)}%</td>
-    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.conv_result.duty) :''} - ${validMod ? round(100*modResult.conv_result['%'],2) :''}%</td>
+    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.conv_result.duty)+' - '+round(100*modResult.conv_result['%'],2)+'%' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">▪ Temperatura de pared de tubos radiantes</td>
@@ -622,22 +622,22 @@ const stringCompactResult = (uSystem, baseResult, opt, modResult = {}, modOpt = 
   <tr>
     <td class="tg-simple">· CO2</td>
     <td class="tg-simple">${round(baseResult.flows['CO2_%'])} %</td>
-    <td class="tg-simple">${validMod ? round(modResult.flows['CO2_%']) :''} %</td>
+    <td class="tg-simple">${validMod ? round(modResult.flows['CO2_%'])+' %' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">· N2</td>
     <td class="tg-simple">${round(baseResult.flows['N2_%']) } %</td>
-    <td class="tg-simple">${validMod ? round(modResult.flows['N2_%'])  :''} %</td>
+    <td class="tg-simple">${validMod ? round(modResult.flows['N2_%']) +' %' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">· O2</td>
     <td class="tg-simple">${round(baseResult.flows['O2_%'],2)} %</td>
-    <td class="tg-simple">${validMod ? round(modResult.flows['O2_%'],2) :''} %</td>
+    <td class="tg-simple">${validMod ? round(modResult.flows['O2_%'],2)+' %' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">· H2O</td>
     <td class="tg-simple">${round(baseResult.flows['H2O_%'])} %</td>
-    <td class="tg-simple">${validMod ? round(modResult.flows['H2O_%']) :''} %</td>
+    <td class="tg-simple">${validMod ? round(modResult.flows['H2O_%'])+' %' :''}</td>
   </tr>
   <tr>
     <td colspan="3"></td>
@@ -645,22 +645,22 @@ const stringCompactResult = (uSystem, baseResult, opt, modResult = {}, modOpt = 
   <tr>
     <td class="tg-simple">▪ Pérdidas de calor por chimenea</td>
     <td class="tg-simple">${unit.heat_flow(baseResult.conv_result.Q_stack)} - ${round(100*baseResult.conv_result.Q_stack/baseResult.rad_result.Q_in,2)}% del total</td>
-    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.conv_result.Q_stack) :''} - ${validMod ? round(100*modResult.conv_result.Q_stack/modResult.rad_result.Q_in,2) :''}% del total</td>
+    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.conv_result.Q_stack)+' - '+round(100*modResult.conv_result.Q_stack/modResult.rad_result.Q_in,2)+'% del total' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">▪ Pérdidas de calor al ambiente</td>
     <td class="tg-simple">${unit.heat_flow(baseResult.rad_result.Q_losses)} - ${round(100*baseResult.rad_result.Q_losses/baseResult.rad_result.Q_in,2)}% del total</td>
-    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.rad_result.Q_losses) :''} - ${validMod ? round(100*modResult.rad_result.Q_losses/modResult.rad_result.Q_in,2) :''}% del total</td>
+    <td class="tg-simple">${validMod ? unit.heat_flow(modResult.rad_result.Q_losses)+' - '+round(100*modResult.rad_result.Q_losses/modResult.rad_result.Q_in,2)+'% del total' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">▪ Eficiencia Térmica NHV (API-560)</td>
     <td class="tg-simple">${round(baseResult.rad_result.eff_total,2)} %</td>
-    <td class="tg-simple">${validMod ? round(modResult.rad_result.eff_total,2) :''} %</td>
+    <td class="tg-simple">${validMod ? round(modResult.rad_result.eff_total,2)+' %' :''}</td>
   </tr>
   <tr>
     <td class="tg-simple">▪ Eficiencia Térmica GHV (API-560)</td>
     <td class="tg-simple">${round(baseResult.rad_result.eff_thermal_val,2)} %</td>
-    <td class="tg-simple">${validMod ? round(modResult.rad_result.eff_thermal_val,2) :''} %</td>
+    <td class="tg-simple">${validMod ? round(modResult.rad_result.eff_thermal_val,2)+' %' :''}</td>
   </tr>
 </tbody>
 </table>`;
