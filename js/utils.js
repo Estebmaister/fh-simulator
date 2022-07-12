@@ -368,73 +368,68 @@ const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
   return Math.abs((delta_t1 - delta_t2) /Math.log(Math.abs(delta_t1 / delta_t2)) );
 };
 
-const englishSystem = { //(US Customary)
-  "energy/mol":   (n) => round(n*unitConv.kJtoBTU())      + " Btu/mol",
-  "mass/mol":     (n) => round(n)                         + " lb/lbmol",
-  heat_flow :     (n) => round(n*unitConv.kJtoBTU()*1e-6) + " MMBtu/h",
-  heat_flux:      (n) => round(n*
-    unitConv.kJtoBTU() / unitConv.m2toft2())              + " Btu/h-ft²",
-  fouling_factor: (n) => round(n * 
-    unitConv.m2toft2()*unitConv.KtoR()/unitConv.kJtoBTU())+ " h-ft²-°F/Btu",
-  "energy/mass":  (n,dec) => round(n*
-    unitConv.kJtoBTU() / unitConv.kgtolb() ,dec)          + " Btu/lb",
-  "energy/vol":   (n) => round(n*
-    unitConv.kJtoBTU() / unitConv.mtoft()**3)             + " Btu/ft³",
+const dualSystem = (onlyUnit, noUnit, decimal=3 ,units="", number=0) => {
+  if (onlyUnit) return ` ${units}`;
+  return round(number, decimal) + (noUnit ? "" : ` ${units}`);
+}
 
-  area:     (n) => round(n * 10.763910417)     + " ft²",
-  length:   (n) => round(unitConv.mtoft(n))    + " ft",
-  lengthC:  (n) => round(unitConv.mtoin(n))    + " in",
-  lengthInv:(n) => round(n /unitConv.mtoft()) + " 1/ft",
-  temp:     (n) => round(unitConv.KtoR(n))     + " °R",
-  tempC:    (n,dec) => round(unitConv.CtoF(n-tempToK),dec)+" °F",
-  pressure: (n) => round(n * 0.0001450377)     + " psi",
-  mass:     (n) => round(n * 2.2046244202e-3)  + " lb",
-  mass_flow:(n,dec) => round(unitConv.kgtolb(n),dec)+ " lb/h",
-  barrel_flow:(n, spG = spGrav) => 
-    round( unitConv.kgtolb(n)/
-      unitConv.BPDtolb_h(1,spG) /1000 ) + " x10³ BPD",
-  vol_flow: (n) => round(n*unitConv.mtoft()**3)+" ft³/h",
-  cp:       (n) => round(n * 0.238845896627)   + " Btu/lb-°F",
-  cp_mol:   (n) => round(n * 0.238845896627)   + " Btu/lb-mol-°F",
-  power:    (n) => round(n * 3.4121416331)     + " Btu/h",
-  moist:    (n) => round(n * 1e3)              + " ÷10³ lb H2O/lb",
-  thermal:  (n) => round(n *unitConv.kJtoBTU()/
-    unitConv.KtoR()/unitConv.mtoft() )         + " BTU/h-ft-°F",
-  convect:  (n) => round(n *unitConv.kJtoBTU()/
-    unitConv.KtoR()/(unitConv.mtoft()**2) )    + " BTU/h-ft²-°F",
-  viscosity:(n) => round(n * 1)                + " cP",
+const englishSystem = { //(US Customary)
+  "energy/mol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/mol", unitConv.kJtoBTU(n)),
+  "mass/mol":     (n,d,nU,oU) => dualSystem(oU,nU,d,"lb/lbmol", n),
+  heat_flow :     (n,d,nU,oU) => dualSystem(oU,nU,d,"MMBtu/h", unitConv.kJtoBTU(n)*1e-6),
+  heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h-ft²",unitConv.kJtoBTU(n) /unitConv.m2toft2()),
+  fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"h-ft²-°F/Btu", unitConv.m2toft2(n)*unitConv.KtoR()/unitConv.kJtoBTU()),
+  "energy/mass":  (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb", unitConv.kJtoBTU(n) / unitConv.kgtolb()),
+  "energy/vol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/ft³", unitConv.kJtoBTU(n) / unitConv.mtoft()**3),
+
+  area:     (n,d,nU,oU) => dualSystem(oU,nU,d,"ft²", unitConv.m2toft2(n)),
+  length:   (n,d,nU,oU) => dualSystem(oU,nU,d,"ft", unitConv.mtoft(n)),
+  lengthC:  (n,d,nU,oU) => dualSystem(oU,nU,d,"in", unitConv.mtoin(n)),
+  lengthInv:(n,d,nU,oU) => dualSystem(oU,nU,d,"1/ft",n/unitConv.mtoft()),
+  temp:     (n,d,nU,oU) => dualSystem(oU,nU,d,"°R", unitConv.KtoR(n)),
+  tempC:    (n,d,nU,oU) => dualSystem(oU,nU,d,"°F", unitConv.CtoF(n-tempToK)),
+  pressure: (n,d,nU,oU) => dualSystem(oU,nU,d,"psi", n *1.450377e-4),
+  mass:     (n,d,nU,oU) => dualSystem(oU,nU,d,"lb", unitConv.kgtolb(n)),
+  mass_flow:(n,d,nU,oU) => dualSystem(oU,nU,d,"lb/h", unitConv.kgtolb(n)),
+  barrel_flow:(n,d,nU,oU,spG = spGrav) => dualSystem(oU,nU,d,"x10³ BPD", unitConv.kgtolb(n)/ unitConv.BPDtolb_h(1,spG) /1e3),
+  vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"ft³/h", unitConv.mtoft(n)**3),
+  cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-°F", n *.238845896627),
+  cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-mol-°F", n *.238845896627),
+  power:    (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h", n *3.4121416331),
+  moist:    (n,d,nU,oU) => dualSystem(oU,nU,d,"÷10³ lb H2O/lb", n*1e3),
+  thermal:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft-°F", unitConv.kJtoBTU(n)/unitConv.KtoR()/unitConv.mtoft()),
+  convect:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft²-°F", unitConv.kJtoBTU(n)/unitConv.KtoR()/(unitConv.mtoft()**2)),
+  viscosity:(n,d,nU,oU) => dualSystem(oU,nU,d,"cP", n),
   system:   {en: "English", es: "Inglés"}
 };
 
 const siSystem = {
-  "energy/mol":   (n) => round(n * 1) + " kJ/mol",
-  "mass/mol":     (n) => round(n * 1) + " kg/kmol",
-  heat_flow:      (n) => round(n*1e-6)+ " MJ/h",
-  heat_flux:      (n) => round(n * 1) + " W/m²",
-  fouling_factor: (n,dec) => round(n*3600,dec) + " ÷10³ m²-K/W",
+  "energy/mol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/mol", n),
+  "mass/mol":     (n,d,nU,oU) => dualSystem(oU,nU,d,"kg/kmol", n),
+  heat_flow:      (n,d,nU,oU) => dualSystem(oU,nU,d,"MJ/h", n*1e-6),
+  heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"W/m²", n),
+  fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"÷10³ m²-K/W", n*3.6e3),
 
-  "energy/mass":  (n,dec) => round(n,dec) + " kJ/kg",
-  "energy/vol":   (n) => round(n * 1) + " kJ/m³",
-  area:     (n) => round(n * 1)    + " m²",
-  length:   (n) => round(n * 1)    + " m",
-  lengthC:  (n) => round(n * 1e2)  + " cm",
-  lengthInv:(n) => round(n * 1)    + " 1/m",
-  tempC:    (n,_dec) => round(n * 1-tempToK,1) + " °C",
-  temp:     (n) => round(n * 1)    + " K",
-  pressure: (n) => round(n * 1e-3) + " kPa",
-  mass:     (n) => round(n * 1e-3) + " kg",
-  mass_flow:(n,dec) => round(n,dec)+ " kg/h",
-  barrel_flow:(n, spG = spGrav) =>
-    round(unitConv.kgtolb(n)/
-    unitConv.BPDtolb_h(1,spG)/1e3) + " x10³ BPD",
-  vol_flow: (n) => round(n * 1)    + " m³/h",
-  cp:       (n) => round(n * 1)    + " kJ/kg-K",
-  cp_mol:   (n) => round(n * 1)    + " kJ/kmol-K",
-  power:    (n) => round(n * 1)    + " W",
-  moist:    (n) => round(n * 1e3)  + " g H2O/kg",
-  thermal:  (n) => round(n * 1)    + " kJ/h-m-C",
-  convect:  (n) => round(n * 1)    + " kJ/h-m²-C",
-  viscosity:(n) => round(n * 1)    + " cP",
+  "energy/mass":  (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kg", n),
+  "energy/vol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/m³", n),
+  area:       (n,d,nU,oU)  => dualSystem(oU,nU,d,"m²", n),
+  length:     (n,d,nU,oU)  => dualSystem(oU,nU,d,"m", n),
+  lengthC:    (n,d,nU,oU)  => dualSystem(oU,nU,d,"cm", n*1e2),
+  lengthInv:  (n,d,nU,oU)  => dualSystem(oU,nU,d,"1/m", n),
+  tempC:      (n,_d,nU,oU) => dualSystem(oU,nU,1,"°C", n -tempToK),
+  temp:       (n,d,nU,oU)  => dualSystem(oU,nU,d,"K", n),
+  pressure:   (n,d,nU,oU)  => dualSystem(oU,nU,d,"kPa", n *1e-3),
+  mass:       (n,d,nU,oU)  => dualSystem(oU,nU,d,"kg", n *1e-3),
+  mass_flow:  (n,d,nU,oU)  => dualSystem(oU,nU,d,"kg/h", n),
+  barrel_flow:(n,d,nU,oU,spG =spGrav) => englishSystem.barrel_flow(n,d,nU,oU,spG),
+  vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"m³/h", n),
+  cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kg-K", n),
+  cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kmol-K", n),
+  power:    (n,d,nU,oU) => dualSystem(oU,nU,d,"W", n),
+  moist:    (n,d,nU,oU) => dualSystem(oU,nU,d,"g H2O/kg", n *1e3),
+  thermal:  (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/h-m-C", n),
+  convect:  (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/h-m²-C", n),
+  viscosity:(n,d,nU,oU) => dualSystem(oU,nU,d,"cP", n),
   system:   {en: "SI", es: "SI"}
 };
 
