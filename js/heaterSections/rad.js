@@ -87,6 +87,7 @@ const radSection = (params, noLog) => {
     efficiency = params.efficiency               || .8,   // (-) % *.01
     heat_loss_percent = params.heat_loss_percent || .015, // (-) % *.01
     NCV = params.NCV, // (kJ/kg) net calorific value
+    GCV = params.GCV, // (kJ/kg) net calorific value
     m_fluid= params.m_fluid, // (kg/h) Fluid mass flow
     m_air  = (mFuel = m_fuel) => params.m_air_ratio*mFuel, // (kg/h) Air mass flow
     m_flue = (mFuel = m_fuel) => params.m_flue_ratio*mFuel,// (kg/h) Flue mass flow
@@ -110,10 +111,12 @@ const radSection = (params, noLog) => {
       (Rfi +1/hi(tB,tW) +(Di*Math.log(Do/Di)/(2*kw_tube(tW))) ) +tB;
 
   const // ******* Heat input to the radiant section ********
-    Q_air   = (mFuel) => m_air(mFuel) *Cp_air *(t_air -t_amb), // Sensible heat of air
-    Q_fuel  = (mFuel) => mFuel * Cp_fuel*(t_fuel -t_amb), // Sensible heat of fuel
-    Q_rls   = (mFuel) => mFuel * NCV, // Combustion heat of fuel
-    Q_in    = (mFuel) => Q_rls(mFuel) + Q_air(mFuel) + Q_fuel(mFuel); // Heat input
+    Q_air    = (mFuel) => m_air(mFuel) *Cp_air *(t_air -t_amb), // Sensible heat of air
+    Q_fuel   = (mFuel) => mFuel * Cp_fuel*(t_fuel -t_amb), // Sensible heat of fuel
+    Q_rls    = (mFuel) => mFuel * NCV, // Combustion heat of fuel
+    Q_in     = (mFuel) => Q_rls(mFuel) + Q_air(mFuel) + Q_fuel(mFuel), // Heat input
+    Q_rls_gcv= (mFuel) => mFuel * GCV, // Combustion heat of fuel with liquid water out
+    Q_in_gcv = (mFuel) => Q_rls_gcv(mFuel) + Q_air(mFuel) + Q_fuel(mFuel); // Heat input
   
   const // ******* Heat taken out of radiant section ********
     Q_flue = (tG, mFuel) => m_flue(mFuel)*Cp_flue(tG,t_amb)*(tG-t_amb), // Flue gases's sensible heat 
@@ -238,6 +241,7 @@ const radSection = (params, noLog) => {
     "%":        duty_rad/duty_total,
     eff_total:  duty_total/Q_rls(m_fuel) > 1 ? 100 : 100*duty_total/Q_rls(m_fuel),
     eff_thermal:(Q_stack)=>100 *(Q_in(m_fuel) - Q_losses(m_fuel) - Q_stack) /Q_in(m_fuel),
+    eff_gcv:    (Q_stack)=>100 *(Q_in_gcv(m_fuel) - Q_losses(m_fuel) - Q_stack) /Q_in_gcv(m_fuel),
     duty_flux:  duty_rad/At,
 
     Alpha:    alpha,

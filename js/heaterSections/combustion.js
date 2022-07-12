@@ -175,7 +175,7 @@ const deltaH = (compound, t) => {
 
 /** (kJ/kmol), Enthalpy of combustion for a certain compound 
   * returns a function if no temp is passed */
-const combustionH = (compound, t, tIni, liquidWater) => {
+const combustionH = (compound, t, tIni, liquidWater = false) => {
   // hrp = HP − HR // H = H0 + deltaH  // H0 = n(hf)
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
 
@@ -199,12 +199,12 @@ const combustionH = (compound, t, tIni, liquidWater) => {
 };
 
 /** (kJ/kg) Enthalpy of combustion for a certain fuel mix */
-const ncv = (fuels, products, compounds, tAmb) => {
+const ncv = (fuels, products, compounds, tAmb, gcv = false) => {
   let value = 0;
   for (const fuel in fuels) {
     if (fuel in products) continue;
     const compound = compounds.filter(elem => elem.Formula == fuel)[0]
-    value += fuels[fuel]*combustionH(compound)(tAmb);
+    value += fuels[fuel]*combustionH(compound, undefined, tAmb, gcv)(tAmb);
     //logger.info(`H of combustion for ${fuel}: ` +
     // `${combustionH(compound)(tAmb)/compound.MW} KJ/Kg` )
   }
@@ -284,6 +284,9 @@ const combPerFuelCompound = (compounds, products, normalFuel) => {
 const combSection = (airExcess, fuels, params, onlyO2) => {
   if (!onlyO2) logger.debug(`"airExcess", "value": ${airExcess}`);
   const units = initSystem(params.unitSystem);
+  const moisture_val = moistAirWeightRatio(
+    params.t_air, params.humidity
+  );
   const debug_data = {
     err: "",
     atmPressure:     units.pressure(params.p_atm),
@@ -293,8 +296,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     "humidity_%": params.humidity,
     "dryAirN2_%": round(dryAirN2Percentage,2),
     "dryAirO2_%": round(dryAirO2Percentage,2),
-    moisture:   units.moist(moistAirWeightRatio(
-      params.t_air, params.humidity)),
+    moisture:   units.moist(moisture_val),
     spGrav: params.sp_grav,
     cpFluidTb: units.cp(params.Cp_fluid((params.t_in_conv + params.t_out) /2)),
     unitSystem: units.system[params.lang]
@@ -359,6 +361,8 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     'H2O_%':100*products['H2O']/totalPerMol,
     'CO2_%':100*products['CO2']/totalPerMol,
     'O2_%': 100*products['O2'] /totalPerMol,
+    
+    moisture_val,
 
     O2_mol_req_theor: o2required,
     O2_mass_req_theor:units.mass(o2required * data[2].MW),
@@ -399,8 +403,10 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   flows.flue_MW  = units["mass/mol"](flows.flue_MW);
 
   params.NCV = -ncv(normalFuel, products, compounds, params.t_amb)/MW_multicomp(normalFuel); // kJ/kg
+  params.GCV = -ncv(normalFuel, products, compounds, params.t_amb, true)/MW_multicomp(normalFuel); // kJ/kg
   flows.NCV = units["energy/mass"](params.NCV,0);
   flows.NCV_val = params.NCV;
+  flows.GCV_val = params.GCV;
 
   params.adFlame = newtonRaphson(
     adFlame(normalFuel, products, params.t_amb, o2excess),

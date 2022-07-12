@@ -150,6 +150,8 @@ const heaterFunc = (fuels, opts) => {
   heat_result.conv_result = convSection(params);
   heat_result.rad_result.eff_thermal_val = 
     heat_result.rad_result.eff_thermal(heat_result.conv_result.Q_stack);
+  heat_result.rad_result.eff_gcv_val = 
+    heat_result.rad_result.eff_gcv(heat_result.conv_result.Q_stack);
 
   return heat_result
 }
