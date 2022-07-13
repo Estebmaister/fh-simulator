@@ -421,7 +421,7 @@ const siSystem = {
   pressure:   (n,d,nU,oU)  => dualSystem(oU,nU,d,"kPa", n *1e-3),
   mass:       (n,d,nU,oU)  => dualSystem(oU,nU,d,"kg", n *1e-3),
   mass_flow:  (n,d,nU,oU)  => dualSystem(oU,nU,d,"kg/h", n),
-  barrel_flow:(n,d,nU,oU,spG =spGrav) => englishSystem.barrel_flow(n,d,nU,oU,spG),
+  barrel_flow:(n,d,nU,oU,spG = spGrav) => englishSystem.barrel_flow(n,d,nU,oU,spG),
   vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"m³/h", n),
   cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kg-K", n),
   cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kmol-K", n),

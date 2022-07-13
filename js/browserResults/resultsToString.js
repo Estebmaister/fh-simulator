@@ -521,10 +521,7 @@ const stringCompactResult = (
   </tr>
   <tr>
     <td class="tg-simple">▪ Temperatura de entrada, ${unit.tempC(0,0,0,true)}</td>
-    <td class="tg-simple">${unit.tempC(
-      baseResult.conv_result.t_in_given,
-      0, true
-    )}</td>
+    <td class="tg-simple">${unit.tempC(baseResult.conv_result.t_in_given,0,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.tempC(modResult.conv_result.t_in_given,0,true) : ""
     }</td>
@@ -543,9 +540,7 @@ const stringCompactResult = (
   </tr>
   <tr>
     <td class="tg-simple">▪ Absorción total de calor, ${unit.heat_flow(0,0,0,true)}</td>
-    <td class="tg-simple">${unit.heat_flow(
-      baseResult.rad_result.duty_total,3,true
-    )}</td>
+    <td class="tg-simple">${unit.heat_flow(baseResult.rad_result.duty_total,3,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.heat_flow(modResult.rad_result.duty_total,3,true) : ""
     }</td>
@@ -564,9 +559,7 @@ const stringCompactResult = (
   </tr>
   <tr>
     <td class="tg-simple">· Rfi interno escudo/convectivo, ${unit.fouling_factor(0,0,0,true)}</td>
-    <td class="tg-simple">${unit.fouling_factor(
-      baseResult.conv_result.rfi,3,true
-    )}</td>
+    <td class="tg-simple">${unit.fouling_factor(baseResult.conv_result.rfi,3,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.fouling_factor(modResult.conv_result.rfi,3,true) : ""
     }</td>
