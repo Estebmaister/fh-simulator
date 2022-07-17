@@ -241,7 +241,7 @@ const radSection = (params, noLog) => {
     "%":        duty_rad/duty_total,
     eff_total:  duty_total/Q_rls(m_fuel) > 1 ? 100 : 100*duty_total/Q_rls(m_fuel),
     eff_thermal:(Q_stack)=>100 *(Q_in(m_fuel) - Q_losses(m_fuel) - Q_stack) /Q_in(m_fuel),
-    eff_gcv:    (Q_stack)=>100 *(Q_in_gcv(m_fuel) - Q_losses(m_fuel) - Q_stack) /Q_in_gcv(m_fuel),
+    eff_gcv:    (Q_stack)=>100 *(Q_in(m_fuel) - Q_losses(m_fuel) - Q_stack) /Q_in_gcv(m_fuel),
     duty_flux:  duty_rad/At,
 
     Alpha:    alpha,

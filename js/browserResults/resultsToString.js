@@ -893,7 +893,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">▪ Eficiencia Térmica NHV (API-560), %</td>
+    <td class="tg-simple">▪ Eficiencia Térmica @ NHV, %</td>
     <td class="tg-simple">${round(
       baseResult.rad_result.eff_thermal_val,
       2
@@ -903,7 +903,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">▪ Eficiencia Térmica GHV (API-560), %</td>
+    <td class="tg-simple">▪ Eficiencia Térmica @ GHV, %</td>
     <td class="tg-simple">${round(
       baseResult.rad_result.eff_gcv_val,
       2

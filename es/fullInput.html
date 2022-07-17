@@ -52,6 +52,13 @@
     <section id="data-sect">
       <h1>Simulador de hornos de proceso de tiro natural</h1>
       <h4>(Diseñado para la instrucción de ingenieros y operadores)</h4>
+      <p class="side-margins">Esta página permite visualizar todas las variables resultantes del cálculo de la simulación para un estado definido con los datos ingresados.</p>
+      <p class="side-margins">
+        Al final de la página se puede expandir la sección de graficar, la cual posibilita definir un rango de variación para una de cuatro variables permitidas y así mostrar el comportamiento del proceso en dicho rango.
+        <br>
+        (se recomienda usar esta sección solo como referencia para comprobar lo robusto del algoritmo, ya que ciertos puntos pueden no ser aplicables a la realidad por restricciones físicas que el simulador no contempla)
+      </p>
+      <br>
     </section>
     <form lang="es" id="data-form" method="GET" action="./fullResult.html">
 
@@ -62,7 +69,7 @@
       </p>
 
       <hr>
-      <h3>Condiciones de diseño</h3>
+      <h3>Condiciones de Proceso</h3>
       <div class="form-div">
         <p id="sub-duty" class="project-info">
           Flujo Vol. <input step="1" min="0" name="m_fluid" type="number" value="90000"> BPD
