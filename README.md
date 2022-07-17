@@ -2,7 +2,7 @@
 
 ![Algorithm Diagram](./img/diagrama-algo.png)
 
-![Mechanic Diagram](https://github.com/[username]/[reponame]/blob/[branch]/img/diagrama-meca.png?raw=true)
+![Mechanic Diagram](https://github.com/estebmaister/fh-simulator/blob/main/img/diagrama-meca.png?raw=true)
 
 ## Running it locally
 
