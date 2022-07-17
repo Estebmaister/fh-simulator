@@ -1,5 +1,11 @@
 # Fire-Heater Simulator
 
+![Algorithm Diagram](./img/diagrama-algo.jpg)
+
+![Mechanic Diagram](https://github.com/[username]/[reponame]/blob/[branch]/img/diagrama-meca.jpg?raw=true)
+
+## Running it locally
+
 Make sure you have `node` installed and run this simulator with the following command in the terminal:
 
 ```sh
@@ -23,11 +29,23 @@ To update the data used in the simulator from the .csv table, run the following 
 npm run data
 ```
 
-### Example return
+## Changing the algorithm web version
+
+To update the files used by the web version of the app, run the following command:
+
+```sh
+npm start
+```
+
+## Example return
 
 ```json
-{"INFO": "Radiant section (K) Tg: 920.6321107253049"}
-{"DEBUG": {
+{ "INFO": "Adiabatic flame temp: [2,111.555 K] 1,838.4 °C"}
+{ "INFO": "duty_rad_dist: 62.40, ext_cycle_reps: 15"}
+{ "DEFAULT": "RADI, T_in_calc: 378.5 °C, M_fuel: 2,073.530 kg/h, Tg_out: 799.0 °C"}
+{ "DEFAULT": "SHLD, cycles: 8, T_in_calc: 370.1 °C, Tg_out: 694.3 °C"}
+{ "DEFAULT": "CONV, T_in_calc: 358.9 °C, T_in_given: 358.9 °C, Tg_stack: 390.4 °C"}
+{ "INFO": {
   "flows": {
     "total_flow": 21.814,
     "dry_total_flow": 19.272,
@@ -47,6 +65,7 @@ npm run data
     "flue_MW": "28.149 kg/kmol",
     "flue_Cp_Tamb": "30.197 kJ/kmol-K",
     "NCV": "966864.235 kJ/mol"
+    ...
   },
   "products": {
     "O2": 1.893,
@@ -67,7 +86,10 @@ npm run data
     "N2Pressure_%": 77.695,
     "O2Pressure_%": 20.591,
     "unitSystem": "SI"
-  }
+  },
+  "rad_result": {...},
+  "shld_result": {...},
+  "conv_result": {...}
 }}
 ```
 

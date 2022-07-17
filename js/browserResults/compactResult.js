@@ -33,8 +33,6 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
       baseResult = localResult ? localResult.result : {};
       break;
   }
-
-
   
   const loader = document.getElementById('loader-wrapper');
   if (loader) loader.remove();
@@ -48,7 +46,7 @@ const clearOldResult = ( storageResult, caseName ) => {
   
   const timeDiff = Date.now() - storageResult.time.date;
 
-  if (timeDiff > 1e3*60*60*24) { // > 1 day
+  if (timeDiff > 1e3*60*60*24*3) { // > 3 days
     logger.info(`Deleting ${caseName} old result`)
     localStorage.removeItem(caseName);
     return true;
