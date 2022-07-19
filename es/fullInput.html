@@ -72,11 +72,11 @@
       <h3>Condiciones de Proceso</h3>
       <div class="form-div">
         <p id="sub-duty" class="project-info">
-          Flujo Vol. <input step="1" min="0" name="m_fluid" type="number" value="90000"> BPD
+          Flujo Vol. <input step="1" min="10000" max="200000" name="m_fluid" type="number" value="90000"> BPD
           <sub><span>~</span> lb/hr</sub>
         </p>
         <p class="project-info">
-          Gravedad Esp. (SG) <em>@ 60°F</em> <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" value="0.84">
+          Gravedad Esp. (SG) <em>@ 60°F</em> <input id="sp-grav" step="0.01" min="0.01" name="sp_grav" type="number" value="0.84">
         </p>
         <p class="project-info">
           Absorción de calor ("duty"): 
@@ -135,7 +135,7 @@
       <div class="form-div">
         
         <p class="project-info">
-          Pérdidas por radiación <input step="0.1" min="0" name="heat_loss" type="number" value="1.5"> %
+          Pérdidas por radiación <input step="0.1" min="0" max="100" name="heat_loss" type="number" value="1.5"> %
         </p>
         <div class="form-div full-width">
           <h4 class="full-width">Factores de Ensuciamiento por Sección</h4>
@@ -176,7 +176,7 @@
 
       <div class="form-div flex-evenly">
           <p class="project-info sub-temp">
-            Temp. Aire Ambiental <input step="1" min="0" max="100" name="t_amb" type="number" value="80"> °F
+            Temp. Aire Ambiental <input step="1" min="0" max="120" name="t_amb" type="number" value="80"> °F
             <sub><span>~</span> °C</sub>
           </p> 
           <p class="project-info">
@@ -211,7 +211,7 @@
         <div class="form-div comp"> 
           <p class="project-info">Composición molar</p>
           <p class="project-info sub-temp">Temp. ingreso comb. T<sub>f</sub> 
-            <input step="1" min="0" max="100" type="number" name="t_fuel" value="80"> °F
+            <input step="1" min="0" max="120" type="number" name="t_fuel" value="80"> °F
             <sub><span>~</span> °C</sub> 
           </p>
         </div> 
