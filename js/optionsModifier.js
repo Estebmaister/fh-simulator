@@ -67,14 +67,14 @@ const optionsModifierAmbient = (key, browserData, options) => {
     maxAirExcess = 300,
     maxHumidity = 100,
     maxO2Excess = 30,
-    maxTamb = 1e2,
+    maxTamb = 1.2e2,
     maxPatm = 2,
     minPatm = 1e-2;
   let optValue;
   switch (key) {
     case 't_amb':
       optValue = parseFloat(browserData[key])
-      if (optValue < maxTamb) 
+      if (optValue <= maxTamb) 
         options.tAir = unitConv.FtoK(optValue);
       break;
     case 'humidity':
@@ -98,7 +98,7 @@ const optionsModifierAmbient = (key, browserData, options) => {
         options.o2Excess = optValue * .01;
       break;
     case 'o2_basis':
-      // Not configured
+      // TODO: Not configured
       break;
     default:
       break;
