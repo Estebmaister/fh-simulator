@@ -158,6 +158,8 @@ const convSection = (params, noLog) => {
 
   return {
     t_fin:        params.Ts( Tb(t_in), Tw( Tb(t_in), Tw(Tb(t_in)) )),
+    t_fin_max:    t_out + Q_conv( t_in, tg_in, tg_out)/(At/(params.N_conv/ params.Tpr_sh_cnv)) *(Do/Di) 
+      *( Rfi +1/hi(Tb(t_in),Tw( Tb(t_in), Tw(Tb(t_in)) )) +( Di *Math.log(Do/Di) /(2*kw_tube(Tw( Tb(t_in), Tw(Tb(t_in)) ))) ) ),
     t_in_given:   params.t_in_conv,
     t_in:         t_in,
     t_out:        t_out,
