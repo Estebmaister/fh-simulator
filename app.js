@@ -38,8 +38,8 @@ const createParams = (opts) => {
       unitConv.lbtokg(opts.mFluid),
       opts.spGrav
     ), // kg/h
-    t_in  = unitConv.FtoK(opts.tIn), // (K)
-    t_out = unitConv.FtoK(opts.tOut),// (K)
+    t_in  = opts.tIn, // (K)
+    t_out = opts.tOut,// (K)
     miu_fluid_in = opts.miuFluidIn,  // (cp)
     miu_fluid_out= opts.miuFluidOut, // (cp)
     cp_fluid_in = unitConv.CpENtoCpSI(opts.cpFluidIn), // (kJ/kg-C)
@@ -63,11 +63,11 @@ const createParams = (opts) => {
     t_in_conv:  t_in,       // (K) global process inlet
     t_out:      t_out,      // (K) global process outlet
     m_fluid:    m_fluid,    // (kg/h) 
-    Rfi: unitConv.RfENtoRfSI(opts.rfi), // (h-m2-C/kJ) int. fouling rad
-    Rfo: unitConv.RfENtoRfSI(opts.rfoConv), // (h-m2-C/kJ) ext. fouling cnv
-    Rfi_conv: unitConv.RfENtoRfSI(opts.rfiConv), // (h-m2-C/kJ) int. fouling conv sect
-    Rfi_shld: unitConv.RfENtoRfSI(opts.rfiShld), // (h-m2-C/kJ) int. fouling shld sect
-    Rfo_shld: unitConv.RfENtoRfSI(opts.rfoShld), // (h-m2-C/kJ) ext. fouling shld sect
+    Rfi:      opts.rfi,     // (h-m2-C/kJ) int. fouling rad
+    Rfo:      opts.rfoConv, // (h-m2-C/kJ) ext. fouling cnv
+    Rfi_conv: opts.rfiConv, // (h-m2-C/kJ) int. fouling conv sect
+    Rfi_shld: opts.rfiShld, // (h-m2-C/kJ) int. fouling shld sect
+    Rfo_shld: opts.rfoShld, // (h-m2-C/kJ) ext. fouling shld sect
     efficiency: opts.effcy,         // (% *.01)
     duty_rad_dist: opts.radDist,    // (% *.01)
     heat_loss_percent: opts.hLoss,  // (% *.01)

@@ -63,8 +63,8 @@
     <form lang="es" id="data-form" method="GET" action="./fullResult.html">
 
       <!-- <p class="project-info">
-        Caso de simulación: 
-        <input name="project_title" type="text" value="base" required> 
+        Caso de simulación:
+        <input name="project_title" type="text" value="base" required>
         <span class="validity"></span>
       </p> -->
 
@@ -79,15 +79,15 @@
           Gravedad específica (SG) <em>@ 60°F</em> <input id="sp-grav" step="0.01" min="0.01" name="sp_grav" type="number" lang="en" value="0.84">
         </p>
         <p class="project-info">
-          Absorción de calor ("duty"): 
+          Absorción de calor ("duty"):
           <span id="span-duty">71.53</span> MMBtu/hr
         </p>
       </div>
-      
+
       <div class="form-div">
         <div class="form-block">
-          <div class="form-div"> 
-            <div class="form-block flex-evenly"> 
+          <div class="form-div">
+            <div class="form-block flex-evenly">
               <p class="project-info">
                 Temperatura de entrada
                 <span class="sub-temp" style="white-space: nowrap;">
@@ -96,25 +96,25 @@
                 </span>
               </p>
               <p class="project-info">
-                Temperatura salida 
+                Temperatura salida
                 <span class="sub-temp" style="white-space: nowrap;">
                   (T)<sub>out</sub> <input id="t_out"step="1" min="300" name="t_out"type="number" lang="en" value="772"> °F
                   <sub><span>~</span> °C</sub>
                 </span>
               </p>
             </div>
-            <div class="form-block flex-evenly"> 
+            <div class="form-block flex-evenly">
               <p class="project-info">
-                Calor específico 
+                Calor específico
                 <span style="white-space: nowrap;">
-                  (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" lang="en" value="0.676"> 
+                  (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" lang="en" value="0.676">
                   <sub>Btu/lb-°F</sub>
                 </span>
               </p>
               <p class="project-info">
-                Calor específico 
+                Calor específico
                 <span style="white-space: nowrap;">
-                  (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" lang="en" value="0.703"> 
+                  (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" lang="en" value="0.703">
                   <sub>Btu/lb-°F</sub>
                 </span>
               </p>
@@ -123,14 +123,14 @@
         </div>
         <div class="form-block">
           <div class="form-div">
-            <div class="form-block flex-evenly"> 
+            <div class="form-block flex-evenly">
               <p class="project-info">
-                Viscosidad absoluta  
+                Viscosidad absoluta
                 <span style="white-space: nowrap;">
                   (μ)<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" lang="en" value="1.45"> cp
                 </span>
               <p class="project-info">
-                Viscosidad absoluta  
+                Viscosidad absoluta
                 <span style="white-space: nowrap;">
                   (μ)<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" lang="en" value="0.96"> cp
                 </span>
@@ -138,14 +138,14 @@
             </div>
             <div class="form-block flex-evenly">
               <p class="project-info">
-                Conductividad térmica  
+                Conductividad térmica
                 <span style="white-space: nowrap;">
                   (k)<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" lang="en" value="0.038">
                   <sub>Btu/h.ft.°F</sub>
                 </span>
               </p>
               <p class="project-info">
-                Conductividad térmica  
+                Conductividad térmica
                 <span style="white-space: nowrap;">
                   (k)<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" lang="en" value="0.035">
                   <sub>Btu/h.ft.°F</sub>
@@ -157,7 +157,7 @@
       </div>
 
       <div class="form-div">
-        
+
         <p class="project-info">
           Pérdidas por radiación <input step="0.1" min="0" max="100" name="heat_loss" type="number" lang="en" value="1.5"> %
         </p>
@@ -202,12 +202,12 @@
           <p class="project-info sub-temp">
             Temperatura del Aire Ambiental <input step="1" min="0" max="120" name="t_amb" type="number" lang="en" value="80"> °F
             <sub><span>~</span> °C</sub>
-          </p> 
+          </p>
           <p class="project-info">
             Humedad relativa <input step="0.1" min="0" max="100" name="humidity" type="number" lang="en" value="50.0"> %
           </p>
           <p class="project-info">
-            Presión atmosférica <input step="0.01" min="0.01" max="2" name="p_atm" type="number" lang="en" placeholder="1.00"> 
+            Presión atmosférica <input step="0.01" min="0.01" max="2" name="p_atm" type="number" lang="en" placeholder="1.00">
             <sub>atm</sub>
           </p>
           <p class="project-info">
@@ -225,36 +225,36 @@
       <h3>Combustible <span id="show-hide-fuel">[editar]</span></h3>
 
       <div id="fuel-div">
-        <!-- <div class="form-div"> 
+        <!-- <div class="form-div">
           <p class="project-info">Combustible especificado como <select name="fuel_percent">
-            <option value="mole_percent">porcentaje molar</option> 
+            <option value="mole_percent">porcentaje molar</option>
             <option value="mass_percent">mass percent</option>
-          </select></p> 
+          </select></p>
         </div> -->
-        
-        <div class="form-div comp"> 
+
+        <div class="form-div comp">
           <p class="project-info">Composición molar</p>
-          <p class="project-info sub-temp">Temperatura de ingreso T<sub>f</sub> 
+          <p class="project-info sub-temp">Temperatura de ingreso T<sub>f</sub>
             <input step="1" min="0" max="120" type="number" lang="en" name="t_fuel" value="80"> °F
-            <sub><span>~</span> °C</sub> 
+            <sub><span>~</span> °C</sub>
           </p>
-        </div> 
+        </div>
 
         <div class="form-div comp-div">
           <!-- <div class="fuel-compound">
-            <p class="fuel-name">Carbon      </p><p class="fuel-formula">C                          </p> <p class="fuel-input"><input max="100" min="0.00" name="C"      id="C"      placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Carbon      </p><p class="fuel-formula">C                          </p> <p class="fuel-input"><input max="100" min="0.00" name="C"      id="C"      placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div> -->
           <div class="fuel-compound">
-            <p class="fuel-name">Metano        </p><p class="fuel-formula">CH<sub>4</sub>             </p> <p class="fuel-input"><input max="100" min="0.00" name="CH4"    id="CH4"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Metano        </p><p class="fuel-formula">CH<sub>4</sub>             </p> <p class="fuel-input"><input max="100" min="0.00" name="CH4"    id="CH4"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Etano         </p><p class="fuel-formula">C<sub>2</sub>H<sub>6</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H6"   id="C2H6"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Etano         </p><p class="fuel-formula">C<sub>2</sub>H<sub>6</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H6"   id="C2H6"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Propano       </p><p class="fuel-formula">C<sub>3</sub>H<sub>8</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C3H8"   id="C3H8"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Propano       </p><p class="fuel-formula">C<sub>3</sub>H<sub>8</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C3H8"   id="C3H8"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">n-Butano      </p><p class="fuel-formula">C<sub>4</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C4H10"  id="C4H10"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">n-Butano      </p><p class="fuel-formula">C<sub>4</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C4H10"  id="C4H10"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
             <p class="fuel-name">i-Butano      </p><p class="fuel-formula">C<sub>4</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="iC4H10" id="iC4H10" placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
@@ -266,10 +266,10 @@
             <p class="fuel-name">Propileno      </p><p class="fuel-formula">C<sub>3</sub>H<sub>6</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C3H6"   id="C3H6"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <!-- <div class="fuel-compound">
-            <p class="fuel-name">n-Pentane   </p><p class="fuel-formula">C<sub>5</sub>H<sub>12</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C5H12"  id="C5H12"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">n-Pentane   </p><p class="fuel-formula">C<sub>5</sub>H<sub>12</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C5H12"  id="C5H12"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">i-Pentane   </p><p class="fuel-formula">C<sub>5</sub>H<sub>12</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="iC5H12" id="iC5H12" placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">i-Pentane   </p><p class="fuel-formula">C<sub>5</sub>H<sub>12</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="iC5H12" id="iC5H12" placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
             <p class="fuel-name">neoPentane </p><p class="fuel-formula">C<sub>5</sub>H<sub>12</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="nC5H12" id="nC5H12" placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
@@ -278,25 +278,25 @@
             <p class="fuel-name">n-Hexane    </p><p class="fuel-formula">C<sub>6</sub>H<sub>14</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C6H14"  id="C6H14"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Butileno       </p><p class="fuel-formula">C<sub>4</sub>H<sub>8</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C4H8"   id="C4H8"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Butileno       </p><p class="fuel-formula">C<sub>4</sub>H<sub>8</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C4H8"   id="C4H8"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">i-Buteno       </p><p class="fuel-formula">C<sub>4</sub>H<sub>8</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="iC4H8"  id="iC4H8"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">i-Buteno       </p><p class="fuel-formula">C<sub>4</sub>H<sub>8</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="iC4H8"  id="iC4H8"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">n-Penteno      </p><p class="fuel-formula">C<sub>5</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C5H10"  id="C5H10"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">n-Penteno      </p><p class="fuel-formula">C<sub>5</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C5H10"  id="C5H10"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Benzeno        </p><p class="fuel-formula">C<sub>6</sub>H<sub>6</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C6H6"   id="C6H6"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Benzeno        </p><p class="fuel-formula">C<sub>6</sub>H<sub>6</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C6H6"   id="C6H6"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Tolueno        </p><p class="fuel-formula">C<sub>7</sub>H<sub>8</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C7H8"   id="C7H8"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Tolueno        </p><p class="fuel-formula">C<sub>7</sub>H<sub>8</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C7H8"   id="C7H8"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Xyleno         </p><p class="fuel-formula">C<sub>8</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C8H10"  id="C8H10"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Xyleno         </p><p class="fuel-formula">C<sub>8</sub>H<sub>10</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C8H10"  id="C8H10"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Acetileno      </p><p class="fuel-formula">C<sub>2</sub>H<sub>2</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H2"   id="C2H2"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Acetileno      </p><p class="fuel-formula">C<sub>2</sub>H<sub>2</sub> </p> <p class="fuel-input"><input max="100" min="0.00" name="C2H2"   id="C2H2"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
             <p class="fuel-name">Naftaleno      </p><p class="fuel-formula">C<sub>10</sub>H<sub>8</sub></p> <p class="fuel-input"><input max="100" min="0.00" name="C10H8"  id="C10H8"  placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
@@ -308,42 +308,42 @@
             <p class="fuel-name">Etanol        </p><p class="fuel-formula">C<sub>2</sub>H<sub>5</sub>OH</p> <p class="fuel-input"><input max="100" min="0.00" name="C2H5OH" id="C2H5OH" placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Amoniaco      </p><p class="fuel-formula">NH<sub>3</sub>             </p> <p class="fuel-input"><input max="100" min="0.00" name="NH3"    id="NH3"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Amoniaco      </p><p class="fuel-formula">NH<sub>3</sub>             </p> <p class="fuel-input"><input max="100" min="0.00" name="NH3"    id="NH3"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Azufre        </p><p class="fuel-formula">S                          </p> <p class="fuel-input"><input max="100" min="0.00" name="S"      id="S"      placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Azufre        </p><p class="fuel-formula">S                          </p> <p class="fuel-input"><input max="100" min="0.00" name="S"      id="S"      placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
             <p class="fuel-name">Hidrógeno Sul.</p><p class="fuel-formula">H<sub>2</sub>S        </p> <p class="fuel-input"><input max="100" min="0.00" name="H2S"    id="H2S"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Agua          </p><p class="fuel-formula">H<sub>2</sub>O             </p> <p class="fuel-input"><input max="100" min="0.00" name="H2Ol"   id="H2Ol"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Agua          </p><p class="fuel-formula">H<sub>2</sub>O             </p> <p class="fuel-input"><input max="100" min="0.00" name="H2Ol"   id="H2Ol"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
             <p class="fuel-name">Oxígeno       </p><p class="fuel-formula">O<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="O2"     id="O2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div> -->
           <div class="fuel-compound">
-            <p class="fuel-name">Monóxido de Carbono</p><p class="fuel-formula">CO                      </p> <p class="fuel-input"><input max="100" min="0.00" name="CO"     id="CO"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Monóxido de Carbono</p><p class="fuel-formula">CO                      </p> <p class="fuel-input"><input max="100" min="0.00" name="CO"     id="CO"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Hidrógeno     </p><p class="fuel-formula">H<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="H2"     id="H2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Hidrógeno     </p><p class="fuel-formula">H<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="H2"     id="H2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Nitrógeno     </p><p class="fuel-formula">N<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="N2"     id="N2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Nitrógeno     </p><p class="fuel-formula">N<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="N2"     id="N2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Dióxido de Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="100" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p> 
+            <p class="fuel-name">Dióxido de Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="100" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
         </div>
-        <div class="form-div comp"> 
+        <div class="form-div comp">
           <p class="project-info">Total <span id="total" style="font-weight: bold;"> 0 </span> %</p>
         </div>
       </div>
 
       <hr>
 
-      <div class="form-div"> 
-        <div class="form-block"> 
+      <div class="form-div">
+        <div class="form-block">
           <div class="toggle">
             <div class="toggle-inside">
               <p>SI</p>
@@ -363,23 +363,23 @@
       <h3>Graficar <span id="show-hide-graph">[variables]</span></h3>
 
       <div id="graph-div">
-        
+
         <div class="form-div comp">
-          <p class="project-info">Variable a modificar <select name="graph_var">
-            <option value="m_fluid">Flujo de crudo</option> 
-            <option value="t_out">T. salida crudo</option>
-            <option value="air_excess">Exceso de aire</option>
-            <option value="humidity">Humedad Rel.</option>
-          </select></p> 
+          <p class="project-info">Tendencias vs <select name="graph_var">
+            <option value="m_fluid">10³xBPD Residuo</option>
+            <option value="t_out">Temp. Salida Residuo</option>
+            <option value="air_excess">Exceso de Aire</option>
+            <option value="humidity">Humedad Relativa</option>
+          </select></p>
           <p class="project-info sub-temp">Rango de variación <input type="range" name="graph_range" step="1" min="1" max="99">
             <span>~</span>
           </p>
           <p class="project-info sub-temp">N° de puntos<input type="range" name="graph_points" step="2" min="2" max="200">
             <span>~</span>
           </p>
-        </div> 
+        </div>
 
-        <div class="form-div"> 
+        <div class="form-div">
           <button id="graph-action">Graficar</button>
         </div>
       </div>

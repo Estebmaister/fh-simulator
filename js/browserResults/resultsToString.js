@@ -291,7 +291,7 @@ Datos de entrada
   Calor específico (Cp) residuo: ${result_obj.debug_data.cpFluidTb}
 
   Gravedad específica (residuo): ${result_obj.debug_data.spGrav}
-  Flujo másico (residuo):     ${unit.mass_flow(
+  Flujo másico (residuo):        ${unit.mass_flow(
     result_obj.rad_result.m_fluid,
     1
   )}
@@ -305,11 +305,12 @@ Datos de entrada
       result_obj.conv_result.duty
   )}
 
-  Eficiencia térmica del horno:   ${round(
-    result_obj.rad_result.eff_thermal(result_obj.conv_result.Q_stack),
-    2
-  )}%
+  Eficiencia térmica (NHV): ${round(result_obj.rad_result.eff_thermal_val, 2)}%
+  Eficiencia térmica (GCV): ${round(result_obj.rad_result.eff_gcv_val, 2)}%
 
+  Emisiones de CO2: ${round(( (result_obj.products["CO2"] * 44.01) / 
+    result_obj.flows["fuel_MW"]) *result_obj.rad_result.m_fuel *(1e-3 * 24 * 365), 
+    0)} ton/año
 
 Moles de gases de combustión por mol de combustible
 
@@ -420,11 +421,12 @@ Input Data
       result_obj.conv_result.duty
   )}
 
-  Heater Thermal Efficiency: ${round(
-    result_obj.rad_result.eff_thermal(result_obj.conv_result.Q_stack),
-    2
-  )}%
+  Heater Thermal Efficiency (NHV): ${round(result_obj.rad_result.eff_thermal_val, 2)}%
+  Heater Thermal Efficiency (GCV): ${round(result_obj.rad_result.eff_gcv_val, 2)}%
 
+  CO2 Emissions: ${round(( (result_obj.products["CO2"] * 44.01) / 
+    result_obj.flows["fuel_MW"]) *result_obj.rad_result.m_fuel *(1e-3 * 24 * 365), 
+    0)} ton/year
 
 Flue gas moles and components (per mol of fuel)
 

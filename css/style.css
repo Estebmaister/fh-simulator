@@ -100,7 +100,7 @@ footer {
 
 /* -------    Lang switch    ------*/
 
-#lang {
+#lang, #units {
   position: fixed;
   right: 1%;
   top: 42px;
@@ -122,10 +122,14 @@ footer {
   background-color: var(--contrast-color, lightgray);
   cursor: pointer;
 }
-#lang span {
+#units {
+  width: 7rem;
+  left: 62px;
+}
+#lang span, #units span {
   font-weight: 800;
 }
-#lang:hover {
+#lang:hover, #units:hover {
   background-color: var(--primary-color,#000);
   color: var(--contrast-color, #fff);
   font-size: 0.9rem;
@@ -315,6 +319,10 @@ h3 span {
   padding-left: 0.8em;
   padding-bottom: 0.6em;
   align-self: center;
+}
+
+.project-info select {
+  width: 11rem;
 }
 
 .fuel-compound {

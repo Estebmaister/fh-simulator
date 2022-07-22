@@ -29,10 +29,16 @@ const optionsModifierFluid = (key, browserData, options) => {
       options.mFluid = optValue;
       break;
     case 't_in':
-      options.tIn = optValue;
+      options.tIn = unitConv.FtoK(optValue);
+      break;
+    case 'si_t_in':
+      options.tIn = unitConv.CtoK(optValue);
       break;
     case 't_out':
-      options.tOut = optValue;
+      options.tOut = unitConv.FtoK(optValue);
+      break;
+    case 'si_t_out':
+      options.tOut = unitConv.CtoK(optValue);
       break;
     case 'sp_grav':
       options.spGrav = optValue;
@@ -67,33 +73,38 @@ const optionsModifierAmbient = (key, browserData, options) => {
     maxAirExcess = 300,
     maxHumidity = 100,
     maxO2Excess = 30,
-    maxTamb = 1.2e2,
+    maxTamb = 120,
+    maxTambSI = 50,
     maxPatm = 2,
+    maxPatmSI = 2*1e2,
     minPatm = 1e-2;
-  let optValue;
+  let optValue = parseFloat(browserData[key]);
   switch (key) {
     case 't_amb':
-      optValue = parseFloat(browserData[key])
       if (optValue <= maxTamb) 
         options.tAir = unitConv.FtoK(optValue);
       break;
+    case 'si_t_amb':
+      if (optValue <= maxTambSI) 
+        options.tAir = unitConv.CtoK(optValue);
+      break;
     case 'humidity':
-      optValue = parseFloat(browserData[key])
       if (optValue >= 0 && optValue <= maxHumidity) 
         options.humidity = optValue;
       break;
     case 'p_atm':
-      optValue = parseFloat(browserData[key])
       if (optValue >= minPatm && optValue < maxPatm) 
         options.pAtm = optValue *options.pAtmRef;
       break;
+    case 'si_p_atm':
+      if (optValue >= minPatm && optValue < maxPatmSI) 
+        options.pAtm = optValue *1e3;
+      break;
     case 'air_excess':
-      optValue = parseFloat(browserData[key])
       if (optValue >= 0 && optValue <= maxAirExcess) 
         options.airExcess = optValue * .01;
       break;
     case 'o2_excess':
-      optValue = parseFloat(browserData[key])
       if (optValue >= 0 && optValue <= maxO2Excess) 
         options.o2Excess = optValue * .01;
       break;
@@ -133,35 +144,51 @@ const optionsModifier = (key, browserData, options) => {
       break;
     case 'rfi':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0) options.rfi = optValue;
+      if (optValue >= 0) options.rfi = unitConv.RfENtoRfSI(optValue);
+      break;
+    case 'si_rfi':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) options.rfi = optValue/3_600;
       break;
     case 'rfo':
       optValue = parseFloat(browserData[key])
       if (optValue >= 0) {
-        options.rfoConv = optValue;
-        options.rfoShld = optValue;
+        options.rfoConv = unitConv.RfENtoRfSI(optValue);
+        options.rfoShld = unitConv.RfENtoRfSI(optValue);
       }
       break;
+    case 'si_rfo':
+    optValue = parseFloat(browserData[key])
+    if (optValue >= 0) {
+      options.rfoConv = optValue/3_600;
+      options.rfoShld = optValue/3_600;
+    }
+    break;
     case 'rfi_conv':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0) options.rfiConv = optValue;
+      if (optValue >= 0) options.rfiConv = unitConv.RfENtoRfSI(optValue);
       break;
     case 'rfo_conv':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0) options.rfoConv = optValue;
+      if (optValue >= 0) options.rfoConv = unitConv.RfENtoRfSI(optValue);
       break;
     case 'rfi_shld':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0) options.rfiShld = optValue;
+      if (optValue >= 0) options.rfiShld = unitConv.RfENtoRfSI(optValue);
       break;
     case 'rfo_shld':
       optValue = parseFloat(browserData[key])
-      if (optValue >= 0) options.rfoShld = optValue;
+      if (optValue >= 0) options.rfoShld = unitConv.RfENtoRfSI(optValue);
       break;
     case 't_fuel':
       optValue = parseFloat(browserData[key])
       if (optValue >= 0) 
         options.tFuel = unitConv.FtoK(optValue);
+      break;
+    case 'si_t_fuel':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) 
+        options.tFuel = unitConv.CtoK(optValue);
       break;
     case 'unit_system':
       logger.debug(`"${key}", "value":"${browserData[key]}"`)
