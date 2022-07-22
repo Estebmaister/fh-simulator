@@ -46,7 +46,7 @@
         </li>
       </ul>
     </nav>
-    <a id="units" href="./indexEN.html"><span>SI</span> | ENGLISH</a>
+    <a id="units" href="./index.html">SI | <span>ENGLISH</span></a>
   </header>
   <main>
     <section id="data-sect">
@@ -90,12 +90,12 @@
               </div>
               <div class="full-width">
                 <p class="project-info sub-temp">
-                  Temperatura entrada <input id="t_in" step="1" min="320" max="385" name="si_t_in" type="number" lang="en" value="360"> °C
+                  Temperatura entrada <input id="t_in" step="1" min="600" max="699" name="t_in" type="number" lang="en" value="678"> °F
                   <sub class="hidden"><span>~</span> °C</sub>
                 </p>
                 <br>
                 <p class="project-info sub-temp">
-                  Temperatura salida <input id="t_out"step="1" min="386" max="480" name="si_t_out"type="number" lang="en" value="411"> °C
+                  Temperatura salida <input id="t_out"step="1" min="700" max="800" name="t_out"type="number" lang="en" value="772"> °F
                   <sub class="hidden"><span>~</span> °C</sub>
                 </p>
 
@@ -109,7 +109,7 @@
                 </p>
                 <br>
 
-                <p class="project-info hidden">
+                <p class="project-info">
                   Absorción de calor ('duty'):
                   <span id="span-duty">71.53</span> MMBtu/hr
                 </p>
@@ -122,15 +122,15 @@
                   Factor de coquización
                   <span style="white-space: nowrap;">
                   (tubos rad):
-                    <input step="0.1" min="0" max="0.5" name="si_rfi" type="number" lang="en" placeholder="0.0">
-                    <sub>x10-3 m²-K/W</sub>
+                    <input step="0.001" min="0" max="0.003" name="rfi" type="number" lang="en" placeholder="0.000">
+                    <sub>hr.ft².°F/Btu</sub>
                   </span>
                 </p>
                 <p class="project-info">
                   Factor ensuciamiento externo:
                   <span style="white-space: nowrap;">
-                    <input step="0.001" min="0" max="0.5" name="si_rfo" type="number" lang="en" value="0.1">
-                    <sub>x10-3 m²-K/W</sub>
+                    <input step="0.001" min="0" max="0.003" name="rfo" type="number" lang="en" value="0.001">
+                    <sub>hr.ft².°F/Btu</sub>
                   </span>
                 </p>
               </div>
@@ -154,11 +154,11 @@
                 Pérdidas por radiación <input step="0.1" min="0" max="5" name="heat_loss" type="number" lang="en" value="1.5"> %
               </p>
               <p class="project-info sub-temp hidden">
-                Temp. ingreso combustión <input id="t_fuel" step="0.1" min="-17" max="45" name="si_t_fuel" type="number" lang="en" value="26.7"> °C
+                Temp. ingreso combustión <input id="t_fuel" step="1" min="0" max="105" name="t_fuel" type="number" lang="en" value="80"> °F
                 <sub><span>~</span> °C</sub>
               </p>
               <p class="project-info sub-temp">
-                Temp. aire ambiental <input id="t_amb" step="0.1" min="-17" max="45" name="si_t_amb" type="number" lang="en" value="26.7"> °C
+                Temp. aire ambiental <input id="t_amb" step="1" min="0" max="105" name="t_amb" type="number" lang="en" value="80"> °F
                 <sub class="hidden"><span>~</span> °C</sub>
               </p>
               <p class="project-info">
@@ -166,8 +166,8 @@
               </p>
 
               <p class="project-info hidden">
-                Presión atmosférica <input step="0.01" min="0" max="200" name="si_p_atm" type="number" lang="en" placeholder="101.325">
-                <sub>kPa</sub>
+                Presión atmosférica <input step="0.01" min="0" max="2" name="p_atm" type="number" lang="en" placeholder="1.00">
+                <sub>atm</sub>
               </p>
             </div>
           </div>
@@ -233,7 +233,7 @@
             <div class="toggle-inside">
               <p>SI</p>
               <label class="switch" for="unit_system">
-                <input id="unit_system" name="unit_system" type="checkbox" value="english"/>
+                <input id="unit_system" name="unit_system" type="checkbox" value="english" checked/>
                 <div class="slider round"></div>
               </label>
               <p>EN</p>

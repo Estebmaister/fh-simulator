@@ -183,8 +183,8 @@ const getOptions = () => {
     rfoConv:    0.000,      // hr.ft².°F/Btu
     rfiShld:    0.000,      // hr.ft².°F/Btu
     rfoShld:    0.000,      // hr.ft².°F/Btu
-    tIn:        678,        // F
-    tOut:       772,        // F
+    tIn:        unitConv.FtoK(678),// K
+    tOut:       unitConv.FtoK(772),// K
     mFluid:     90e3,       // BPD
     miuFluidIn: 1.45,       // cp
     miuFluidOut:.960,       // cp
@@ -408,7 +408,7 @@ const siSystem = {
   "mass/mol":     (n,d,nU,oU) => dualSystem(oU,nU,d,"kg/kmol", n),
   heat_flow:      (n,d,nU,oU) => dualSystem(oU,nU,d,"MJ/h", n*1e-6),
   heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"W/m²", n),
-  fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"÷10³ m²-K/W", n*3.6e3),
+  fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"m²-K/W ÷10³", n*3.6e3),
 
   "energy/mass":  (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kg", n),
   "energy/vol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/m³", n),
