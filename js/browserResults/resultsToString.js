@@ -170,10 +170,11 @@ const stringConvResult = (lang, result_obj, unitSystem) => {
   }
 
   string += `\n
-  t_in:     ${unit.tempC(result_obj.t_in)}
-  t_out:    ${unit.tempC(result_obj.t_out)}
-  Tw:       ${unit.tempC(result_obj.Tw)}
-  t_fin:    ${unit.tempC(result_obj.t_fin)}
+  t_in:      ${unit.tempC(result_obj.t_in)}
+  t_out:     ${unit.tempC(result_obj.t_out)}
+  Tw:        ${unit.tempC(result_obj.Tw)}
+  t_fin_avg: ${unit.tempC(result_obj.t_fin)}
+  t_fin_max: ${unit.tempC(result_obj.t_fin_max)}
 
   tg_in:      ${unit.tempC(result_obj.tg_in)}
   tg_stack:   ${unit.tempC(result_obj.tg_out)}
@@ -801,10 +802,17 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">· Aletas</td>
+    <td class="tg-simple">· Aletas promedio</td>
     <td class="tg-simple">${unit.tempC(baseResult.conv_result.t_fin,0,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.tempC(modResult.conv_result.t_fin,0,true) : ""
+    }</td>
+  </tr>
+  <tr>
+    <td class="tg-simple">· Aletas máxima</td>
+    <td class="tg-simple">${unit.tempC(baseResult.conv_result.t_fin_max,0,true)}</td>
+    <td class="tg-simple">${
+      validMod ? unit.tempC(modResult.conv_result.t_fin_max,0,true) : ""
     }</td>
   </tr>
   <tr><td colspan="3"></td></tr>
