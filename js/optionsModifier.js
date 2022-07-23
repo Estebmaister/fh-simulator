@@ -56,9 +56,15 @@ const optionsModifierFluid = (key, browserData, options) => {
       options.kwFluidOut = optValue;
       break;
     case 'cp_in':
+      options.cpFluidIn = unitConv.CpENtoCpSI(optValue);
+      break;
+    case 'si_cp_in':
       options.cpFluidIn = optValue;
       break;
     case 'cp_out':
+      options.cpFluidOut = unitConv.CpENtoCpSI(optValue);
+      break;
+    case 'si_cp_out':
       options.cpFluidOut = optValue;
       break;
     default:

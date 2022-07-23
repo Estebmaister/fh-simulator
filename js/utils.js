@@ -188,8 +188,8 @@ const getOptions = () => {
     mFluid:     90e3,       // BPD
     miuFluidIn: 1.45,       // cp
     miuFluidOut:.960,       // cp
-    cpFluidIn:  .676,       // Btu/lb-F
-    cpFluidOut: .702,       // Btu/lb-F 
+    cpFluidIn:  unitConv.CpENtoCpSI(.676), // kJ/kg-C
+    cpFluidOut: unitConv.CpENtoCpSI(.702), // kJ/kg-C 
     kwFluidIn:  .038,       // Btu/h-ft-F
     kwFluidOut: .035,       // Btu/h-ft-F
     pAtm:       pAtmRef,    // Pa
