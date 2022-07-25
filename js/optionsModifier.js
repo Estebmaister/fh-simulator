@@ -99,7 +99,7 @@ const optionsModifierAmbient = (key, browserData, options) => {
         options.humidity = optValue;
       break;
     case 'p_atm':
-      if (optValue >= minPatm && optValue < maxPatm) 
+      if (optValue >= minPatm && optValue <= maxPatm) 
         options.pAtm = optValue *options.pAtmRef;
       break;
     case 'si_p_atm':
