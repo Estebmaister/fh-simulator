@@ -61,14 +61,14 @@
       <br>
     </section>
 
-    <form lang="en" id="data-form" method="GET" action="./fullResult.html">
+    <form id="data-form" method="GET" action="./fullResult.html">
 
       <!-- <p class="project-info">
         Case: <input name="project_title" type="text" value="base" required> <span class="validity"></span>
       </p> -->
 
       <hr>
-      <h3>Design conditions</h3>
+      <h3>Process conditions</h3>
       <div class="form-div">
         <p id="sub-duty" class="project-info">
           Input flow <input step="1" min="0" name="m_fluid" type="number" value="90000"> BPD 
@@ -132,16 +132,44 @@
       </div>
 
       <div class="form-div">
-        <p class="project-info">R<sub>fi</sub> radiant <input step="0.001" min="0" name="rfi" type="number" value="0.000">
-          <sub>hr.ft².°F/Btu</sub>
+        <p class="project-info">
+          Heat Loss <input step="0.1" min="0" max="10" name="heat_loss" type="number" value="1.5"> %
         </p>
-        <p class="project-info">R<sub>fo</sub> convect <input step="0.001" min="0" name="rfo" type="number" value="0.000">
-          <sub>hr.ft².°F/Btu</sub>
+        <p class="project-info hidden">
+          Fixed Rad. Dist. <input step="0.1" min="40" max="100" name="rad_dist" type="number" placeholder="70.0"> %
         </p>
-        <p class="project-info">Heat Loss <input step="0.1" min="0" max="5" name="heat_loss" type="number" value="1.5"> %
-        </p>
-        <p class="project-info">Fixed Rad. Dist. <input step="0.1" min="40" max="100" name="rad_dist" type="number" placeholder="0.0"> %
-        </p>
+        <div class="form-div full-width">
+          <h4 class="full-width">Fouling factors per section</h4>
+          <div class="form-factor">
+            <h5>RADIANT</h5>
+            <p class="project-info">
+              R<sub>fi</sub> <input step="0.001" min="0" name="rfi" type="number" placeholder="0.000">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+          </div>
+          <div class="form-factor">
+            <h5>SHIELD</h5>
+            <p class="project-info">
+              R<sub>fi</sub> <input step="0.001" min="0" name="rfi_shld" type="number" placeholder="0.000">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+            <p class="project-info">
+              R<sub>fo</sub> <input step="0.001" min="0" name="rfo_shld" type="number" value="0.001">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+          </div>
+          <div class="form-factor">
+            <h5>CONVECTIVE</h5>
+            <p class="project-info">
+              R<sub>fi</sub> <input step="0.001" min="0" name="rfi_conv" type="number" placeholder="0.000">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+            <p class="project-info">
+              R<sub>fo</sub> <input step="0.001" min="0" name="rfo_conv" type="number" value="0.001">
+              <sub>hr.ft².°F/Btu</sub>
+            </p>
+          </div>
+        </div>
       </div>
 
       <div class="form-div">

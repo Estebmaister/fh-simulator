@@ -315,8 +315,8 @@ h3 span {
 .project-info {
   margin: 0;
   display: inline-block;
-  padding-right: 0.8em;
-  padding-left: 0.8em;
+  padding-right: 0.5em;
+  padding-left: 0.5em;
   padding-bottom: 0.6em;
   align-self: center;
 }

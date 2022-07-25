@@ -124,13 +124,17 @@ formElement.addEventListener('submit', function () {
 const 
   barrelsToft3 = 5.6145833333,
   ft3Tolb = 62.371, // for Water @60°F
-  BPDtolb_h = (SG) => barrelsToft3*ft3Tolb*SG/24;
+  lbtokg = 1/2.20462,
+  BPDtolb_h = (SG) => barrelsToft3*ft3Tolb*SG/24,
+  BPDtokg_h = (SG) => barrelsToft3*ft3Tolb*lbtokg*SG/24/3.6;
+let BDPtoMass = BPDtolb_h;
 
 const updateDuty = () => spanDutyField.innerHTML = Math.round(
-    +inputFlow.value*BPDtolb_h(+spGrav.value) *
+    +inputFlow.value*BDPtoMass(+spGrav.value) *
     (+tOut.value-tIn.value) *(+cpOut.value+ +cpIn.value)/2
     /10_000
   ) /100;
+
 const updateFlow = () => spanFlowField.innerHTML = Math.round(
   +inputFlow.value*BPDtolb_h(+spGrav.value) ).toLocaleString();
 
@@ -146,6 +150,7 @@ const spanDutyField = document.getElementById('span-duty');
 if (subDuty) {
   inputFlow = subDuty.getElementsByTagName('input')[0];
   spanFlowField = subDuty.getElementsByTagName('span')[0];
+  if (tIn && tIn.name.includes("si")) BDPtoMass = BPDtokg_h;
   if (inputFlow && spanDutyField) {
     inputFlow.addEventListener('input', updateDuty)
     inputFlow.addEventListener('input', updateFlow)

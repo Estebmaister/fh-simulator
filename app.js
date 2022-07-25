@@ -42,8 +42,8 @@ const createParams = (opts) => {
     t_out = opts.tOut,// (K)
     miu_fluid_in = opts.miuFluidIn,  // (cp)
     miu_fluid_out= opts.miuFluidOut, // (cp)
-    cp_fluid_in = unitConv.CpENtoCpSI(opts.cpFluidIn), // (kJ/kg-C)
-    cp_fluid_out= unitConv.CpENtoCpSI(opts.cpFluidOut),// (kJ/kg-C) 
+    cp_fluid_in  = opts.cpFluidIn, // (kJ/kg-C)
+    cp_fluid_out = opts.cpFluidOut,// (kJ/kg-C) 
     kw_fluid_in = unitConv.kwENtokwSI(opts.kwFluidIn), // (kJ/h-m-C)
     kw_fluid_out= unitConv.kwENtokwSI(opts.kwFluidOut);// (kJ/h-m-C)
 

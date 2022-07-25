@@ -666,30 +666,30 @@ const stringCompactResult = (
     <td class="tg-simple">· Combustible</td>
     <td class="tg-simple">${unit.mass_flow(
       baseResult.rad_result.m_fuel,
-      0,true
+      2,true
     )}</td>
     <td class="tg-simple">${
-      validMod ? unit.mass_flow(modResult.rad_result.m_fuel, 0,true) : ""
+      validMod ? unit.mass_flow(modResult.rad_result.m_fuel, 2,true) : ""
     }</td>
   </tr>
   <tr>
     <td class="tg-simple">· Aire</td>
     <td class="tg-simple">${unit.mass_flow(
       baseResult.rad_result.m_air,
-      0,true
+      2,true
     )}</td>
     <td class="tg-simple">${
-      validMod ? unit.mass_flow(modResult.rad_result.m_air, 0,true) : ""
+      validMod ? unit.mass_flow(modResult.rad_result.m_air, 2,true) : ""
     }</td>
   </tr>
   <tr>
     <td class="tg-simple">· Gases de combustión</td>
     <td class="tg-simple">${unit.mass_flow(
       baseResult.rad_result.m_flue,
-      0,true
+      2,true
     )}</td>
     <td class="tg-simple">${
-      validMod ? unit.mass_flow(modResult.rad_result.m_flue, 0,true) : ""
+      validMod ? unit.mass_flow(modResult.rad_result.m_flue, 2,true) : ""
     }</td>
   </tr>
   <tr><td colspan="3"></td></tr>
