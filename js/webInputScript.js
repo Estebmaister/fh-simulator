@@ -126,14 +126,14 @@ const
   ft3Tolb = 62.371, // for Water @60°F
   lbtokg = 1/2.20462,
   BPDtolb_h = (SG) => barrelsToft3*ft3Tolb*SG/24,
-  BPDtokg_h = (SG) => barrelsToft3*ft3Tolb*lbtokg*SG/24/3.6;
+  BPDtokg_h = (SG) => barrelsToft3*ft3Tolb*lbtokg*SG/24/3600;
 let BDPtoMass = BPDtolb_h;
 
 const updateDuty = () => spanDutyField.innerHTML = Math.round(
     +inputFlow.value*BDPtoMass(+spGrav.value) *
     (+tOut.value-tIn.value) *(+cpOut.value+ +cpIn.value)/2
-    /10_000
-  ) /100;
+    /1e3
+  ) /1e3;
 
 const updateFlow = () => spanFlowField.innerHTML = Math.round(
   +inputFlow.value*BPDtolb_h(+spGrav.value) ).toLocaleString();

@@ -16,7 +16,7 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
       baseOpt = opt;
       baseResult = result;
       localResult = JSON.parse(localStorage.getItem(MODIFIED));
-      clearOldResult(localResult, MODIFIED);
+      clearOldLocalResult(localResult, MODIFIED);
       modOpt = localResult ? localResult.opt : {};
       modResult = localResult ? localResult.result : {};
       break;
@@ -24,7 +24,7 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
       modOpt = opt;
       modResult = result;
       localResult = JSON.parse(localStorage.getItem(BASE));
-      clearOldResult(localResult, BASE);
+      clearOldLocalResult(localResult, BASE);
       if (!localResult) {
         const defaultResult = comb(fuel, defaultOpt);
         localResult = {result:defaultResult, opt:defaultOpt};
@@ -41,18 +41,14 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
   if (outComb) outComb.innerHTML = stringCompactResult(opt.unitSystem, baseResult, baseOpt, modResult, modOpt);
 }
 
-const clearOldResult = ( storageResult, caseName ) => {
-  if (!storageResult || !storageResult.time) return true;
-  
-  const timeDiff = Date.now() - storageResult.time.date;
+const clearOldLocalResult = ( storageResult = {}, caseName = '' ) => {
+  const noTimeDiff  = !storageResult || !storageResult.time;
+  const threeDays = 1e3*60*60*24*3;
 
-  if (timeDiff > 1e3*60*60*24*3) { // > 3 days
-    logger.info(`Deleting ${caseName} old result`)
+  if (noTimeDiff || Date.now() - storageResult.time.date > threeDays) {
+    logger.info(`Deleting ${caseName} old result`);
     localStorage.removeItem(caseName);
-    return true;
   }
-
-  return false
 }
 
 

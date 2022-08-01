@@ -12,15 +12,28 @@ const graphicData = ( comb, fuel, opt ) => {
   opt.unitSystem = 'english'
   const browserResult = [];
 
+  const CASE = `${opt.title}_graph`;
   // Checking local storage to avoid repeating calculations
   let prevResult;
-  let localResult = JSON.parse(localStorage.getItem(`${opt.title}_graph`));
+  let localResult = JSON.parse(localStorage.getItem(CASE));
+  const threeDays = 1e3*60*60*24*3;
   if (localResult) {
-    prevResult = localResult[`${window.location.search}`];
-    if (Object.keys(localResult).length > 5)
-      localStorage.clear();
+    if (
+      Object.keys(localResult).length > 5 || 
+      !localResult.time || 
+      Date.now() - localResult.time.date > threeDays
+    ) {
+      localStorage.removeItem(CASE);
+      localResult = {};
+    } else {
+      prevResult = localResult[`${window.location.search}`];
+    }
   }
-  if (prevResult) {draw(prevResult, opt); return;}
+  if (prevResult) {
+    draw(prevResult, opt);
+    savedLogger.debug(`"Drawing stored case: ${CASE}"`);
+    return;
+  }
 
   let graphVar;
   opt.graphRange *= 1e-2;
@@ -81,7 +94,8 @@ const graphicData = ( comb, fuel, opt ) => {
   
   if (!localResult) localResult = {};
   localResult[`${window.location.search}`] = browserResult;
-  localStorage.setItem(`${opt.title}_graph`, JSON.stringify(localResult));
+  localResult.time = {date: Date.now()};
+  localStorage.setItem(CASE, JSON.stringify(localResult));
   console.log(browserResult);
   draw(browserResult, opt);
 }
