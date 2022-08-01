@@ -405,6 +405,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   params.NCV = -ncv(normalFuel, products, compounds, params.t_amb)/MW_multicomp(normalFuel); // kJ/kg
   params.GCV = -ncv(normalFuel, products, compounds, params.t_amb, true)/MW_multicomp(normalFuel); // kJ/kg
   flows.NCV = units["energy/mass"](params.NCV,0);
+  flows.GCV = units["energy/mass"](params.GCV,0);
   flows.NCV_val = params.NCV;
   flows.GCV_val = params.GCV;
 

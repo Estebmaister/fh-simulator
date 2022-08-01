@@ -351,7 +351,8 @@ Moles de gases de combustión por mol de combustible
     3
   )}
 
-  Poder Calorífico Neto (NCV): ${result_obj.flows["NCV"]}
+  Poder Calorífico Neto  (NCV): ${result_obj.flows["NCV"]}
+  Poder Calorífico Bruto (GCV): ${result_obj.flows["GCV"]}
 
   Flujo másico (combustible): ${unit.mass_flow(
     result_obj.rad_result.m_fuel,
@@ -475,7 +476,8 @@ Flue gas moles and components (per mol of fuel)
 
   Fuel MW:             ${unit["mass/mol"](result_obj.flows["fuel_MW"])}
   Fuel Sp. Heat, Cp:   ${result_obj.flows["Cp_fuel"]}
-  Fuel Net Calorific Value, NCV: ${result_obj.flows["NCV"]}
+  Fuel Net Calorific Value, NCV:   ${result_obj.flows["NCV"]}
+  Fuel Gross Calorific Value, GCV: ${result_obj.flows["GCV"]}
 
   Flue MW:             ${result_obj.flows["flue_MW"]}
   Flue Sp. Heat, Cp:   ${result_obj.flows["Cp_flue"]}
@@ -634,16 +636,16 @@ const stringCompactResult = (
   </tr>
   <tr>
     <td class="tg-simple">Poder Calorífico Neto (NCV), ${unit["energy/mass"](0,0,0,true)}</td>
-    <td class="tg-simple">${unit["energy/mass"](baseResult.flows.NCV_val,1,true)}</td>
+    <td class="tg-simple">${unit["energy/mass"](baseResult.flows.NCV_val,0,true)}</td>
     <td class="tg-simple">${
-      validMod ? unit["energy/mass"](modResult.flows.NCV_val,1,true) : ""
+      validMod ? unit["energy/mass"](modResult.flows.NCV_val,0,true) : ""
     }</td>
   </tr>
   <tr>
     <td class="tg-simple">Poder Calorífico Bruto (GCV), ${unit["energy/mass"](0,0,0,true)}</td>
-    <td class="tg-simple">${unit["energy/mass"](baseResult.flows.GCV_val,1,true)}</td>
+    <td class="tg-simple">${unit["energy/mass"](baseResult.flows.GCV_val,0,true)}</td>
     <td class="tg-simple">${
-      validMod ? unit["energy/mass"](modResult.flows.GCV_val,1,true) : ""
+      validMod ? unit["energy/mass"](modResult.flows.GCV_val,0,true) : ""
     }</td>
   </tr>
   <tr>
@@ -802,14 +804,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">· Aletas promedio</td>
-    <td class="tg-simple">${unit.tempC(baseResult.conv_result.t_fin,0,true)}</td>
-    <td class="tg-simple">${
-      validMod ? unit.tempC(modResult.conv_result.t_fin,0,true) : ""
-    }</td>
-  </tr>
-  <tr>
-    <td class="tg-simple">· Aletas máxima</td>
+    <td class="tg-simple">· Máxima Aletas</td>
     <td class="tg-simple">${unit.tempC(baseResult.conv_result.t_fin_max,0,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.tempC(modResult.conv_result.t_fin_max,0,true) : ""

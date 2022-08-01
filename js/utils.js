@@ -390,7 +390,7 @@ const englishSystem = { //(US Customary)
   tempC:    (n,d,nU,oU) => dualSystem(oU,nU,d,"°F", unitConv.CtoF(n-tempToK)),
   pressure: (n,d,nU,oU) => dualSystem(oU,nU,d,"psi", n *1.450377e-4),
   mass:     (n,d,nU,oU) => dualSystem(oU,nU,d,"lb", unitConv.kgtolb(n)),
-  mass_flow:(n,d,nU,oU) => dualSystem(oU,nU,d,"lb/h", unitConv.kgtolb(n)),
+  mass_flow:(n,_d,nU,oU) => dualSystem(oU,nU,0,"lb/h", unitConv.kgtolb(n)),
   barrel_flow:(n,d,nU,oU,spG = spGrav) => dualSystem(oU,nU,d,"x10³ BPD", unitConv.kgtolb(n)/ unitConv.BPDtolb_h(1,spG) /1e3),
   vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"ft³/h", unitConv.mtoft(n)**3),
   cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-°F", n *.238845896627),
@@ -406,7 +406,7 @@ const englishSystem = { //(US Customary)
 const siSystem = {
   "energy/mol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/mol", n),
   "mass/mol":     (n,d,nU,oU) => dualSystem(oU,nU,d,"kg/kmol", n),
-  heat_flow:      (n,d,nU,oU) => dualSystem(oU,nU,d,"kW", n*1e-3 /3600),
+  heat_flow:      (n,_d,nU,oU) => dualSystem(oU,nU,5,"MW", n*1e-6 /3600),
   heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"W/m²", n /3600),
   fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"m²-K/W ÷10³", n*3.6e3),
 
@@ -416,7 +416,7 @@ const siSystem = {
   length:     (n,d,nU,oU)  => dualSystem(oU,nU,d,"m", n),
   lengthC:    (n,d,nU,oU)  => dualSystem(oU,nU,d,"cm", n*1e2),
   lengthInv:  (n,d,nU,oU)  => dualSystem(oU,nU,d,"1/m", n),
-  tempC:      (n,_d,nU,oU) => dualSystem(oU,nU,1,"°C", n -tempToK),
+  tempC:      (n,_d,nU,oU) => dualSystem(oU,nU,0,"°C", n -tempToK),
   temp:       (n,d,nU,oU)  => dualSystem(oU,nU,d,"K", n),
   pressure:   (n,d,nU,oU)  => dualSystem(oU,nU,d,"kPa", n *1e-3),
   mass:       (n,d,nU,oU)  => dualSystem(oU,nU,d,"kg", n *1e-3),

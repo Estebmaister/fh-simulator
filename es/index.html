@@ -39,7 +39,7 @@
           <a class="nav-link" href="./fullInput.html">+Datos</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="./result.html">Resultados</a>
+          <a class="nav-link" href="./instructions.html">Instrucciones</a>
         </li>
         <li class="nav-sec">
           <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Proyecto</a>
@@ -84,18 +84,18 @@
                   <sub class="hidden"><span>~</span> lb/hr</sub>
                 </p>
                 <p class="project-info">
-                  Gravedad específica <em>@ 60°F</em> <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" lang="en" min="0" value="0.84">
+                  Gravedad específica <em>@ 15.6°C</em> <input id="sp-grav" step="0.01" min="0" name="sp_grav" type="number" lang="en" min="0" value="0.84">
 
                 </p>
               </div>
               <div class="full-width">
                 <p class="project-info sub-temp">
-                  Temperatura entrada <input id="t_in" step="0.1" min="320" max="385" name="si_t_in" type="number" lang="en" value="359.0"> °C
+                  Temperatura entrada <input id="t_in" step="1" min="315" max="370" name="si_t_in" type="number" lang="en" value="359"> °C
                   <sub class="hidden"><span>~</span> °C</sub>
                 </p>
                 <br>
                 <p class="project-info sub-temp">
-                  Temperatura salida <input id="t_out"step="0.1" min="386" max="480" name="si_t_out"type="number" lang="en" value="411.0"> °C
+                  Temperatura salida <input id="t_out"step="1" min="371" max="427" name="si_t_out"type="number" lang="en" value="411"> °C
                   <sub class="hidden"><span>~</span> °C</sub>
                 </p>
 
@@ -111,7 +111,7 @@
 
                 <p class="project-info">
                   Absorción de calor ('duty'):
-                  <span id="span-duty">20.86</span> kW
+                  <span id="span-duty">0.02086</span> MW
                 </p>
               </div>
             </div>
@@ -154,11 +154,11 @@
                 Pérdidas por radiación <input step="0.1" min="0" max="5" name="heat_loss" type="number" lang="en" value="1.5"> %
               </p>
               <p class="project-info sub-temp hidden">
-                Temp. ingreso combustión <input id="t_fuel" step="0.1" min="-17" max="45" name="si_t_fuel" type="number" lang="en" value="26.7"> °C
+                Temp. ingreso combustión <input id="t_fuel" step="1" min="-17" max="45" name="si_t_fuel" type="number" lang="en" value="27"> °C
                 <sub><span>~</span> °C</sub>
               </p>
               <p class="project-info sub-temp">
-                Temp. aire ambiental <input id="t_amb" step="0.1" min="-17" max="45" name="si_t_amb" type="number" lang="en" value="26.7"> °C
+                Temp. aire ambiental <input id="t_amb" step="1" min="-17" max="45" name="si_t_amb" type="number" lang="en" value="27"> °C
                 <sub class="hidden"><span>~</span> °C</sub>
               </p>
               <p class="project-info">

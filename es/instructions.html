@@ -27,46 +27,45 @@
 	<meta name="twitter:card" content="summary_large_image" />
 
 	<link rel="stylesheet" href="../css/style.css" />
-  <script src="https://d3js.org/d3.v5.min.js" defer></script>
-  <script src="../js/browserResults/graphicDraw.js" defer></script>
-  <script src="../js/webResultScript.js" defer></script>
+	<link rel="stylesheet" href="../css/loader.css" />
 </head>
 <body>
   <header id="header">
-    <a class="logo" href="#"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo"  onclick="window.history.back()"/></a>
+    <a class="logo"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" onclick="history.back()"/></a>
 
     <nav id="navbar">
       <ul id="nav-list">
         <li class="nav-sec">
-          <a class="nav-link" href="../es/fullInput.html">Datos</a>
+          <a class="nav-link" href="./index.html">Datos</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="../es/instructions.html">Instrucciones</a>
+          <a class="nav-link" href="./instructions.html">Instrucciones</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="https://github.com/Estebmaister/fh-simulator" target="_blank">Proyecto</a>
+          <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Proyecto</a>
         </li>
       </ul>
     </nav>
-    <a id="lang" onclick="window.location.href = window.location.href.replace('/es_graph','/en_graph')">EN | <span>ES</span></a>
+    <!-- <a id="lang" onclick="window.location.href = window.location.href.replace('/es/','/en/')">EN | <span>ES</span></a> -->
   </header>
   <main>
     <section id="data-sect">
       <h1>Simulador de hornos de proceso de tiro natural</h1>
-      <h4>(Diseñado para la instrucción de ingenieros y operadores)</h4>
-      <p>Los puntos rojos corresponden a los valores calculados en las iteraciones y las líneas azules representan una línea de tendencia polinómica.</p>
+      <p>Página de instrucciones de uso y limitaciones.</p>
     </section>
-    <svg></svg>
+    <section id="output-sect">
+      <p>Aquí estarán escritas todas las instrucciones y limitaciones que se acuerden para evitar colocar advertencias en el ingreso de datos o resultados.</p>
+    </section>
   </main>
-  <footer>
-    <p>
+	<footer>
+		<p>
       <a class="credits" id="profile-link" href="http://www.usb.ve" target="_blank">
         © USB 2021
-      </a>
-    </p>
+			</a>
+		</p>
     <p>
-      v1.3.0<em> - Calculos realizados en el motor del navegador, registros disponibles en la consola</em>
+      v1.3.0<em> - Cálculos realizados en el motor del navegador, registros disponibles en consola</em>
     </p>
-  </footer>
+	</footer>
 </body>
 </html>
