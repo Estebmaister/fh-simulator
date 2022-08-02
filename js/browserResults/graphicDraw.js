@@ -179,7 +179,7 @@ function innerDraw(
     .attr("x", innerWidth*.5)
     .attr("fill", "#8E8883")
     .attr("font-size", xAxisFontSize)
-    .text(xAxisLabel)
+    //.text(xAxisLabel)
 
   const yAxisG = graphic.append('g').call(yAxis)
   .attr("fill", "#FEF8F3");
@@ -240,3 +240,7 @@ function innerDraw(
   .attr('text-anchor', 'middle')
   .text(title);
 }
+
+module.exports = {
+	draw
+};
