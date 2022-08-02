@@ -1,4 +1,6 @@
 const {logger, unitConv} = require('./../utils');
+const {draw} = require('./graphicDraw');
+const loader = document.getElementById('output-sect');
 
 const graphicData = ( comb, fuel, opt ) => {
 
@@ -32,6 +34,7 @@ const graphicData = ( comb, fuel, opt ) => {
   if (prevResult) {
     draw(prevResult, opt);
     savedLogger.debug(`"Drawing stored case: ${CASE}"`);
+    if (loader) loader.remove();
     return;
   }
 
@@ -98,6 +101,7 @@ const graphicData = ( comb, fuel, opt ) => {
   localStorage.setItem(CASE, JSON.stringify(localResult));
   console.log(browserResult);
   draw(browserResult, opt);
+  if (loader) loader.remove();
 }
 
 module.exports = {

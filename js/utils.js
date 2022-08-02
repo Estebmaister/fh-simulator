@@ -406,7 +406,7 @@ const englishSystem = { //(US Customary)
 const siSystem = {
   "energy/mol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/mol", n),
   "mass/mol":     (n,d,nU,oU) => dualSystem(oU,nU,d,"kg/kmol", n),
-  heat_flow:      (n,_d,nU,oU) => dualSystem(oU,nU,5,"MW", n*1e-6 /3600),
+  heat_flow:      (n,d,nU,oU) => dualSystem(oU,nU,d,"MW", n*1e-6 /3.6),
   heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"W/m²", n /3600),
   fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"m²-K/W ÷10³", n*3.6e3),
 
@@ -425,7 +425,7 @@ const siSystem = {
   vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"m³/s", n /3600),
   cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kg-K", n),
   cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kmol-K", n),
-  power:    (n,d,nU,oU) => dualSystem(oU,nU,d,"W", n /3600),
+  power:    (n,d,nU,oU) => dualSystem(oU,nU,d,"W", n /3.6),
   moist:    (n,d,nU,oU) => dualSystem(oU,nU,d,"g H2O/kg", n *1e3),
   thermal:  (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/h-m-C", n),
   convect:  (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/h-m²-C", n),
