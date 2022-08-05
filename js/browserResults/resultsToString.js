@@ -369,13 +369,6 @@ Moles de gases de combustión por mol de combustible
 
   Calor específico (Cp) combustible: ${result_obj.flows["Cp_fuel"]}
   Calor específico (Cp) gases:       ${result_obj.flows["Cp_flue"]}
-
-  Emisiones de CO2 (t/año): ${round(
-    ((result_obj.products["CO2"] * 44.01) / result_obj.flows["fuel_MW"]) *
-      result_obj.rad_result.m_fuel *
-      (1e-3 * 24 * 365),
-    2
-  )}
 `;
   } else {
     outputString = `
@@ -481,13 +474,6 @@ Flue gas moles and components (per mol of fuel)
 
   Flue MW:             ${result_obj.flows["flue_MW"]}
   Flue Sp. Heat, Cp:   ${result_obj.flows["Cp_flue"]}
-
-  CO2 Emissions (t/year): ${round(
-    ((result_obj.products["CO2"] * 44.01) / result_obj.flows["fuel_MW"]) *
-      result_obj.rad_result.m_fuel *
-      (1e-3 * 24 * 365),
-    2
-  )}
 `;
   }
   return outputString;
