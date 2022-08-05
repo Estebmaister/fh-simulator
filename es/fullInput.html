@@ -18,7 +18,7 @@
 	<meta property="og:image" content="../img/logo.png" />
 	<meta property="og:url" content="#" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Simulador de horno de proceso" />
+	<meta property="og:site_name" content="Simulador de hornos de proceso" />
 
 	<meta name="twitter:title" content="Esteban Camargo (Remoter)" />
 	<meta name="twitter:image" content="../img/logo.png" />
@@ -39,7 +39,7 @@
           <a class="nav-link" href="./">-Datos</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="./instructions.html">Instrucciones</a>
+          <a class="nav-link" href="./instructions.html">Alcance</a>
         </li>
         <li class="nav-sec">
           <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Proyecto</a>
@@ -76,7 +76,7 @@
           <sub><span>~</span> lb/hr</sub>
         </p>
         <p class="project-info">
-          Gravedad específica (SG) <em>@ 60°F</em> <input id="sp-grav" step="0.01" min="0.01" name="sp_grav" type="number" lang="en" value="0.84">
+          Gravedad específica (SG) <em>@ 60°F</em> <input id="sp-grav" step="0.001" min="0.806" max="1.076" name="sp_grav" type="number" lang="en" value="0.840">
         </p>
         <p class="project-info">
           Absorción de calor ("duty"):
@@ -207,7 +207,7 @@
             Humedad relativa <input step="0.1" min="0" max="100" name="humidity" type="number" lang="en" value="50.0"> %
           </p>
           <p class="project-info">
-            Presión atmosférica <input step="0.01" min="0.01" max="2" name="p_atm" type="number" lang="en" placeholder="1.00">
+            Presión atmosférica <input step="0.1" min="0.9" max="1.1" name="p_atm" type="number" lang="en" placeholder="1.0">
             <sub>atm</sub>
           </p>
           <p class="project-info">
@@ -371,10 +371,10 @@
             <option value="air_excess">Exceso de Aire</option>
             <option value="humidity">Humedad Relativa</option>
           </select></p>
-          <p class="project-info sub-temp">Rango de variación <input type="range" name="graph_range" step="1" min="1" max="70">
+          <p class="project-info sub-temp">Rango de variación <input type="range" name="graph_range" step="1" min="1" max="70" value="20">
             <span>~</span>
           </p>
-          <p class="project-info sub-temp">N° de puntos<input type="range" name="graph_points" step="2" min="2" max="180">
+          <p class="project-info sub-temp">N° de puntos<input type="range" name="graph_points" step="2" min="2" max="150" value="20">
             <span>~</span>
           </p>
         </div>

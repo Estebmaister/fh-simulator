@@ -43,6 +43,7 @@ const graphicData = ( comb, fuel, opt ) => {
   switch (opt.graphVar) {
     case 'humidity':
       graphVar = 'humidity';
+      opt.graphRange *= 1e2;
       break;
     case 'air_excess':
       graphVar = 'airExcess';

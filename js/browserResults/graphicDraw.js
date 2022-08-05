@@ -1,13 +1,14 @@
+const xSuperTitle = document.getElementById('graph-title');
 
 function draw(data = [], opts = {}) {
   const 
-    svgHeight = window.innerHeight/1.6,
+    svgHeight = window.innerHeight,
     svgWidth  = window.innerWidth * (1 -.03);
 
   let graphPerRow = svgWidth > 1300 ? 2 : 1;
   let heightMulti = graphPerRow == 1 ? 2 : 3;
   
-  const margin = { top: 100, right: 0, bottom: 100, left: 45 };
+  const margin = { top: 150, right: 30, bottom: 100, left: 45 };
   const innerHeight = (svgHeight -margin.top  -margin.bottom)/heightMulti;
   const innerWidth  = (svgWidth  -1.5*margin.left -margin.right)/graphPerRow;
 
@@ -17,37 +18,37 @@ function draw(data = [], opts = {}) {
     .attr("class" , "line-chart")
     .style("border", '1px solid lightgray')
   
-  
+  const drawCommonProps = {svg,data,margin,innerHeight,innerWidth}
 
-  innerDraw(opts, 'co2_emiss', 
+  innerDraw(opts, 'm_fuel', 
     0, 
     svgHeight*0,
-    {svg,data,margin,innerHeight,innerWidth}
-  );
-  innerDraw(opts, 'm_fuel', 
-    graphPerRow == 1 ? 0 : svgWidth/2, 
-    graphPerRow == 1 ? svgHeight*0.5 : 0,
-    {svg,data,margin,innerHeight,innerWidth}
+    drawCommonProps
   );
   innerDraw(opts, 'cnv_tg_out', 
-    0, 
-    graphPerRow == 1 ? svgHeight*1 : svgHeight/2,
-    {svg,data,margin,innerHeight,innerWidth}
-  );
-  innerDraw(opts, 'efficiency', 
-    graphPerRow == 1 ? 0 : svgWidth/2,
-    graphPerRow == 1 ? svgHeight*1.5 : svgHeight/2,
-    {svg,data,margin,innerHeight,innerWidth}
+    graphPerRow == 1 ? 0 : svgWidth/2, 
+    graphPerRow == 1 ? svgHeight*0.5 : 0,
+    drawCommonProps
   );
   innerDraw(opts, 'rad_dist', 
-    0,
-    graphPerRow == 1 ? svgHeight*2 : svgHeight,
-    {svg,data,margin,innerHeight,innerWidth}
+    0, 
+    graphPerRow == 1 ? svgHeight*1 : svgHeight/2,
+    drawCommonProps
   );
   innerDraw(opts, 'cnv_dist', 
     graphPerRow == 1 ? 0 : svgWidth/2,
+    graphPerRow == 1 ? svgHeight*1.5 : svgHeight/2,
+    drawCommonProps
+  );
+  innerDraw(opts, 'efficiency', 
+    0,
+    graphPerRow == 1 ? svgHeight*2 : svgHeight,
+    drawCommonProps
+  );
+  innerDraw(opts, 'co2_emiss', 
+    graphPerRow == 1 ? 0 : svgWidth/2,
     graphPerRow == 1 ? svgHeight*2.5 : svgHeight,
-    {svg,data,margin,innerHeight,innerWidth}
+    drawCommonProps
   );
 }
 
@@ -60,16 +61,16 @@ function innerDraw(
 
   const xAxisFontSize = innerWidth < 1200 ? "1.7em" : "2.5em";
   const xAxisTickSize = innerWidth < 500 ? "0.9em" : "1.5em";
-  const yAxisFontSize = innerWidth < 900 ? innerHeight *.07 : innerHeight *.08;
+  const yAxisFontSize = innerWidth < 900 ? innerHeight *.055 : innerHeight *.06;
   const yAxisTickSize = innerWidth < 900 ? "1em" : "1.2em";
-  const titleFontSize = innerWidth < 900 ? innerWidth *.046 : innerWidth *.035;
+  const titleFontSize = innerWidth < 900 ? innerWidth *.04 : innerWidth *.03;
 
   const xValue = d => d[opts.graphVar];
   let xAxisLabel = '', xTitle;
   switch (opts.graphVar) {
     case 'humidity':
       xTitle = opts.lang == "es" ? 
-        'Humedad' :
+        'Humedad Relativa' :
         'Humidity';
       xAxisLabel = `${xTitle} [%]`;
       break;
@@ -85,21 +86,22 @@ function innerDraw(
         'Residue flow';
       xAxisLabel = `${xTitle} [10³-BPD]`;
       break;
-  
     default:
       xTitle = opts.lang == "es" ? 
-        'Temp. Salida de residuo' :
-        'Residue Outlet Temp';
+        'Temperatura de Salida de residuo' :
+        'Residue Outlet Temperature';
       xAxisLabel = 'Temp [F]';
       break;
   }
+
+  xSuperTitle.innerHTML = xTitle;
   
   const yValue = d => d[yVar];
   let yAxisLabel = '', yTitle;
   switch (yVar) {
     case 'co2_emiss':
       yTitle = opts.lang == "es" ? 
-        'Emisiones CO2' :
+        'Emisiones de CO2' :
         'CO2 Emissions';
       yAxisLabel = opts.lang == "es" ? 
         `${yTitle} [t/año]` :
@@ -107,39 +109,39 @@ function innerDraw(
       break;
     case 'm_fuel':
       yTitle = opts.lang == "es" ? 
-        'Flujo de comb.' :
+        'Flujo de combustible' :
         'Fuel mass flow';
       yAxisLabel = `${yTitle} [lb/h]`;
       break;
     case 'efficiency':
       yTitle = opts.lang == "es" ? 
-        'Eficiencia' :
-        'Efficiency';
+        'Eficiencia (@ NHV)' :
+        'Efficiency (@ NHV)';
       yAxisLabel = `${yTitle} [%]`;
       break;
     case 'cnv_tg_out':
       yTitle = opts.lang == "es" ? 
-        'Temp. Chimenea' :
-        'Temp stack';
+        'Temperatura de Chimenea' :
+        'Stack Temperature';
       yAxisLabel = `${yTitle} [F]`;
       break;
     case 'rad_dist':
       yTitle = opts.lang == "es" ? 
-        'Dist. Radiante' :
-        'Radiant dist.';
+        'Distribución Radiante' :
+        'Radiant distribution';
       yAxisLabel = `${yTitle} [%]`;
       break;
     case 'cnv_dist':
       yTitle = opts.lang == "es" ? 
-        'Dist. Convectiva' :
-        'Convective dist.';
+        'Distribución Convectiva' :
+        'Convective distribution';
       yAxisLabel = `${yTitle} [%]`;
       break;
     default:
       break;
   }
 
-  const title = `${yTitle} vs. ${xTitle}`;
+  const title = `${yTitle}`; //`${yTitle} vs. ${xTitle}`
   const circleRadius = 3;
 
   const xExtent  = d3.extent(data, xValue)
@@ -179,7 +181,7 @@ function innerDraw(
     .attr("x", innerWidth*.5)
     .attr("fill", "#8E8883")
     .attr("font-size", xAxisFontSize)
-    //.text(xAxisLabel)
+    .text(xAxisLabel)
 
   const yAxisG = graphic.append('g').call(yAxis)
   .attr("fill", "#FEF8F3");
