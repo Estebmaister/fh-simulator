@@ -164,12 +164,26 @@ const optionsModifier = (key, browserData, options) => {
       }
       break;
     case 'si_rfo':
-    optValue = parseFloat(browserData[key])
-    if (optValue >= 0) {
-      options.rfoConv = optValue/3_600;
-      options.rfoShld = optValue/3_600;
-    }
-    break;
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) {
+        options.rfoConv = optValue/3_600;
+        options.rfoShld = optValue/3_600;
+      }
+      break;
+    case 'rfi_sc':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) {
+        options.rfiConv = unitConv.RfENtoRfSI(optValue);
+        options.rfiShld = unitConv.RfENtoRfSI(optValue);
+      }
+      break;
+    case 'si_rfi_sc':
+      optValue = parseFloat(browserData[key])
+      if (optValue >= 0) {
+        options.rfiConv = optValue/3_600;
+        options.rfiShld = optValue/3_600;
+      }
+      break;
     case 'rfi_conv':
       optValue = parseFloat(browserData[key])
       if (optValue >= 0) options.rfiConv = unitConv.RfENtoRfSI(optValue);
