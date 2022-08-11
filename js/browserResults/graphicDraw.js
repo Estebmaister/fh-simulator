@@ -2,13 +2,13 @@ const xSuperTitle = document.getElementById('graph-title');
 
 function draw(data = [], opts = {}) {
   const 
-    svgHeight = window.innerHeight,
-    svgWidth  = window.innerWidth * (1 -.03);
+    svgHeight = window.innerHeight * (1 -.15),
+    svgWidth  = window.innerWidth * (1 -.05);
 
   let graphPerRow = svgWidth > 1300 ? 2 : 1;
   let heightMulti = graphPerRow == 1 ? 2 : 3;
   
-  const margin = { top: 150, right: 30, bottom: 100, left: 45 };
+  const margin = { top: 150, right: 0, bottom: 100, left: 45 };
   const innerHeight = (svgHeight -margin.top  -margin.bottom)/heightMulti;
   const innerWidth  = (svgWidth  -1.5*margin.left -margin.right)/graphPerRow;
 
@@ -59,11 +59,11 @@ function innerDraw(
 
     innerWidth = innerWidth -margin.left;
 
-  const xAxisFontSize = innerWidth < 1200 ? "1.7em" : "2.5em";
-  const xAxisTickSize = innerWidth < 500 ? "0.9em" : "1.5em";
+  const xAxisFontSize = innerWidth < 700 ? "1.5em" : "2.5em";
+  const xAxisTickSize = innerWidth < 900 ? "0.9em" : "1.5em";
   const yAxisFontSize = innerWidth < 900 ? innerHeight *.055 : innerHeight *.06;
   const yAxisTickSize = innerWidth < 900 ? "1em" : "1.2em";
-  const titleFontSize = innerWidth < 900 ? innerWidth *.04 : innerWidth *.03;
+  const titleFontSize = innerWidth < 1300 ? "2em" : innerWidth *.03;
 
   const xValue = d => d[opts.graphVar];
   let xAxisLabel = '', xTitle;
