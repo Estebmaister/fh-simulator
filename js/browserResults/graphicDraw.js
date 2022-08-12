@@ -1,3 +1,6 @@
+const {initSystem} = require('./../utils');
+const unit = initSystem('en');
+
 const xSuperTitle = document.getElementById('graph-title');
 
 function draw(data = [], opts = {}) {
@@ -73,6 +76,7 @@ function innerDraw(
         'Humedad Relativa' :
         'Humidity';
       xAxisLabel = `${xTitle} [%]`;
+      xTitle += ` @(${unit.tempC(opts.tAir,0)})`
       break;
     case 'air_excess':
       xTitle = opts.lang == "es" ? 
@@ -115,9 +119,10 @@ function innerDraw(
       break;
     case 'efficiency':
       yTitle = opts.lang == "es" ? 
-        'Eficiencia (@ NHV)' :
-        'Efficiency (@ NHV)';
+        'Eficiencia Térmica' :
+        'Thermal Efficiency';
       yAxisLabel = `${yTitle} [%]`;
+      yTitle += " (@ NHV)"
       break;
     case 'cnv_tg_out':
       yTitle = opts.lang == "es" ? 
