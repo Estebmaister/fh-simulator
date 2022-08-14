@@ -28,6 +28,9 @@ const optionsModifierFluid = (key, browserData, options) => {
     case 'm_fluid':
       options.mFluid = optValue;
       break;
+    case 'si_m_fluid':
+      options.mFluid = unitConv.m3ToBarrels(optValue);
+      break;
     case 't_in':
       options.tIn = unitConv.FtoK(optValue);
       break;

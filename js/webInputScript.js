@@ -124,9 +124,10 @@ formElement.addEventListener('submit', function () {
 const 
   barrelsToft3 = 5.6145833333,
   ft3Tolb = 62.371, // for Water @60°F
+  m3ToBarrels = 1/(0.158987295),
   lbtokg = 1/2.20462,
   BPDtolb_h = (SG) => barrelsToft3*ft3Tolb*SG/24,
-  BPDtokg_h = (SG) => barrelsToft3*ft3Tolb*lbtokg*SG/24/3.6;
+  BPDtokg_h = (SG) => m3ToBarrels*barrelsToft3*ft3Tolb*lbtokg*SG/24/3.6;
 let BDPtoMass = BPDtolb_h;
 
 const updateDuty = () => spanDutyField.innerHTML = Math.round(
