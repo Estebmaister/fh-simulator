@@ -504,10 +504,10 @@ const stringCompactResult = (
     <td class="tg-simple" colspan="3">Residuo atmosférico</td>
   </tr>
   <tr>
-    <td class="tg-simple">▪ Flujo volumétrico, BDP</td>
-    <td class="tg-simple">${opt.mFluid.toLocaleString()}</td>
+    <td class="tg-simple">▪ Flujo volumétrico, ${unit.barrel_flowC(0,0,0,true)}</td>
+    <td class="tg-simple">${unit.barrel_flowC(opt.mFluid,0,true)}</td>
     <td class="tg-simple">${
-      validMod ? modOpt.mFluid.toLocaleString() : ""
+      validMod ? unit.barrel_flowC(modOpt.mFluid,0,true) : ""
     }</td>
   </tr>
   <tr>

@@ -80,7 +80,7 @@
                 <p><strong>Residuo atmosférico</strong></p>
 
                 <p id="sub-duty" class="project-info">
-                  Flujo volumétrico <input step="1" min="60000" max="120000" name="m_fluid" type="number" lang="en" value="90000"> BPD
+                  Flujo volumétrico <input step="1" min="9540" max="19078" name="si_m_fluid" type="number" lang="en" value="14309"> m³/d
                   <sub class="hidden"><span>~</span> lb/hr</sub>
                 </p>
                 <p class="project-info">
@@ -111,32 +111,32 @@
 
                 <p class="project-info">
                   Absorción de calor ('duty'):
-                  <span id="span-duty">0.02086</span> MW
+                  <span id="span-duty">20.86</span> MW
                 </p>
               </div>
             </div>
 
             <div class="form-div">
-              <div class="full-width">
+              <p class="full-width"><strong>Factores de Ensuciamiento</strong></p>
+              <p class="project-info">
+                Interno radiante:
+                <span style="white-space: nowrap;">
+                  <input step="0.1" min="0" max="0.5" name="si_rfi" type="number" lang="en" placeholder="0.0">
+                  <sub>x10-3 m²-K/W</sub>
+                </span>
+              </p>
+              <div>
                 <p class="project-info">
-                  Factor de coquización
-                  <span style="white-space: nowrap;">
-                  (tubos rad):
-                    <input step="0.1" min="0" max="0.5" name="si_rfi" type="number" lang="en" placeholder="0.0">
-                    <sub>x10-3 m²-K/W</sub>
-                  </span>
-                </p>
-                <p class="project-info">
-                  Factor ensuciamiento externo:
-                  <span style="white-space: nowrap;">
-                    <input step="0.1" min="0" max="0.5" name="si_rfo" type="number" lang="en" value="0.1">
-                    <sub>x10-3 m²-K/W</sub>
-                  </span>
-                </p>
-                <p class="project-info">
-                  Factor ensuciamiento interno:
+                  Interno escudo/convectivo:
                   <span style="white-space: nowrap;">
                     <input step="0.1" min="0" max="0.5" name="si_rfi_sc" type="number" lang="en" placeholder="0.0">
+                    <sub>x10-3 m²-K/W</sub>
+                  </span>
+                </p>
+                <p class="project-info">
+                  Externo escudo/convectivo:
+                  <span style="white-space: nowrap;">
+                    <input step="0.1" min="0" max="0.5" name="si_rfo" type="number" lang="en" value="0.1">
                     <sub>x10-3 m²-K/W</sub>
                   </span>
                 </p>

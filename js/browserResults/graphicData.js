@@ -79,14 +79,21 @@ const graphicData = ( comb, fuel, opt ) => {
       humidity:   runResult.debug_data['humidity_%'],
       
       // --- Output vars
+      rad_tg_out: unitConv.KtoF(runResult.rad_result.tg_out),
       cnv_tg_out: unitConv.KtoF(runResult.conv_result.tg_out),
       
       // m_flue:     runResult.shld_result.m_flue ? runResult.shld_result.m_flue : 0,
-      m_fuel:     runResult.rad_result.m_fuel ? unitConv.kgtolb(runResult.rad_result.m_fuel) : 0,
-      efficiency: runResult.rad_result.eff_thermal_val ? runResult.rad_result.eff_thermal_val : 0,
+      m_fuel:     runResult.rad_result.m_fuel ? 
+        unitConv.kgtolb(runResult.rad_result.m_fuel) : 0,
+      efficiency: runResult.rad_result.eff_thermal_val ? 
+        runResult.rad_result.eff_thermal_val : 0,
       // duty_total: runResult.rad_result.duty_total,
-      rad_dist:   runResult.rad_result['%'] < 1  ? Math.round(1e5*runResult.rad_result['%'])/1e3 : 0,
-      cnv_dist:   runResult.conv_result['%'] < 1 ? Math.round(1e5*runResult.conv_result['%'])/1e3 :0,
+      rad_dist:   runResult.rad_result['%'] < 1  ? 
+        Math.round(1e5*runResult.rad_result['%'])/1e3 : 0,
+      cnv_dist:   runResult.conv_result['%'] < 1 ? 
+        Math.round(1e5*runResult.conv_result['%'])/1e3 :0,
+      rad_cnv_dist: runResult.conv_result['%'] != 0 ? 
+        runResult.rad_result['%'] / runResult.conv_result['%'] : 0,
       // shl_duty:  runResult.shld_result.duty,
       co2_emiss: Math.round(1e2 *
         runResult.products["CO2"] * (44.01 / runResult.flows["fuel_MW"]) *

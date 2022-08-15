@@ -1,7 +1,7 @@
 /******************************************************************
  * Exported functions from this file
  ******************************************************************
- * @newtonRaphson (f, fp, x0, options)
+ * @newtonRaphson (f, fp, x0, options, name, noLog)
  * @version  1.00
  * @param   {f function} valid function to find the zero.
  * @param   {fp function} optional function derivate.
@@ -9,18 +9,11 @@
  * @param   {options object} valid options object.
  * @return  {number or false} a number is the iterations reach the result, 
  *          false if not.
+ * //TODO: No check is made for NaN or undefined input numbers.
  * 
- * @logger {info,warn,error,debug,default}
- * @version  1.00
+ * @logger  {info, warn, error, debug, default}
  * @param   {argument} optional string or object to print.
  * @return  {null} prints to the console.
- * 
- * @author  Esteban Camargo
- * @date    17 Jul 2021
- * @call    node . true true 25 70 80 1e5
- * @callParams verbose, check for changes in csv, t_amb, humidity, air_excess, p_amb
- * 
- * //TODO: No check is made for NaN or undefined input numbers.
  *
  *****************************************************************/
 
@@ -121,7 +114,7 @@ const
   tempToK = 273.15,
   pAtmRef = 101_325,
   /* ATT: Changes here must be done at webInput too. */
-  barrelsToft3 = 5.6145833333, 
+  barrelsToft3 = 5.6145833333,
   ft3Tolb = 62.371, // for Water @60°F
   spGrav = 0.84, // for current fluid
   tempAmbRef = tempToK + 15.55556; // 288.7 K
@@ -137,6 +130,7 @@ const unitConv = {
 
   kgtolb: (n=1) => n*2.20462,
   lbtokg: (n=1) => n/2.20462,
+  m3ToBarrels: (n=1) => n/(0.158987295),
   BPDtolb_h:(n=1,spG=spGrav) => n*barrelsToft3*ft3Tolb/24*spG,
   lb_htoBPD:(n=1,spG=spGrav) => n/barrelsToft3/ft3Tolb*24/spG,
 
@@ -392,6 +386,7 @@ const englishSystem = { //(US Customary)
   mass:     (n,d,nU,oU) => dualSystem(oU,nU,d,"lb", unitConv.kgtolb(n)),
   mass_flow:(n,_d,nU,oU) => dualSystem(oU,nU,0,"lb/h", unitConv.kgtolb(n)),
   barrel_flow:(n,d,nU,oU,spG = spGrav) => dualSystem(oU,nU,d,"x10³ BPD", unitConv.kgtolb(n)/ unitConv.BPDtolb_h(1,spG) /1e3),
+  barrel_flowC:(n,d,nU,oU) => dualSystem(oU,nU,d,"BPD", n),
   vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"ft³/h", unitConv.mtoft(n)**3),
   cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-°F", n *.238845896627),
   cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-mol-°F", n *.238845896627),
@@ -422,6 +417,7 @@ const siSystem = {
   mass:       (n,d,nU,oU)  => dualSystem(oU,nU,d,"kg", n *1e-3),
   mass_flow:  (n,d,nU,oU)  => dualSystem(oU,nU,d,"kg/s", n /3600),
   barrel_flow:(n,d,nU,oU,spG = spGrav) => englishSystem.barrel_flow(n,d,nU,oU,spG),
+  barrel_flowC:(n,d,nU,oU) => dualSystem(oU,nU,d,"m³/d", n/unitConv.m3ToBarrels()),
   vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"m³/s", n /3600),
   cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kg-K", n),
   cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kmol-K", n),
