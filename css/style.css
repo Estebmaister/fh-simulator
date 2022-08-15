@@ -201,6 +201,7 @@ footer {
 }
 
 /* ------- 4. Output data    ------*/
+
 pre {
   display: flex;
   flex-wrap: wrap;
@@ -218,6 +219,13 @@ pre {
   font-size: 0.9rem;
   display: block;
   width: 7em;
+}
+
+/* -------    Footer         ------*/
+
+.instructions {
+  border: 1px solid #fff;
+  margin-left: 5%;
 }
 
 /* -------   Form Structure  ------*/

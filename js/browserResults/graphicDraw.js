@@ -28,17 +28,17 @@ function draw(data = [], opts = {}) {
     svgHeight*0,
     drawCommonProps
   );
-  innerDraw(opts, 'cnv_tg_out', 
+  innerDraw(opts, 'rad_tg_out', 
     graphPerRow == 1 ? 0 : svgWidth/2, 
     graphPerRow == 1 ? svgHeight*0.5 : 0,
     drawCommonProps
   );
-  innerDraw(opts, 'rad_dist', 
+  innerDraw(opts, 'cnv_tg_out', 
     0, 
     graphPerRow == 1 ? svgHeight*1 : svgHeight/2,
     drawCommonProps
   );
-  innerDraw(opts, 'cnv_dist', 
+  innerDraw(opts, 'rad_cnv_dist', 
     graphPerRow == 1 ? 0 : svgWidth/2,
     graphPerRow == 1 ? svgHeight*1.5 : svgHeight/2,
     drawCommonProps
@@ -129,6 +129,18 @@ function innerDraw(
         'Temperatura de Chimenea' :
         'Stack Temperature';
       yAxisLabel = `${yTitle} [F]`;
+      break;
+    case 'rad_tg_out':
+      yTitle = opts.lang == "es" ? 
+        'Temperatura de Arco Radiante' :
+        'Radiant Flue Temperature';
+      yAxisLabel = `${yTitle} [F]`;
+      break;
+    case 'rad_cnv_dist':
+      yTitle = opts.lang == "es" ? 
+        'Absorción de calor (Rad/Conv)' :
+        'Heat absorption (Rad/Conv)';
+      yAxisLabel = `${yTitle}`;
       break;
     case 'rad_dist':
       yTitle = opts.lang == "es" ? 
