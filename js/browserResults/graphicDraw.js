@@ -6,7 +6,7 @@ const xSuperTitle = document.getElementById('graph-title');
 function draw(data = [], opts = {}) {
   const 
     svgHeight = window.innerHeight * (1 -.15),
-    svgWidth  = window.innerWidth * (1 -.05);
+    svgWidth  = window.innerWidth * (1 -.025);
 
   let graphPerRow = svgWidth > 1300 ? 2 : 1;
   let heightMulti = graphPerRow == 1 ? 2 : 3;
@@ -167,11 +167,11 @@ function innerDraw(
     .range([0, innerWidth])
     .domain(xExtent)
     .nice();
-  const yExtent = d3.extent(data, yValue)
+  // const yExtent = d3.extent(data, yValue);
   const yScale = d3.scaleLinear()
     .range([innerHeight, 0])
-    .domain([d3.min(data, d => d[yVar]*.998), d3.max(data, d => d[yVar]*1.002)])
-    //.domain(yExtent)
+    .domain([d3.min(data, d => d[yVar]*.997), d3.max(data, d => d[yVar]*1.003)])
+    // .domain(yExtent)
     .nice();
 
   const xAxis = d3.axisBottom(xScale)
