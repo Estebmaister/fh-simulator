@@ -62,9 +62,10 @@ function innerDraw(
 
     innerWidth = innerWidth -margin.left;
 
-  const xAxisFontSize = innerWidth < 700 ? "1.5em" : "2.5em";
+  // const xAxisFontSize = innerWidth < 700 ? "1.5em" : "2.5em";
   const xAxisTickSize = innerWidth < 900 ? "0.9em" : "1.5em";
   const yAxisFontSize = innerWidth < 900 ? innerHeight *.055 : innerHeight *.06;
+  const xAxisFontSize = yAxisFontSize;
   const yAxisTickSize = innerWidth < 900 ? "1em" : "1.2em";
   const titleFontSize = innerWidth < 1300 ? "2em" : innerWidth *.03;
 
@@ -76,7 +77,7 @@ function innerDraw(
         'Humedad Relativa' :
         'Humidity';
       xAxisLabel = `${xTitle} [%]`;
-      xTitle += ` @(${unit.tempC(opts.tAir,0)})`
+      xTitle += ` @${unit.tempC(opts.tAir,0)} (Temp. ambiente)`
       break;
     case 'air_excess':
       xTitle = opts.lang == "es" ? 
@@ -169,7 +170,8 @@ function innerDraw(
   const yExtent = d3.extent(data, yValue)
   const yScale = d3.scaleLinear()
     .range([innerHeight, 0])
-    .domain(yExtent)
+    .domain([d3.min(data, d => d[yVar]*.998), d3.max(data, d => d[yVar]*1.002)])
+    //.domain(yExtent)
     .nice();
 
   const xAxis = d3.axisBottom(xScale)
