@@ -39,7 +39,7 @@
           <a class="nav-link" href="./index.html">Datos</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="./instructions.html">Alcance</a>
+          <a class="nav-link" href="./instructions.html">Alcances</a>
         </li>
         <li class="nav-sec">
           <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Proyecto</a>
@@ -58,30 +58,30 @@
 
       <p>Tal como está concebido, el algoritmo de este simulador, elaborado sobre la base de un horno de tiro natural, tipo cabina, que procesa originalmente un residuo atmosférico y cuyo calor absorbido en condiciones normales de operación es de 20.9 MW (71.5 MMBtu/h), es capaz de realizar cálculos en una amplia gama de condiciones de proceso.</p>
 
-      <p>Su versatilidad es tal que si se introducen las propiedades de rigor, también es capaz de “procesar” crudos, otros residuos, aceites de calentamiento, y otras cargas líquidas no vaporizantes. No obstante, al incluir cambios en algunas variables sin considerar las limitaciones operacionales y/o mecánicas del horno los resultados podrían no tener sentido real.</p>
+      <p>Su versatilidad es tal que si se introducen las propiedades de rigor, también es capaz de "procesar" crudos, otros residuos, aceites de calentamiento, y otras cargas líquidas no vaporizantes. No obstante, al incluir cambios en algunas variables sin considerar las limitaciones operacionales y/o mecánicas del horno los resultados podrían no tener sentido real.</p>
 
     </section>
     <section class="justify-text vertical-margins side-margins" id="heater">
       <h3>Horno</h3>
 
       <p>Condiciones de Operación Estandar</p>
-
+      <!-- El calor absorbido del horno es superior al calor absorbido en la condición de diseño -->
       <ul>
         <li>
-          Diseño: 23.0 MW (78.79 MMBtu/h) - Máxima capacidad de procesamiento
+          <strong>Diseño</strong>: 23.0 MW (78.79 MMBtu/h) - Máxima capacidad de procesamiento.
         </li>
         <li>
-          Normal: 20.9 MW (71.5 MMBtu/h) [90,75% del Diseño] - Operación habitual del horno
+          <strong>Normal</strong>: 20.9 MW (71.5 MMBtu/h) [90,75% del Diseño] - Operación habitual del horno.
         </li>
         <li>
-          Turndown: 10.45 MW (35.77 MBtu/h) [45,4% del Diseño] - Condición de mínima capacidad. <br>
-          No equivale a una condición de “turndown” de los quemadores puesto que podría lograrse con cierto número de quemadores operando normalmente y otros quemadores simplemente apagados
+          <strong>Turndown</strong>: 10.45 MW (35.77 MBtu/h) [45,4% del Diseño] - Condición de mínima capacidad. <br>
+          No equivale a una condición de "turndown" de los quemadores puesto que podría lograrse con cierto número de quemadores operando normalmente y otros quemadores simplemente apagados.
         </li>
       </ul>
 
       <p>
-        Gravedad específica @ 60°F [0,84] - 
-        Esta gravedad específica @ 60ºF corresponde a un residuo atmosférico. Si se cambia este dato se estará modificando la naturaleza del fluido de proceso lo cual es inusual desde la perspectiva operacional.
+        Gravedad específica @ 15.6°C (60°F) [0,84] - 
+        Esta gravedad específica corresponde a un residuo atmosférico. Si se cambia este dato se estará modificando la naturaleza del fluido de proceso lo cual es inusual desde la perspectiva operacional.
       </p>
     </section>
     <section class="justify-text vertical-margins side-margins" id="interface">
