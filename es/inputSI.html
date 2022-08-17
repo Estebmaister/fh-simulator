@@ -31,32 +31,39 @@
 </head>
 <body>
   <header id="header">
-    <a class="logo" href="#"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" /></a>
+    <a class="logo" href="#"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" onclick="history.back()"/></a>
 
     <nav id="navbar">
       <ul id="nav-list">
         <li class="nav-sec">
-          <a class="nav-link" href="./fullInput.html">+Datos</a>
+          <a class="nav-link" href="./index.html">Alcances</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="./instructions.html">Alcances</a>
+          <a class="nav-link" href="./fullInput.html">+Datos</a>
         </li>
         <li class="nav-sec">
           <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Proyecto</a>
         </li>
       </ul>
     </nav>
-    <a id="units" href="./index.html">SI | <span>ENGLISH</span></a>
+    <a id="units" href="./inputEN.html"><span>SI</span> | ENGLISH</a>
   </header>
   <main>
     <section id="data-sect">
       <h1>Simulador de hornos de proceso de tiro natural</h1>
       <h4>(Diseñado para la instrucción de ingenieros y operadores)</h4>
       <p class="side-margins">
-        Esta página permite visualizar un resumen de las variables resultantes del cálculo de la simulación para un estado definido con los datos ingresados y al cambiar el caso a uno distinto del base muestra una comparación de ambos casos.
+        Este página permite comparar el desempeño de un horno de procesos de tiro natural bajo dos
+        condiciones operacionales diferentes. Puede entonces: <strong>a)</strong> mostrar un resumen de las variables
+        resultantes del cálculo del simulador de hornos de proceso para un Caso <strong>Base</strong> definido mediante
+        el ingreso de las condiciones de proceso y de combustión, los factores de ensuciamiento y la
+        composición molar del combustible y <strong>b)</strong> comparar estos resultados con los obtenidos mediante la
+        modificación de algunas o todas las variables anteriores (Caso <strong>Modificado</strong>).
         <br> (Cada vez que se pulse el botón de calcular se actualizará el estado del caso seleccionado)
       </p>
-      <p class="side-margins">Para ver los resultados extendidos de un estado particular y editar más variables, hacer click en la opción +DATOS, ubicada en el menú superior.</p>
+      <p class="side-margins">
+        Para observar los resultados ampliados del simulador bajo una condición operacional específica deberá hacer clic en la opción <strong>+Datos</strong>, ubicada en el menú superior e introducir los datos correspondientes a la condición.
+      </p>
     </section>
     <form lang="es" id="data-form" method="GET" action="./result.html">
 
@@ -80,68 +87,67 @@
                 <p><strong>Residuo atmosférico</strong></p>
 
                 <p id="sub-duty" class="project-info">
-                  Flujo volumétrico <input step="1" min="60000" max="120000" name="m_fluid" type="number" lang="en" value="90000"> BPD
+                  Flujo volumétrico <input step="1" min="9540" max="19078" name="si_m_fluid" type="number" lang="en" value="14309"> m³/d
                   <sub class="hidden"><span>~</span> lb/hr</sub>
                 </p>
                 <p class="project-info">
-                  Gravedad específica <em>@ 60°F</em> <input id="sp-grav" step="0.001" min="0.806" max="1.076" name="sp_grav" type="number" lang="en" value="0.840">
+                  Gravedad específica <em>@ 15.6°C</em> <input id="sp-grav" step="0.001" min="0.806" max="1.076" name="sp_grav" type="number" lang="en" value="0.840">
 
                 </p>
               </div>
               <div class="full-width">
                 <p class="project-info sub-temp">
-                  Temperatura entrada <input id="t_in" step="1" min="600" max="699" name="t_in" type="number" lang="en" value="678"> °F
+                  Temperatura entrada <input id="t_in" step="1" min="315" max="370" name="si_t_in" type="number" lang="en" value="359"> °C
                   <sub class="hidden"><span>~</span> °C</sub>
                 </p>
                 <br>
                 <p class="project-info sub-temp">
-                  Temperatura salida <input id="t_out"step="1" min="700" max="800" name="t_out"type="number" lang="en" value="772"> °F
+                  Temperatura salida <input id="t_out"step="1" min="371" max="427" name="si_t_out"type="number" lang="en" value="411"> °C
                   <sub class="hidden"><span>~</span> °C</sub>
                 </p>
 
                 <p class="project-info hidden">
-                  Calor Esp. (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" lang="en" disabled value="0.676">
-                  <sub>Btu/lb-°F</sub>
+                  Calor Esp. (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="si_cp_in" type="number" lang="en" disabled value="2.830">
+                  <sub>kJ/kg.°C</sub>
                 </p>
                 <p class="project-info hidden">
-                  Calor Esp. (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" lang="en" disabled value="0.703">
-                  <sub>Btu/lb-°F</sub>
+                  Calor Esp. (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="si_cp_out"type="number" lang="en" disabled value="2.943">
+                  <sub>kJ/kg.°C</sub>
                 </p>
                 <br>
 
                 <p class="project-info">
                   Absorción de calor ('duty'):
-                  <span id="span-duty">71.53</span> MMBtu/hr
+                  <span id="span-duty">20.86</span> MW
                 </p>
               </div>
             </div>
 
             <div class="form-div">
               <p class="full-width"><strong>Factores de Ensuciamiento</strong></p>
-              
+              <p class="project-info">
+                Interno radiante:
+                <span style="white-space: nowrap;">
+                  <input step="0.1" min="0" max="0.5" name="si_rfi" type="number" lang="en" value="0.1">
+                  <sub>x10-3 m²-K/W</sub>
+                </span>
+              </p>
+              <div>
                 <p class="project-info">
-                  Interno radiante:
+                  Interno escudo/convectivo:
                   <span style="white-space: nowrap;">
-                    <input step="0.001" min="0" max="0.003" name="rfi" type="number" lang="en" placeholder="0.000">
-                    <sub>hr.ft².°F/Btu</sub>
+                    <input step="0.1" min="0" max="0.5" name="si_rfi_sc" type="number" lang="en" value="0.1">
+                    <sub>x10-3 m²-K/W</sub>
                   </span>
                 </p>
-                <div>
-                  <p class="project-info">
-                    Interno escudo/convectivo:
-                    <span style="white-space: nowrap;">
-                      <input step="0.001" min="0" max="0.003" name="rfi_sc" type="number" lang="en" placeholder="0.000">
-                      <sub>hr.ft².°F/Btu</sub>
-                    </span>
-                  </p>
-                  <p class="project-info">
-                    Externo escudo/convectivo:
-                    <span style="white-space: nowrap;">
-                      <input step="0.001" min="0" max="0.003" name="rfo" type="number" lang="en" value="0.001">
-                      <sub>hr.ft².°F/Btu</sub>
-                    </span>
-                  </p>
-                </div>
+                <p class="project-info">
+                  Externo escudo/convectivo:
+                  <span style="white-space: nowrap;">
+                    <input step="0.1" min="0" max="0.5" name="si_rfo" type="number" lang="en" value="0.1">
+                    <sub>x10-3 m²-K/W</sub>
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
 
@@ -162,11 +168,11 @@
                 Pérdidas por radiación <input step="0.1" min="0" max="5" name="heat_loss" type="number" lang="en" value="1.5"> %
               </p>
               <p class="project-info sub-temp hidden">
-                Temp. ingreso combustión <input id="t_fuel" step="1" min="0" max="105" name="t_fuel" type="number" lang="en" value="80"> °F
+                Temp. ingreso combustión <input id="t_fuel" step="1" min="-17" max="45" name="si_t_fuel" type="number" lang="en" value="27"> °C
                 <sub><span>~</span> °C</sub>
               </p>
               <p class="project-info sub-temp">
-                Temp. aire ambiental <input id="t_amb" step="1" min="0" max="105" name="t_amb" type="number" lang="en" value="80"> °F
+                Temp. aire ambiental <input id="t_amb" step="1" min="-17" max="45" name="si_t_amb" type="number" lang="en" value="27"> °C
                 <sub class="hidden"><span>~</span> °C</sub>
               </p>
               <p class="project-info">
@@ -174,8 +180,8 @@
               </p>
 
               <p class="project-info hidden">
-                Presión atmosférica <input step="0.1" min="0.9" max="1.1" name="p_atm" type="number" lang="en" placeholder="1.0">
-                <sub>atm</sub>
+                Presión atmosférica <input step="0.01" min="0" max="200" name="si_p_atm" type="number" lang="en" placeholder="101.325">
+                <sub>kPa</sub>
               </p>
             </div>
           </div>
@@ -241,7 +247,7 @@
             <div class="toggle-inside">
               <p>SI</p>
               <label class="switch" for="unit_system">
-                <input id="unit_system" name="unit_system" type="checkbox" value="english" checked/>
+                <input id="unit_system" name="unit_system" type="checkbox" value="english"/>
                 <div class="slider round"></div>
               </label>
               <p>EN</p>

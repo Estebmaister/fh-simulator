@@ -31,32 +31,37 @@
 </head>
 <body>
   <header id="header">
-    <a class="logo" href="./"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" /></a>
+    <a class="logo"><img class="logo" id="header-img" src="../img/logo.png" alt="Logo" onclick="history.back()"/></a>
 
     <nav id="navbar">
       <ul id="nav-list">
         <li class="nav-sec">
-          <a class="nav-link" href="./">-Datos</a>
+          <a class="nav-link" href="./index.html">Alcances</a>
         </li>
         <li class="nav-sec">
-          <a class="nav-link" href="./instructions.html">Alcances</a>
+          <a class="nav-link" href="./inputSI.html">-Datos</a>
         </li>
         <li class="nav-sec">
           <a class="nav-link" href="https://github.com/estebmaister/fh-simulator" target="_blank">Proyecto</a>
         </li>
       </ul>
     </nav>
-    <a id="lang" href="../en">EN | <span>ES</span></a>
+    <a id="lang" href="../en/inputEN.html">EN | <span>ES</span></a>
   </header>
   <main>
     <section id="data-sect">
       <h1>Simulador de hornos de proceso de tiro natural</h1>
       <h4>(Diseñado para la instrucción de ingenieros y operadores)</h4>
-      <p class="side-margins">Esta página permite visualizar todas las variables resultantes del cálculo de la simulación para un estado definido con los datos ingresados.</p>
       <p class="side-margins">
-        Al final de la página se puede expandir la sección de graficar, la cual posibilita definir un rango de variación para una de cuatro variables permitidas y así mostrar el comportamiento del proceso en dicho rango.
+        Esta página permite visualizar todas las variables resultantes del cálculo del simulador
+        para una condición operacional definida mediante los datos ingresados de proceso, ensuciamiento
+        del serpentín, combustión y composición del combustible.
         <br>
-        (Se recomienda usar esta sección solo como referencia para comprobar lo robusto del algoritmo, ya que ciertos puntos pueden no ser aplicables a la realidad por restricciones físicas que el simulador no contempla)
+        Al final de la página se puede desplegar una sección de <strong>Gráficas</strong>, la cual posibilita definir un rango
+        de variación y un número de iteraciones del simulador para cuatro variables (flujo de residuo,
+        temperatura de salida del residuo, exceso de aire y humedad relativa a la temperatura ambiental
+        seleccionada. Las gráficas mostrarán las tendencias en el comportamiento de las variables de
+        proceso en el rango seleccionado.
       </p>
       <br>
     </section>
@@ -360,7 +365,7 @@
       </div>
 
       <hr>
-      <h3>Gráficas (o Tendencia) <span id="show-hide-graph">[variables]</span></h3>
+      <h3>Gráficas <span id="show-hide-graph">[variables]</span></h3>
 
       <div id="graph-div">
 
