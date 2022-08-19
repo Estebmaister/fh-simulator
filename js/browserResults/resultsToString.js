@@ -790,7 +790,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">· Máxima Aletas</td>
+    <td class="tg-simple">· Máxima Aletas (perímetro)</td>
     <td class="tg-simple">${unit.tempC(baseResult.conv_result.t_fin_max,0,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.tempC(modResult.conv_result.t_fin_max,0,true) : ""

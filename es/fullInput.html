@@ -112,14 +112,14 @@
               <p class="project-info">
                 Calor específico
                 <span style="white-space: nowrap;">
-                  (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" lang="en" value="0.676">
+                  (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0.001" name="cp_in" type="number" lang="en" value="0.676">
                   <sub>Btu/lb.°F</sub>
                 </span>
               </p>
               <p class="project-info">
                 Calor específico
                 <span style="white-space: nowrap;">
-                  (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0" name="cp_out"type="number" lang="en" value="0.703">
+                  (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0.001" name="cp_out"type="number" lang="en" value="0.703">
                   <sub>Btu/lb.°F</sub>
                 </span>
               </p>
@@ -132,12 +132,12 @@
               <p class="project-info">
                 Viscosidad absoluta
                 <span style="white-space: nowrap;">
-                  (μ)<sub>in</sub> <input step="0.01" min="0" name="miu_in" type="number" lang="en" value="1.45"> cp
+                  (μ)<sub>in</sub> <input step="0.01" min="0.01" name="miu_in" type="number" lang="en" value="1.45"> cp
                 </span>
               <p class="project-info">
                 Viscosidad absoluta
                 <span style="white-space: nowrap;">
-                  (μ)<sub>out</sub> <input step="0.01" min="0" name="miu_out" type="number" lang="en" value="0.96"> cp
+                  (μ)<sub>out</sub> <input step="0.01" min="0.01" name="miu_out" type="number" lang="en" value="0.96"> cp
                 </span>
               </p>
             </div>
@@ -145,14 +145,14 @@
               <p class="project-info">
                 Conductividad térmica
                 <span style="white-space: nowrap;">
-                  (k)<sub>in</sub> <input step="0.001" min="0" name="kw_in" type="number" lang="en" value="0.038">
+                  (k)<sub>in</sub> <input step="0.001" min="0.001" name="kw_in" type="number" lang="en" value="0.038">
                   <sub>Btu/h.ft.°F</sub>
                 </span>
               </p>
               <p class="project-info">
                 Conductividad térmica
                 <span style="white-space: nowrap;">
-                  (k)<sub>out</sub> <input step="0.001" min="0" name="kw_out" type="number" lang="en" value="0.035">
+                  (k)<sub>out</sub> <input step="0.001" min="0.001" name="kw_out" type="number" lang="en" value="0.035">
                   <sub>Btu/h.ft.°F</sub>
                 </span>
               </p>
@@ -164,7 +164,7 @@
       <div class="form-div">
 
         <p class="project-info">
-          Pérdidas por radiación <input step="0.1" min="0" max="90" name="heat_loss" type="number" lang="en" value="1.5"> %
+          Pérdidas por radiación <input step="0.1" min="0" max="50" name="heat_loss" type="number" lang="en" value="1.5"> %
         </p>
         <div class="form-div full-width">
           <h4 class="full-width">Factores de Ensuciamiento por Sección</h4>
@@ -212,7 +212,7 @@
             Humedad relativa <input step="0.1" min="0" max="100" name="humidity" type="number" lang="en" value="50.0"> %
           </p>
           <p class="project-info">
-            Presión atmosférica <input step="0.1" min="0.9" max="1.1" name="p_atm" type="number" lang="en" placeholder="1.0">
+            Presión atmosférica <input step="0.01" min="0.95" max="1.05" name="p_atm" type="number" lang="en" placeholder="1.00">
             <sub>atm</sub>
           </p>
           <p class="project-info">
