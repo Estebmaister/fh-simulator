@@ -130,11 +130,22 @@ const
   BPDtokg_h = (SG) => m3ToBarrels*barrelsToft3*ft3Tolb*lbtokg*SG/24/3.6;
 let BDPtoMass = BPDtolb_h;
 
-const updateDuty = () => spanDutyField.innerHTML = Math.round(
+const updateDuty = () => {
+  const newDuty = Math.round(
     +inputFlow.value*BDPtoMass(+spGrav.value) *
     (+tOut.value-tIn.value) *(+cpOut.value+ +cpIn.value)/2
     /1e4
   ) /1e2;
+  spanDutyField.innerHTML = newDuty;
+  if (!alertDuty || !alertDiv) return;
+  const dutyDifference = Math.round(newDuty/designDuty*100)/100;
+  alertDuty.innerHTML = dutyDifference
+  if (1.01 <= dutyDifference || 0.453 >= dutyDifference) {
+    alertDiv.className = '';
+  } else {
+    alertDiv.className = 'hidden';
+  }
+}
 
 const updateFlow = () => spanFlowField.innerHTML = Math.round(
   +inputFlow.value*BPDtolb_h(+spGrav.value) ).toLocaleString();
@@ -145,6 +156,11 @@ const cpIn = document.getElementById(cpInElementID);
 const cpOut = document.getElementById(cpOutElementID);
 const spGrav = document.getElementById(spGravElementID);
 const subDuty = document.getElementById(subDutyElementID);
+
+let designDuty = 78.79; // MMBtu/h
+if (tIn && tIn.name.includes("si")) designDuty = 23.0; //MW
+const alertDiv = document.getElementById("alert-div");
+const alertDuty = document.getElementById("alert-duty");
 
 let inputFlow, spanFlowField;
 const spanDutyField = document.getElementById('span-duty');
@@ -185,8 +201,8 @@ for (const element of subTemps) {
   inputField.addEventListener('input', element.updateTemp)
 }
 
-const AmbTempInput = document.getElementById("t_amb")
-const FuelTempInput = document.getElementById("t_fuel")
+const AmbTempInput = document.getElementById("t_amb");
+const FuelTempInput = document.getElementById("t_fuel");
 if (AmbTempInput) {
   AmbTempInput.addEventListener('input', () => 
     FuelTempInput.value = AmbTempInput.value
@@ -200,4 +216,5 @@ window.addEventListener('keydown',function(e){
         return false;
       }
     }
-  },true);
+  },true
+);

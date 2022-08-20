@@ -208,6 +208,11 @@ pre {
   justify-content: space-around;
 }
 
+.alert {
+  color: var(--alert-color);
+  text-align: center;
+}
+
 /* -------    Footer         ------*/
 
 .credits {
