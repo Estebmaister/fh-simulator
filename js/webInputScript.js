@@ -1,3 +1,26 @@
+/** Approx functions extracted from utils.js file */
+const linearApprox = ({x1,x2,y1,y2}) => {
+  if (typeof y1 !== "number") {
+    console.error(new Error(`call for linearApprox with incorrect value type for y1: ${y1}`));
+    return () => 0;
+  }
+  if (x1 == x2 || x2 == undefined || y2 == undefined) 
+    return () => y1;
+  const m = (y2 - y1) / (x2 - x1);
+  return (x) => m * (x - x1) + y1;
+};
+const viscosityApprox = ({t1,t2,v1,v2}) => {
+  if (typeof v1 !== "number") {
+    console.error(new Error(`call for viscosityApprox with incorrect value type for v1: ${v1}`));
+    return () => 0;
+  }
+  if (t1 == t2 || t2 == undefined || v2 == undefined) 
+    return () => v1;
+  const B = Math.log(v1/v2) / (1/t1 - 1/t2)
+  const A = v1 * Math.exp(-B/t1);
+  return (temp) => A * Math.exp(B/temp);
+}
+
 // defaultFuels are the default values set for the combustible
 let defaultFuels = {
   CH4: .5647, C2H4: .0158, C2H6: .1515, C3H8: .0622,
@@ -18,6 +41,10 @@ const tInElementID = "t_in";
 const tOutElementID = "t_out";
 const cpInElementID = "cp_in";
 const cpOutElementID = "cp_out";
+const kwInElementID = "kw_in";
+const kwOutElementID = "kw_out";
+const miuInElementID = "miu_in";
+const miuOutElementID = "miu_out";
 const spGravElementID = "sp-grav";
 const totalElementID = "total";
 const subDutyElementID = "sub-duty";
@@ -154,6 +181,10 @@ const tIn = document.getElementById(tInElementID);
 const tOut = document.getElementById(tOutElementID);
 const cpIn = document.getElementById(cpInElementID);
 const cpOut = document.getElementById(cpOutElementID);
+const kwIn = document.getElementById(kwInElementID);
+const kwOut = document.getElementById(kwOutElementID);
+const miuIn = document.getElementById(miuInElementID);
+const miuOut = document.getElementById(miuOutElementID);
 const spGrav = document.getElementById(spGravElementID);
 const subDuty = document.getElementById(subDutyElementID);
 
@@ -178,10 +209,37 @@ if (subDuty) {
   }
 }
 
+const cp = linearApprox({
+  x1: tIn.value,  y1: cpIn ? +cpIn.value :0,
+  x2: tOut.value, y2: cpOut ? +cpOut.value :0
+});
+const kw = linearApprox({
+  x1: tIn.value,  y1: kwIn ? +kwIn.value :0,
+  x2: tOut.value, y2: kwOut ? +kwOut.value :0
+});
+const miu = viscosityApprox({
+  t1: tIn.value,  v1: miuIn ? +miuIn.value :0,
+  t2: tOut.value, v2: miuOut ? +miuOut.value :0
+});
+
 // -- Updating temp input values to show, from fahrenheit to celsius.
 function updateTemp(_ev) {
   if (subDuty && spanDutyField) updateDuty();
   if (spanDutyField) updateFlow();
+  if (this.getElementsByTagName("input") && 
+    this.getElementsByTagName("input")[0]) {
+    let tInput = this.getElementsByTagName("input")[0];
+    if (tInput.id.includes("in")) {
+      if (cpIn) cpIn.value = cp(tInput.value);
+      if (kwIn) kwIn.value = kw(tInput.value);
+      if (miuIn) miuIn.value = miu(tInput.value);
+    }
+    if (tInput.id.includes("out")) {
+      if (cpOut) cpOut.value = cp(tInput.value);
+      if (kwOut) kwOut.value = kw(tInput.value);
+      if (miuOut) miuOut.value = miu(tInput.value);
+    }
+  }
   const inputField = this.getElementsByTagName('input')[0];
   const spanField = this.getElementsByTagName('span')[0];
   if (inputField == undefined || spanField == undefined) return;
