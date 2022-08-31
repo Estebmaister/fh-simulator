@@ -77,7 +77,7 @@ function innerDraw(
         'Humedad Relativa' :
         'Humidity';
       xAxisLabel = `${xTitle} [%]`;
-      xTitle += ` @${unit.tempC(opts.tAir,0)} (Temp. ambiente)`
+      xTitle += ` @ ${unit.tempC(opts.tAir,0)} (Temp. ambiente)`
       break;
     case 'air_excess':
       xTitle = opts.lang == "es" ? 
@@ -114,7 +114,7 @@ function innerDraw(
       break;
     case 'm_fuel':
       yTitle = opts.lang == "es" ? 
-        'Flujo de combustible' :
+        'Flujo de Combustible' :
         'Fuel mass flow';
       yAxisLabel = `${yTitle} [lb/h]`;
       break;
@@ -139,7 +139,7 @@ function innerDraw(
       break;
     case 'rad_cnv_dist':
       yTitle = opts.lang == "es" ? 
-        'Absorción de calor (Rad/Conv)' :
+        'Absorción de Calor (Rad/Conv)' :
         'Heat absorption (Rad/Conv)';
       yAxisLabel = `${yTitle}`;
       break;
