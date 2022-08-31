@@ -1,3 +1,6 @@
+/** Round function */
+const round = (n,dec) => Math.round(n*(10**dec))/(10**dec);
+
 /** Approx functions extracted from utils.js file */
 const linearApprox = ({x1,x2,y1,y2}) => {
   if (typeof y1 !== "number") {
@@ -158,14 +161,13 @@ const
 let BDPtoMass = BPDtolb_h;
 
 const updateDuty = () => {
-  const newDuty = Math.round(
+  const newDuty = round(
     +inputFlow.value*BDPtoMass(+spGrav.value) *
     (+tOut.value-tIn.value) *(+cpOut.value+ +cpIn.value)/2
-    /1e4
-  ) /1e2;
+    /1e6, 2);
   spanDutyField.innerHTML = newDuty;
   if (!alertDuty || !alertDiv) return;
-  const dutyDifference = Math.round(newDuty/designDuty*100)/100;
+  const dutyDifference = round(newDuty/designDuty,2);
   alertDuty.innerHTML = dutyDifference
   if (1.01 <= dutyDifference || 0.453 >= dutyDifference) {
     alertDiv.className = '';
@@ -230,14 +232,14 @@ function updateTemp(_ev) {
     this.getElementsByTagName("input")[0]) {
     let tInput = this.getElementsByTagName("input")[0];
     if (tInput.id.includes("in")) {
-      if (cpIn) cpIn.value = cp(tInput.value);
-      if (kwIn) kwIn.value = kw(tInput.value);
-      if (miuIn) miuIn.value = miu(tInput.value);
+      if (cpIn) cpIn.value = round(cp(tInput.value),3);
+      if (kwIn) kwIn.value = round(kw(tInput.value),3);
+      if (miuIn) miuIn.value = round(miu(tInput.value),2);
     }
     if (tInput.id.includes("out")) {
-      if (cpOut) cpOut.value = cp(tInput.value);
-      if (kwOut) kwOut.value = kw(tInput.value);
-      if (miuOut) miuOut.value = miu(tInput.value);
+      if (cpOut) cpOut.value = round(cp(tInput.value),3);
+      if (kwOut) kwOut.value = round(kw(tInput.value),3);
+      if (miuOut) miuOut.value = round(miu(tInput.value),2);
     }
   }
   const inputField = this.getElementsByTagName('input')[0];
@@ -248,7 +250,7 @@ function updateTemp(_ev) {
     if (spanField.innerHTML.length == 1) spanField.innerHTML = "0"+spanField.innerHTML; 
     return;
   }
-  spanField.innerHTML = Math.round((+inputField.value -32) *(5/9) *10) /10;
+  spanField.innerHTML = round((+inputField.value -32) *(5/9), 1);
 }
 const subTemps = document.getElementsByClassName("sub-temp")
 for (const element of subTemps) {
