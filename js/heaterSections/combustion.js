@@ -69,9 +69,9 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult, noLog) => {
   // Teta = T(Kelvin)
   return (teta) => {
     // Approximate equation valid from 250 K to 1200 K.
-    if (teta < 250 && !noLog) logger.debug(`"Cp0", "temp": ${round(teta)},`+
+    if (teta < 250 && !noLog) logger.debug(`"Cp0", "temp": "${round(teta)}",`+
       `"Msg": "${Substance} bellow range for Cp0 formula"`);
-    if (teta > 1200&& !noLog) logger.debug(`"Cp0", "temp": ${round(teta)},`+
+    if (teta > 1200&& !noLog) logger.debug(`"Cp0", "temp": "${round(teta)}",`+
       `"Msg": "${Substance} above range for Cp0 formula"`);
     if (c0 === "-") {
       logger.debug(`"Cp0", "Msg": "Wrong use, called for compound `+

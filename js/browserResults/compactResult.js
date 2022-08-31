@@ -16,7 +16,7 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
       baseOpt = opt;
       baseResult = result;
       localResult = JSON.parse(localStorage.getItem(MODIFIED));
-      clearOldLocalResult(localResult, MODIFIED);
+      if (clearOldLocalResult(localResult, MODIFIED)) localResult = {};
       modOpt = localResult ? localResult.opt : {};
       modResult = localResult ? localResult.result : {};
       break;
@@ -24,7 +24,7 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
       modOpt = opt;
       modResult = result;
       localResult = JSON.parse(localStorage.getItem(BASE));
-      clearOldLocalResult(localResult, BASE);
+      if (clearOldLocalResult(localResult, BASE)) localResult = {};
       if (!localResult) {
         const defaultResult = comb(fuel, defaultOpt);
         localResult = {result:defaultResult, opt:defaultOpt};
@@ -48,6 +48,9 @@ const clearOldLocalResult = ( storageResult = {}, caseName = '' ) => {
   if (noTimeDiff || Date.now() - storageResult.time.date > threeDays) {
     logger.info(`Deleting ${caseName} old result`);
     localStorage.removeItem(caseName);
+    return true;
+  } else {
+    return false;
   }
 }
 

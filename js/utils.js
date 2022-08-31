@@ -98,7 +98,7 @@ const newtonRaphson = (f, fp, x0, nrOptions, name, noLog) => {
     // Check for convergence:
     if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
       if (!noLog) logger.debug(`"Newton-Raphson", "func":"${name}",`+
-        ` "var converged to":${x1}, "iterations":${iter}`);
+        ` "var_converged_to":"${x1}", "iterations":"${iter}"`);
       return x1;
     }
 
