@@ -210,6 +210,8 @@ pre {
 
 .alert {
   color: var(--alert-color);
+}
+#alert-duty {
   text-align: center;
 }
 
@@ -331,7 +333,7 @@ h1 {
   padding: 1rem;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5 {
   text-align: center;
 }
 
