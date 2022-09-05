@@ -11,7 +11,8 @@ const graphicData = ( comb, fuel, opt ) => {
   logger.info   = () => 0;
   logger.debug  = () => 0;
 
-  opt.unitSystem = 'english'
+  // Making only english system for graphs
+  // opt.unitSystem = 'english'
   const browserResult = [];
 
   const CASE = `${opt.title}_graph`;
@@ -73,6 +74,7 @@ const graphicData = ( comb, fuel, opt ) => {
       // --- Input vars
       m_fluid:    unitConv.lb_htoBPD(unitConv.kgtolb(runResult.rad_result.m_fluid))*1e-3,
       t_out: unitConv.KtoF(runResult.rad_result.t_out),
+      t_out_si: unitConv.KtoC(runResult.rad_result.t_out),
       
       o2_excess:  runResult.flows['O2_%'] < 11 ? runResult.flows['O2_%'] : 11,
       air_excess: runResult.flows['air_excess_%'] > 0 ? runResult.flows['air_excess_%'] : 0,
@@ -80,11 +82,15 @@ const graphicData = ( comb, fuel, opt ) => {
       
       // --- Output vars
       rad_tg_out: unitConv.KtoF(runResult.rad_result.tg_out),
+      rad_tg_out_si: unitConv.KtoC(runResult.rad_result.tg_out),
       cnv_tg_out: unitConv.KtoF(runResult.conv_result.tg_out),
+      cnv_tg_out_si: unitConv.KtoC(runResult.conv_result.tg_out),
       
       // m_flue:     runResult.shld_result.m_flue ? runResult.shld_result.m_flue : 0,
       m_fuel:     runResult.rad_result.m_fuel ? 
         unitConv.kgtolb(runResult.rad_result.m_fuel) : 0,
+      m_fuel_si:  runResult.rad_result.m_fuel ? 
+        runResult.rad_result.m_fuel : 0,
       efficiency: runResult.rad_result.eff_thermal_val ? 
         runResult.rad_result.eff_thermal_val : 0,
       // duty_total: runResult.rad_result.duty_total,

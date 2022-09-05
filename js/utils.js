@@ -123,6 +123,7 @@ const unitConv = {
   RtoK: (n=1) => n*(5/9),
   KtoR: (n=1) => n*(9/5),
   KtoF: (n=1) => n*(9/5) - 459.67,
+  KtoC: (n=1) => n-tempToK,
   CtoK: (n=1) => n+tempToK,
   CtoF: (n=1) => n*(9/5) + 32,
   FtoC: (n=1) => (n-32)*(5/9),

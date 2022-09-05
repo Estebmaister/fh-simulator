@@ -287,6 +287,12 @@ h1 {
 .form-block > .form-div {
   justify-content: space-between;
 }
+@media screen and (max-width: 1575px) and (min-width: 1100px) {
+  .form-block > .form-div > .form-block {
+    flex: auto;
+    flex-wrap: initial;
+  }
+}
 .flex-evenly {
   display: flex;
   flex-wrap: wrap;
@@ -436,7 +442,7 @@ input, select {
   padding-left: .7rem;
   padding-right: .2rem;
 }
-input[disabled] {
+input[disabled], select[disabled] {
   background-color: var(--light-color, white);
   font-weight: 500;
 }
