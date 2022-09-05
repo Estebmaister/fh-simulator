@@ -69,7 +69,7 @@ function innerDraw(
   const yAxisTickSize = innerWidth < 900 ? "1em" : "1.2em";
   const titleFontSize = innerWidth < 1300 ? "2em" : innerWidth *.03;
 
-  const xValue = d => d[opts.graphVar];
+  let xValue = d => d[opts.graphVar];
   let xAxisLabel = '', xTitle;
   switch (opts.graphVar) {
     case 'humidity':
@@ -77,25 +77,30 @@ function innerDraw(
         'Humedad Relativa' :
         'Humidity';
       xAxisLabel = `${xTitle} [%]`;
-      xTitle += ` @ ${unit.tempC(opts.tAir,0)} (Temp. ambiente)`
+      xTitle += ` @ ${initSystem(opts.unitSystem).tempC(opts.tAir,0)} (Temp. Amb.)`
       break;
     case 'air_excess':
       xTitle = opts.lang == "es" ? 
-        'Exceso de aire' :
+        'Exceso de Aire' :
         'Air Excess';
       xAxisLabel = `${xTitle} [%]`;
       break;
     case 'm_fluid':
       xTitle = opts.lang == "es" ? 
-        'Flujo de residuo' : 
-        'Residue flow';
+        'Flujo de Residuo' : 
+        'Residue Flow';
       xAxisLabel = `${xTitle} [10³-BPD]`;
       break;
     default:
       xTitle = opts.lang == "es" ? 
-        'Temperatura de Salida de residuo' :
+        'Temperatura de Salida de Residuo' :
         'Residue Outlet Temperature';
-      xAxisLabel = 'Temp [F]';
+      if (opts.unitSystem.toLowerCase() == "si") {
+        xValue = d => d[opts.graphVar + "_si"];
+        xAxisLabel = 'Temp [C]';
+      } else {
+        xAxisLabel = 'Temp [F]';
+      }
       break;
   }
 
@@ -115,8 +120,13 @@ function innerDraw(
     case 'm_fuel':
       yTitle = opts.lang == "es" ? 
         'Flujo de Combustible' :
-        'Fuel mass flow';
-      yAxisLabel = `${yTitle} [lb/h]`;
+        'Fuel Mass Flow';
+      if (opts.unitSystem.toLowerCase() == "si") {
+        yVar += "_si"
+        yAxisLabel = `${yTitle} [kg/h]`;
+      } else {
+        yAxisLabel = `${yTitle} [lb/h]`;
+      }
       break;
     case 'efficiency':
       yTitle = opts.lang == "es" ? 
@@ -129,30 +139,40 @@ function innerDraw(
       yTitle = opts.lang == "es" ? 
         'Temperatura de Chimenea' :
         'Stack Temperature';
-      yAxisLabel = `${yTitle} [F]`;
+      if (opts.unitSystem.toLowerCase() == "si") {
+        yVar += "_si"
+        yAxisLabel = `${yTitle} [C]`;
+      } else {
+        yAxisLabel = `${yTitle} [F]`;
+      }
       break;
     case 'rad_tg_out':
       yTitle = opts.lang == "es" ? 
         'Temperatura de Arco Radiante' :
         'Radiant Flue Temperature';
-      yAxisLabel = `${yTitle} [F]`;
+      if (opts.unitSystem.toLowerCase() == "si") {
+        yVar += "_si"
+        yAxisLabel = `${yTitle} [C]`;
+      } else {
+        yAxisLabel = `${yTitle} [F]`;
+      }
       break;
     case 'rad_cnv_dist':
       yTitle = opts.lang == "es" ? 
         'Absorción de Calor (Rad/Conv)' :
-        'Heat absorption (Rad/Conv)';
+        'Heat Absorption (Rad/Conv)';
       yAxisLabel = `${yTitle}`;
       break;
     case 'rad_dist':
       yTitle = opts.lang == "es" ? 
         'Distribución Radiante' :
-        'Radiant distribution';
+        'Radiant Distribution';
       yAxisLabel = `${yTitle} [%]`;
       break;
     case 'cnv_dist':
       yTitle = opts.lang == "es" ? 
         'Distribución Convectiva' :
-        'Convective distribution';
+        'Convective Distribution';
       yAxisLabel = `${yTitle} [%]`;
       break;
     default:

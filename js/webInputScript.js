@@ -160,6 +160,19 @@ const
   BPDtokg_h = (SG) => m3ToBarrels*barrelsToft3*ft3Tolb*lbtokg*SG/24/3.6;
 let BDPtoMass = BPDtolb_h;
 
+const warnings = {
+  normal: (d) => `El calor absorbido ("duty") es <strong>${d}</strong> veces el valor de diseño.`,
+  design: (d) => `El calor absorbido ("duty") es igual al valor de diseño.`,
+  
+  //Si el calor absorbido fuese superior a 23 MW (o 78,79 MMBtu/h).
+  above: (d) => `El calor absorbido ("duty") es <strong>${d}</strong> veces superior al diseño. ` +
+    `Sostener esta condición operacional requiere atención especial.`,
+
+  //Si el calor absorbido fuese inferior a 10,45 MW (o 35.8 MMBtu/h)
+  down: () => `El calor absorbido ("duty") es inferior al mínimo operacional ("turndown"). ` +
+    `Sostener esta condición operacional no es recomendable.`
+}
+
 const updateDuty = () => {
   const newDuty = round(
     +inputFlow.value*BDPtoMass(+spGrav.value) *
@@ -168,8 +181,21 @@ const updateDuty = () => {
   spanDutyField.innerHTML = newDuty;
   if (!alertDuty || !alertDiv) return;
   const dutyDifference = round(newDuty/designDuty,2);
-  alertDuty.innerHTML = dutyDifference
-  if (1.01 <= dutyDifference || 0.453 >= dutyDifference) {
+  if (1 > dutyDifference && 0.453 < dutyDifference) {
+    alertDuty.className = '';
+    alertDuty.innerHTML = warnings.normal(dutyDifference);
+    alertDiv.className = '';
+  } else if (1.01 > dutyDifference && 0.99 < dutyDifference) {
+    alertDuty.className = '';
+    alertDuty.innerHTML = warnings.design(dutyDifference);
+    alertDiv.className = '';
+  } else if (1.01 <= dutyDifference) {
+    alertDuty.innerHTML = warnings.above(dutyDifference);
+    alertDuty.className = 'alert';
+    alertDiv.className = '';
+  } else if (0.453 >= dutyDifference) {
+    alertDuty.innerHTML = warnings.down(dutyDifference);
+    alertDuty.className = 'alert';
     alertDiv.className = '';
   } else {
     alertDiv.className = 'hidden';

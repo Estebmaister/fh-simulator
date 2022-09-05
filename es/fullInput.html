@@ -81,7 +81,7 @@
           <sub><span>~</span> lb/hr</sub>
         </p>
         <p class="project-info">
-          Gravedad específica (SG) <em>@ 60°F</em> <input id="sp-grav" step="0.001" min="0.806" max="1.076" name="sp_grav" type="number" lang="en" value="0.840">
+          Gravedad específica (SG) <em>@ 60°F</em> <input id="sp-grav" step="0.001" min="0.806" max="1.076" name="sp_grav" type="number" lang="en" value="0.840" disabled>
         </p>
         <p class="project-info">
           Absorción de calor ("duty"):
@@ -93,16 +93,18 @@
           <div class="form-div">
             <div class="form-block flex-evenly">
               <p class="project-info">
-                Temperatura de entrada
+                Temperatura entrada
                 <span class="sub-temp" style="white-space: nowrap;">
-                  (T)<sub>in</sub> <input id="t_in" step="1" min="300" max="694" name="t_in" type="number" lang="en" value="678"> °F
+                  (T)<sub>in</sub> 
+                  <input id="t_in" step="1" min="300" max="694" name="t_in" type="number" lang="en" value="678"> °F
                   <sub><span>~</span> °C</sub>
                 </span>
               </p>
               <p class="project-info">
                 Temperatura salida
                 <span class="sub-temp" style="white-space: nowrap;">
-                  (T)<sub>out</sub> <input id="t_out"step="1" min="725" max="900" name="t_out"type="number" lang="en" value="772"> °F
+                  (T)<sub>out</sub> 
+                  <input id="t_out"step="1" min="725" max="900" name="t_out"type="number" lang="en" value="772"> °F
                   <sub><span>~</span> °C</sub>
                 </span>
               </p>
@@ -111,14 +113,14 @@
               <p class="project-info">
                 Calor específico
                 <span style="white-space: nowrap;">
-                  (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0.001" name="cp_in" type="number" lang="en" value="0.676">
+                  (Cp)<sub>in</sub> <input id="cp_in" step="0.001" min="0.001" name="cp_in" type="number" lang="en" value="0.676" disabled>
                   <sub>Btu/lb.°F</sub>
                 </span>
               </p>
               <p class="project-info">
                 Calor específico
                 <span style="white-space: nowrap;">
-                  (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0.001" name="cp_out"type="number" lang="en" value="0.703">
+                  (Cp)<sub>out</sub> <input id="cp_out"step="0.001" min="0.001" name="cp_out"type="number" lang="en" value="0.703" disabled>
                   <sub>Btu/lb.°F</sub>
                 </span>
               </p>
@@ -131,12 +133,12 @@
               <p class="project-info">
                 Viscosidad absoluta
                 <span style="white-space: nowrap;">
-                  (μ)<sub>in</sub> <input id="miu_in" step="0.01" min="0.01" name="miu_in" type="number" lang="en" value="1.45"> cp
+                  (μ)<sub>in</sub> <input id="miu_in" step="0.01" min="0.01" name="miu_in" type="number" lang="en" value="1.45" disabled> cp
                 </span>
               <p class="project-info">
                 Viscosidad absoluta
                 <span style="white-space: nowrap;">
-                  (μ)<sub>out</sub> <input id="miu_out" step="0.01" min="0.01" name="miu_out" type="number" lang="en" value="0.96"> cp
+                  (μ)<sub>out</sub> <input id="miu_out" step="0.01" min="0.01" name="miu_out" type="number" lang="en" value="0.96" disabled> cp
                 </span>
               </p>
             </div>
@@ -144,14 +146,14 @@
               <p class="project-info">
                 Conductividad térmica
                 <span style="white-space: nowrap;">
-                  (k)<sub>in</sub> <input id="kw_in" step="0.001" min="0.001" name="kw_in" type="number" lang="en" value="0.038">
+                  (k)<sub>in</sub> <input id="kw_in" step="0.001" min="0.001" name="kw_in" type="number" lang="en" value="0.038" disabled>
                   <sub>Btu/h.ft.°F</sub>
                 </span>
               </p>
               <p class="project-info">
                 Conductividad térmica
                 <span style="white-space: nowrap;">
-                  (k)<sub>out</sub> <input id="kw_out" step="0.001" min="0.001" name="kw_out" type="number" lang="en" value="0.035">
+                  (k)<sub>out</sub> <input id="kw_out" step="0.001" min="0.001" name="kw_out" type="number" lang="en" value="0.035" disabled>
                   <sub>Btu/h.ft.°F</sub>
                 </span>
               </p>
@@ -160,7 +162,7 @@
         </div>
       </div>
       <div id="alert-div">
-        <p class="alert">El calor absorbido del horno es <strong><span id="alert-duty">1.XX</span></strong> veces el valor de diseño.</p>
+        <p class="alert" id="alert-duty"></p>
       </div>
 
       <div class="form-div">
@@ -325,9 +327,6 @@
           </div>
           <div class="fuel-compound">
             <p class="fuel-name">Agua          </p><p class="fuel-formula">H<sub>2</sub>O             </p> <p class="fuel-input"><input max="100" min="0.00" name="H2Ol"   id="H2Ol"   placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
-          </div>
-          <div class="fuel-compound">
-            <p class="fuel-name">Oxígeno       </p><p class="fuel-formula">O<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="O2"     id="O2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div> -->
           <div class="fuel-compound">
             <p class="fuel-name">Monóxido de Carbono</p><p class="fuel-formula">CO                      </p> <p class="fuel-input"><input max="100" min="0.00" name="CO"     id="CO"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
@@ -336,10 +335,13 @@
             <p class="fuel-name">Hidrógeno     </p><p class="fuel-formula">H<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="H2"     id="H2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Nitrógeno     </p><p class="fuel-formula">N<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="N2"     id="N2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
+            <p class="fuel-name">Oxígeno       </p><p class="fuel-formula">O<sub>2</sub>              </p> <p class="fuel-input"><input max="90" min="0.00" name="O2"     id="O2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Dióxido de Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="100" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
+            <p class="fuel-name">Nitrógeno     </p><p class="fuel-formula">N<sub>2</sub>              </p> <p class="fuel-input"><input max="90" min="0.00" name="N2"     id="N2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
+          </div>
+          <div class="fuel-compound">
+            <p class="fuel-name">Dióxido de Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="90" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
         </div>
         <div class="form-div comp">

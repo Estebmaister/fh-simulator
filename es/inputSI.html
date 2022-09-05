@@ -52,8 +52,9 @@
     <section id="data-sect">
       <h1>Simulador de hornos de proceso de tiro natural</h1>
       <h4>(Diseñado para la instrucción de ingenieros y operadores)</h4>
+      <h5>Modo Comparativo</h5>
       <p class="side-margins">
-        Este página permite comparar el desempeño de un horno de procesos de tiro natural bajo dos
+        Esta página permite comparar el desempeño de un horno de procesos de tiro natural bajo dos
         condiciones operacionales diferentes. Puede entonces: <strong>a)</strong> mostrar un resumen de las variables
         resultantes del cálculo del simulador de hornos de proceso para un Caso <strong>Base</strong> definido mediante
         el ingreso de las condiciones de proceso y de combustión, los factores de ensuciamiento y la
@@ -61,6 +62,7 @@
         modificación de algunas o todas las variables anteriores (Caso <strong>Modificado</strong>).
         <br> (Cada vez que se pulse el botón de calcular se actualizará el estado del caso seleccionado)
       </p>
+      <h5>Modo Ampliado</h5>
       <p class="side-margins">
         Para observar los resultados ampliados del simulador bajo una condición operacional específica deberá hacer clic en la opción <strong>+Datos</strong>, ubicada en el menú superior e introducir los datos correspondientes a la condición.
       </p>
@@ -128,9 +130,7 @@
             </div>
           </div>
           <div id="alert-div">
-            <p class="alert">
-              El calor absorbido del horno es <strong><span id="alert-duty">1.XX</span></strong> veces el valor de diseño.
-            </p>
+            <p class="alert" id="alert-duty"></p>
           </div>
           <div class="form-div">
             <p class="full-width"><strong>Factores de Ensuciamiento</strong></p>
@@ -238,10 +238,10 @@
             <p class="fuel-name">Hidrógeno     </p><p class="fuel-formula">H<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="H2"     id="H2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Nitrógeno     </p><p class="fuel-formula">N<sub>2</sub>              </p> <p class="fuel-input"><input max="100" min="0.00" name="N2"     id="N2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
+            <p class="fuel-name">Nitrógeno     </p><p class="fuel-formula">N<sub>2</sub>              </p> <p class="fuel-input"><input max="90" min="0.00" name="N2"     id="N2"     placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
           <div class="fuel-compound">
-            <p class="fuel-name">Dióxido de Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="100" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
+            <p class="fuel-name">Dióxido de Carbono </p><p class="fuel-formula">CO<sub>2</sub>           </p> <p class="fuel-input"><input max="90" min="0.00" name="CO2"    id="CO2"    placeholder="0.00" type="number" lang="en" class="inp" step="0.0001"></p>
           </div>
 
         </div>
