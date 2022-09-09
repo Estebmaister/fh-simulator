@@ -442,7 +442,7 @@ input, select {
   padding-left: .7rem;
   padding-right: .2rem;
 }
-input[disabled], select[disabled] {
+input[disabled], select[disabled], input[readonly], select[readonly] {
   background-color: var(--light-color, white);
   font-weight: 500;
 }
