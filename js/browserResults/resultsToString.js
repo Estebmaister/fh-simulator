@@ -289,7 +289,7 @@ Datos de entrada
     0
   )}
 
-  Calor específico (Cp) residuo: ${result_obj.debug_data.cpFluidTb}
+  Calor específico, Cp(Tb) residuo: ${result_obj.debug_data.cpFluidTb}
 
   Gravedad específica (residuo): ${result_obj.debug_data.spGrav}
   Flujo másico (residuo):        ${unit.mass_flow(
@@ -364,8 +364,8 @@ Moles de gases de combustión por mol de combustible
   Peso molecular (combustible): ${unit["mass/mol"](result_obj.flows["fuel_MW"])}
   Peso molecular (gases):       ${result_obj.flows["flue_MW"]}
 
-  Calor específico (Cp) combustible: ${result_obj.flows["Cp_fuel"]}
-  Calor específico (Cp) gases:       ${result_obj.flows["Cp_flue"]}
+  Calor específico, Cp(T_comb) combustible: ${result_obj.flows["Cp_fuel"]}
+  Calor específico, Cp(T_comb) gases:       ${result_obj.flows["Cp_flue"]}
 `;
   } else {
     outputString = `
@@ -401,7 +401,7 @@ Input Data
     0
   )}
 
-  Process fluid Sp. Heat, Cp: ${result_obj.debug_data.cpFluidTb}
+  Process fluid Sp. Heat, Cp(Tb): ${result_obj.debug_data.cpFluidTb}
 
   Process fluid Sp Grav:   ${result_obj.debug_data.spGrav}
   Process fluid Mass Flow: ${unit.mass_flow(result_obj.rad_result.m_fluid, 1)}
@@ -471,12 +471,12 @@ Flue gas moles and components (per mol of fuel)
   Combustion Air Mass Flow: ${unit.mass_flow(result_obj.rad_result.m_air, 1)}
 
   Fuel MW:             ${unit["mass/mol"](result_obj.flows["fuel_MW"])}
-  Fuel Sp. Heat, Cp:   ${result_obj.flows["Cp_fuel"]}
+  Fuel Sp. Heat, Cp(Tf):   ${result_obj.flows["Cp_fuel"]}
   Fuel Net Calorific Value, NCV:   ${result_obj.flows["NCV"]}
   Fuel Gross Calorific Value, GCV: ${result_obj.flows["GCV"]}
 
   Flue MW:             ${result_obj.flows["flue_MW"]}
-  Flue Sp. Heat, Cp:   ${result_obj.flows["Cp_flue"]}
+  Flue Sp. Heat, Cp(Tf):   ${result_obj.flows["Cp_flue"]}
 `;
   }
   return outputString;
@@ -685,7 +685,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">Calor específico (Cp), ${unit.cp(0, 0, 0, true)}</td>
+    <td class="tg-simple">Calor específico Cp(T comb), ${unit.cp(0, 0, 0, true)}</td>
     <td class="tg-simple">${unit.cp(baseResult.flows.Cp_fuel_val, 3, true)}</td>
     <td class="tg-simple">${
       validMod ? unit.cp(modResult.flows.Cp_fuel_val, 3, true) : ""
