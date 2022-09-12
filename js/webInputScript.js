@@ -162,11 +162,14 @@ let BDPtoMass = BPDtolb_h;
 
 const warnings = {
   normal: (d) => `El calor absorbido ("duty") es <strong>${d}</strong> veces el valor de diseño.`,
-  design: (d) => `El calor absorbido ("duty") es igual al valor de diseño.`,
+  design: () => `El calor absorbido ("duty") es igual al valor de diseño.`,
   
   //Si el calor absorbido fuese superior a 23 MW (o 78,79 MMBtu/h).
   above: (d) => `El calor absorbido ("duty") es <strong>${d}</strong> veces superior al diseño. ` +
     `Sostener esta condición operacional requiere atención especial.`,
+
+  extreme: (d) => `El calor absorbido ("duty") es <strong>${d}</strong> veces superior al diseño. ` +
+    `Sostener esta condición operacional perjudicaría la integridad mecánica del horno.`,
 
   //Si el calor absorbido fuese inferior a 10,45 MW (o 35.8 MMBtu/h)
   down: () => `El calor absorbido ("duty") es inferior al mínimo operacional ("turndown"). ` +
@@ -188,6 +191,10 @@ const updateDuty = () => {
   } else if (1.01 > dutyDifference && 0.99 < dutyDifference) {
     alertDuty.className = '';
     alertDuty.innerHTML = warnings.design(dutyDifference);
+    alertDiv.className = '';
+  } else if (1.2 <= dutyDifference) {
+    alertDuty.innerHTML = warnings.extreme(dutyDifference);
+    alertDuty.className = 'alert';
     alertDiv.className = '';
   } else if (1.01 <= dutyDifference) {
     alertDuty.innerHTML = warnings.above(dutyDifference);

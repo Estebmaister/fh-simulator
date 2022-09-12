@@ -73,6 +73,11 @@ const graphicData = ( comb, fuel, opt ) => {
 
       // --- Input vars
       m_fluid:    unitConv.lb_htoBPD(unitConv.kgtolb(runResult.rad_result.m_fluid))*1e-3,
+      m_fluid_si: unitConv.BarrelsTom3(
+          unitConv.lb_htoBPD(
+            unitConv.kgtolb(runResult.rad_result.m_fluid)
+          )*1e-3
+        ),
       t_out: unitConv.KtoF(runResult.rad_result.t_out),
       t_out_si: unitConv.KtoC(runResult.rad_result.t_out),
       

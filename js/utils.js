@@ -132,6 +132,7 @@ const unitConv = {
   kgtolb: (n=1) => n*2.20462,
   lbtokg: (n=1) => n/2.20462,
   m3ToBarrels: (n=1) => n/(0.158987295),
+  BarrelsTom3: (n=1) => n*(0.158987295),
   BPDtolb_h:(n=1,spG=spGrav) => n*barrelsToft3*ft3Tolb/24*spG,
   lb_htoBPD:(n=1,spG=spGrav) => n/barrelsToft3/ft3Tolb*24/spG,
 
