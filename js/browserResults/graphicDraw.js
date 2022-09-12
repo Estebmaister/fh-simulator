@@ -89,7 +89,12 @@ function innerDraw(
       xTitle = opts.lang == "es" ? 
         'Flujo de Residuo' : 
         'Residue Flow';
-      xAxisLabel = `${xTitle} [10³-BPD]`;
+      if (opts.unitSystem.toLowerCase() == "si") {
+        xValue = d => d[opts.graphVar + "_si"];
+        xAxisLabel = `${xTitle} [10³-m3/d]`;
+      } else {
+        xAxisLabel = `${xTitle} [10³-BPD]`;
+      }
       break;
     default:
       xTitle = opts.lang == "es" ? 
