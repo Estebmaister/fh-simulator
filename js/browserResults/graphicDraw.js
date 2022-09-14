@@ -64,7 +64,7 @@ function innerDraw(
 
   // const xAxisFontSize = innerWidth < 700 ? "1.5em" : "2.5em";
   const xAxisTickSize = innerWidth < 900 ? "0.9em" : "1.5em";
-  const yAxisFontSize = innerWidth < 900 ? innerHeight *.055 : innerHeight *.06;
+  const yAxisFontSize = innerWidth < 900 ? innerHeight *.09 : innerHeight *.1;
   const xAxisFontSize = yAxisFontSize;
   const yAxisTickSize = innerWidth < 900 ? "1em" : "1.2em";
   const titleFontSize = innerWidth < 1300 ? "2em" : innerWidth *.03;
@@ -76,14 +76,15 @@ function innerDraw(
       xTitle = opts.lang == "es" ? 
         'Humedad Relativa' :
         'Humidity';
-      xAxisLabel = `${xTitle} [%]`;
+      // xAxisLabel = `${xTitle} [%]`;
+      xAxisLabel = `[%]`;
       xTitle += ` @ ${initSystem(opts.unitSystem).tempC(opts.tAir,0)} (Temp. Amb.)`
       break;
     case 'air_excess':
       xTitle = opts.lang == "es" ? 
         'Exceso de Aire' :
         'Air Excess';
-      xAxisLabel = `${xTitle} [%]`;
+      xAxisLabel = `[%]`;
       break;
     case 'm_fluid':
       xTitle = opts.lang == "es" ? 
@@ -91,9 +92,9 @@ function innerDraw(
         'Residue Flow';
       if (opts.unitSystem.toLowerCase() == "si") {
         xValue = d => d[opts.graphVar + "_si"];
-        xAxisLabel = `${xTitle} [10³-m3/d]`;
+        xAxisLabel = `[10³-m3/d]`;
       } else {
-        xAxisLabel = `${xTitle} [10³-BPD]`;
+        xAxisLabel = `[10³-BPD]`;
       }
       break;
     default:
@@ -102,9 +103,9 @@ function innerDraw(
         'Residue Outlet Temperature';
       if (opts.unitSystem.toLowerCase() == "si") {
         xValue = d => d[opts.graphVar + "_si"];
-        xAxisLabel = 'Temp [C]';
+        xAxisLabel = '[C]';
       } else {
-        xAxisLabel = 'Temp [F]';
+        xAxisLabel = '[F]';
       }
       break;
   }
@@ -119,8 +120,8 @@ function innerDraw(
         'Emisiones de CO2' :
         'CO2 Emissions';
       yAxisLabel = opts.lang == "es" ? 
-        `${yTitle} [t/año]` :
-        `${yTitle} [t/year]`;
+        `[t/año]` :
+        `[t/year]`;
       break;
     case 'm_fuel':
       yTitle = opts.lang == "es" ? 
@@ -128,16 +129,16 @@ function innerDraw(
         'Fuel Mass Flow';
       if (opts.unitSystem.toLowerCase() == "si") {
         yVar += "_si"
-        yAxisLabel = `${yTitle} [kg/h]`;
+        yAxisLabel = `[kg/h]`;
       } else {
-        yAxisLabel = `${yTitle} [lb/h]`;
+        yAxisLabel = `[lb/h]`;
       }
       break;
     case 'efficiency':
       yTitle = opts.lang == "es" ? 
         'Eficiencia Térmica' :
         'Thermal Efficiency';
-      yAxisLabel = `${yTitle} [%]`;
+      yAxisLabel = `[%]`;
       yTitle += " (@ NHV)"
       break;
     case 'cnv_tg_out':
@@ -146,9 +147,9 @@ function innerDraw(
         'Stack Temperature';
       if (opts.unitSystem.toLowerCase() == "si") {
         yVar += "_si"
-        yAxisLabel = `${yTitle} [C]`;
+        yAxisLabel = `[C]`;
       } else {
-        yAxisLabel = `${yTitle} [F]`;
+        yAxisLabel = `[F]`;
       }
       break;
     case 'rad_tg_out':
@@ -157,16 +158,16 @@ function innerDraw(
         'Radiant Flue Temperature';
       if (opts.unitSystem.toLowerCase() == "si") {
         yVar += "_si"
-        yAxisLabel = `${yTitle} [C]`;
+        yAxisLabel = `[C]`;
       } else {
-        yAxisLabel = `${yTitle} [F]`;
+        yAxisLabel = `[F]`;
       }
       break;
     case 'rad_cnv_dist':
       yTitle = opts.lang == "es" ? 
         'Absorción de Calor (Rad/Conv)' :
         'Heat Absorption (Rad/Conv)';
-      yAxisLabel = `${yTitle}`;
+      yAxisLabel = `(Rad/Conv)`;
       break;
     case 'rad_dist':
       yTitle = opts.lang == "es" ? 
