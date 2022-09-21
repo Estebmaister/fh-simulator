@@ -63,10 +63,10 @@ function innerDraw(
     innerWidth = innerWidth -margin.left;
 
   // const xAxisFontSize = innerWidth < 700 ? "1.5em" : "2.5em";
-  const xAxisTickSize = innerWidth < 900 ? "0.9em" : "1.5em";
-  const yAxisFontSize = innerWidth < 900 ? innerHeight *.09 : innerHeight *.1;
+  const xAxisTickSize = innerWidth < 900 ? "1.15em" : "1.5em";
+  const yAxisFontSize = innerWidth < 900 ? innerHeight *.08 : innerHeight *.1;
   const xAxisFontSize = yAxisFontSize;
-  const yAxisTickSize = innerWidth < 900 ? "1em" : "1.2em";
+  const yAxisTickSize = xAxisTickSize;
   const titleFontSize = innerWidth < 1300 ? "2em" : innerWidth *.03;
 
   let xValue = d => d[opts.graphVar];
@@ -167,7 +167,7 @@ function innerDraw(
       yTitle = opts.lang == "es" ? 
         'Absorción de Calor (Rad/Conv)' :
         'Heat Absorption (Rad/Conv)';
-      yAxisLabel = `(Rad/Conv)`;
+      yAxisLabel = `[Adim]`;
       break;
     case 'rad_dist':
       yTitle = opts.lang == "es" ? 
@@ -204,6 +204,7 @@ function innerDraw(
     .tickSize(-innerHeight)
     .tickPadding(15);
   const yAxis = d3.axisLeft(yScale)
+    .ticks(8)
     .tickSize(-innerWidth)
     .tickPadding(10);
   
