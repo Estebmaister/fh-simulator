@@ -289,7 +289,7 @@ Datos de entrada
     0
   )}
 
-  Calor específico, Cp(Tb) residuo: ${result_obj.debug_data.cpFluidTb}
+  Cp (Tb) promedio (residuo): ${result_obj.debug_data.cpFluidTb}
 
   Gravedad específica (residuo): ${result_obj.debug_data.spGrav}
   Flujo másico (residuo):        ${unit.mass_flow(
