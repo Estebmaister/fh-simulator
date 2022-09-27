@@ -51,19 +51,28 @@ const miuOutElementID = "miu_out";
 const spGravElementID = "sp-grav";
 const totalElementID = "total";
 const subDutyElementID = "sub-duty";
+const alertTotalElementID ="alert-total";
 
 const totalElement = document.getElementById(totalElementID);
+const alertTotalElement = document.getElementById(alertTotalElementID);
 // totalRecalculate change the total value for every new entry at the fuel composition
 const totalRecalculate = () => {
   let total = 0;
   dataFormulas.forEach(element => {
-    const inputElement = document.getElementById(element)
+    const inputElement = document.getElementById(element);
     if (inputElement !== null) {
       if (inputElement.value !== "") total += parseFloat(inputElement.value);
     }
   });
   if (totalElement) {
-    totalElement.innerHTML = parseInt(total * 1e4)/1e4
+    totalElement.innerHTML = parseInt(total * 1e4)/1e4;
+  }
+  if (alertTotalElement) {
+    if (Math.abs(total - 100) > 1) {
+      alertTotalElement.innerHTML = warnings.fuel();
+    } else {
+      alertTotalElement.innerHTML = null;
+    }
   }
 };
 
@@ -173,7 +182,11 @@ const warnings = {
 
   //Si el calor absorbido fuese inferior a 10,45 MW (o 35.8 MMBtu/h)
   down: () => `El calor absorbido ("duty") es inferior al mínimo operacional ("turndown"). ` +
-    `Sostener esta condición operacional no es recomendable.`
+    `Sostener esta condición operacional no es recomendable.`,
+
+  //Si la sumatoria del combustible difiere de 100%
+  fuel: () => `La sumatoria de los componentes del combustible es diferente a ~100%. ` +
+    `El simulador hará una normalización de los valores ingresados y puede que esto no sea lo deseado.`
 }
 
 const updateDuty = () => {
