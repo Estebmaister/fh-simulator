@@ -26,17 +26,17 @@ const logByLevel = (...stringsList) => {
     case "DEBUG":
       if (options.verbose) console.debug(JSON.parse(`{"${stringsList[0]}": ${finalText}}`));
       break;
-    case "INFO":
-      console.info( `{ \x1b[32;1m${stringsList[0]}\x1b[0m: "${finalText}"}`);
+    case "INFO": 
+      console.info( `%c${stringsList[0]}`,'color: lime;', `'${finalText}'`,);
       break;
     case "ERROR":
-      console.error(`{ \x1b[31;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
+      console.error(`%c${stringsList[0]}`,'color: tomato;', `'${finalText}'`,);
       break;
     case "WARN":
-      console.warn( `{ \x1b[35;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
+      console.warn( `%c${stringsList[0]}`,'color: magenta;', `'${finalText}'`,);
       break;
     default:
-      console.log(  `{ \x1b[34;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
+      console.log(  `%c${stringsList[0]}`,'color: dodgerblue;', `'${finalText}'`,);
       break;
   }
 };
