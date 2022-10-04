@@ -1,22 +1,3 @@
-/******************************************************************
- * Exported functions from this file
- ******************************************************************
- * @newtonRaphson (f, fp, x0, options, name, noLog)
- * @version  1.00
- * @param   {f function} valid function to find the zero.
- * @param   {fp function} optional function derivate.
- * @param   {x0 number} valid number seed.
- * @param   {options object} valid options object.
- * @return  {number or false} a number is the iterations reach the result, 
- *          false if not.
- * //TODO: No check is made for NaN or undefined input numbers.
- * 
- * @logger  {info, warn, error, debug, default}
- * @param   {argument} optional string or object to print.
- * @return  {null} prints to the console.
- *
- *****************************************************************/
-
 const logByLevel = (...stringsList) => {
   let finalText = "" + stringsList[1][0]
   for (let i = 1; i < stringsList[1].length; i++) {
@@ -26,17 +7,17 @@ const logByLevel = (...stringsList) => {
     case "DEBUG":
       if (options.verbose) console.debug(JSON.parse(`{"${stringsList[0]}": ${finalText}}`));
       break;
-    case "INFO":
-      console.info( `{ \x1b[32;1m${stringsList[0]}\x1b[0m: "${finalText}"}`);
+    case "INFO": 
+      console.info( `%c${stringsList[0]}`,'color: lime;', `'${finalText}'`,);
       break;
     case "ERROR":
-      console.error(`{ \x1b[31;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
+      console.error(`%c${stringsList[0]}`,'color: tomato;', `'${finalText}'`,);
       break;
     case "WARN":
-      console.warn( `{ \x1b[35;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
+      console.warn( `%c${stringsList[0]}`,'color: magenta;', `'${finalText}'`,);
       break;
     default:
-      console.log(  `{ \x1b[34;1m${stringsList[0]}\x1b[0m: '${finalText}'}`);
+      console.log(  `%c${stringsList[0]}`,'color: dodgerblue;', `'${finalText}'`,);
       break;
   }
 };

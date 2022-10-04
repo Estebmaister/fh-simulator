@@ -1,4 +1,4 @@
-const {newtonRaphson, logger, LMTD, round, unitConv} = require('../utils');
+const {logger, LMTD, round} = require('../utils');
 
 const convSection = (params, noLog) => {
   let
