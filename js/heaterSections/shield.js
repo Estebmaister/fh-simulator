@@ -1,18 +1,4 @@
-/******************************************************************
- * Exported functions from this file
- ******************************************************************
- * @shieldSection (params)
- * @version  1.00
- * @param   {params object} valid params object.
- * @return  {rad_result} an object with all the section results
- * 
- * Q_fluid = m_fluid * Cp_fluid * (t_out - t_in) = Q_rad_sh + Q_conv
- * Q_fluid = Q_R
- * 
- * Q_conv = h_conv * At * ( Tb(tg_in, tg_out) - Tw(t_in, t_out) )
- * Q_conv = m_flue * Cp_flue * (tg_in - tg_out) = Q_flue
- *****************************************************************/
-const {newtonRaphson, logger, LMTD, round, unitConv} = require('../utils');
+const {newtonRaphson, logger, LMTD, round} = require('../utils');
 
 const shieldSection = (params, noLog) => {
   let // Temperatures declaration
@@ -85,7 +71,7 @@ const shieldSection = (params, noLog) => {
     R_sum = (tG_out, tG_in, tB, tW) => R_ext(tG_out, tG_in) + R_tube(tW) + R_int(tB,tW),
     Uo  = (tG_out, tG_in, tB, tW) => 1 / R_sum(tG_out, tG_in, tB, tW);
   
-  const Q_rad = params.q_rad_sh;            // (kJ/h) Q_rad = σ*(α*Acp)*F*(Tg**4 - Tw**4)
+  const Q_rad = params.q_rad_sh;  // (kJ/h) Q_rad = sigma*(alpha*Acp)*F*(Tg**4 - Tw**4)
   /** Q_conv = Uo . Ao . LMTD */
   const Q_conv = (tIn, tG_in, tG_out, tB, tW) => Uo(tG_out, tG_in, tB, tW)*At*LMTD(tIn, t_out, tG_in, tG_out)
   /** Q_R = Q_conv + Q_rad */

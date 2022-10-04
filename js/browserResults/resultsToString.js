@@ -685,7 +685,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">Calor específico Cp(T comb), ${unit.cp(0, 0, 0, true)}</td>
+    <td class="tg-simple">Calor específico Cp (T comb), ${unit.cp(0, 0, 0, true)}</td>
     <td class="tg-simple">${unit.cp(baseResult.flows.Cp_fuel_val, 3, true)}</td>
     <td class="tg-simple">${
       validMod ? unit.cp(modResult.flows.Cp_fuel_val, 3, true) : ""
@@ -731,44 +731,28 @@ const stringCompactResult = (
   </tr>
   <tr>
     <td class="tg-simple">· Residuo atmosférico</td>
-    <td class="tg-simple">${unit.mass_flow(
-      baseResult.rad_result.m_fluid,
-      1,
-      true
-    )}</td>
+    <td class="tg-simple">${unit.mass_flow(baseResult.rad_result.m_fluid,1,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.mass_flow(modResult.rad_result.m_fluid, 1, true) : ""
     }</td>
   </tr>
   <tr>
     <td class="tg-simple">· Combustible</td>
-    <td class="tg-simple">${unit.mass_flow(
-      baseResult.rad_result.m_fuel,
-      2,
-      true
-    )}</td>
+    <td class="tg-simple">${unit.mass_flow(baseResult.rad_result.m_fuel,2,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.mass_flow(modResult.rad_result.m_fuel, 2, true) : ""
     }</td>
   </tr>
   <tr>
     <td class="tg-simple">· Aire</td>
-    <td class="tg-simple">${unit.mass_flow(
-      baseResult.rad_result.m_air,
-      2,
-      true
-    )}</td>
+    <td class="tg-simple">${unit.mass_flow(baseResult.rad_result.m_air,2,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.mass_flow(modResult.rad_result.m_air, 2, true) : ""
     }</td>
   </tr>
   <tr>
     <td class="tg-simple">· Gases de combustión</td>
-    <td class="tg-simple">${unit.mass_flow(
-      baseResult.rad_result.m_flue,
-      2,
-      true
-    )}</td>
+    <td class="tg-simple">${unit.mass_flow(baseResult.rad_result.m_flue,2,true)}</td>
     <td class="tg-simple">${
       validMod ? unit.mass_flow(modResult.rad_result.m_flue, 2, true) : ""
     }</td>

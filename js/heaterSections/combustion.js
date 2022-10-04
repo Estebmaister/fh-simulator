@@ -1,27 +1,6 @@
-/******************************************************************
- * Exported functions from this file
- ******************************************************************
- * @combSection fuels, options, humidity, airExcess
- * @version  1.01
- * @param   {fuels object} valid i.e. {'CH4': 1}.
- * @return  {result object} flows, products, debug_data
- * 
- * @author  Esteban Camargo
- * @date    17 Jul 2021
- * @call    from the principal file
- * @callParams airExcess, fuels, params
- *
- *****************************************************************/
-const {
-  newtonRaphson,
-  options,
-  logger,
-  round,
-  roundDict,
-  initSystem,
-  normalize,
-  flueViscosity,
-  flueThermalCond
+const { newtonRaphson, options, logger,
+  round, roundDict, initSystem,
+  normalize, flueViscosity, flueThermalCond
 } = require('../utils');
 const data = require('../../data/data.json');
 const dryAirN2Percentage = 79.05;
@@ -33,7 +12,6 @@ const dryAir = {
   H2O: 0
 };
 
-//[ ]: expand the use of the error in result dictionary or delete it
 /** Check if the percentages of the fuels sums 100%.
  * In case of check fail an error will be attached to the result.
 */
@@ -176,7 +154,7 @@ const deltaH = (compound, t) => {
 /** (kJ/kmol), Enthalpy of combustion for a certain compound 
   * returns a function if no temp is passed */
 const combustionH = (compound, t, tIni, liquidWater = false) => {
-  // hrp = HP − HR // H = H0 + deltaH  // H0 = n(hf)
+  // hrp = HP - HR // H = H0 + deltaH  // H0 = n(hf)
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
 
   const 
@@ -242,15 +220,6 @@ const adFlame = (normalFuels, products, tIni, o2required) => {
     )(tIni);
     i++;
   }
-
-  // logger.debug(`
-  // products: ${JSON.stringify(products)}
-  // t_amb: ${options.tempAmbRef}
-  // t_ini: ${tIni}
-  // H2O  : ${products.H2O*h2o_H(tIni)}
-  // H2O_f: ${h2o_H(tIni)}
-  // rEntal:${rEnthalpy.reduce((acc, value)=> acc + value)}
-  // `)
   
   // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
   return (t) => pEnthalpy(t) - rEnthalpy.reduce((acc, value)=> acc + value);
@@ -419,18 +388,6 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   if (debug_data.err == "") delete debug_data.err;
   return {flows, products, debug_data};
 };
-
-// Testing logs
-// logger.info( `Cp_dry_${data[33].Substance} Cp0(kJ/kmol-K): `+
-//     `${Cp0(data[33], true)( (options.tAmb + 15+273.15)*0.5 )}`)
-// logger.info(`H2O-mol per O2-mol in air ${params.humidity}% RH): `+
-//   `${moistAirWeightRatio(params.t_amb, params.humidity)}`)
-// logger.default(combustionH(data[7]).toString())
-// logger.default(deltaH(data[7])(options.tempAmbRef))
-// logger.default(combustionH(data[7],500,true) / data[7].MW)
-// logger.default(combustionH(data[7],500) / data[7].MW)
-// logger.default(data[7].Substance, " h0: ", data[7].h0)
-
 
 module.exports = {
   combSection

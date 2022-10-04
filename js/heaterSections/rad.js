@@ -107,7 +107,7 @@ const radSection = (params, noLog) => {
     hi = (tB,tW = tB) => .023 *(kw_fluid(tB) /Di) *reynolds(tB)**.8 *
       prandtl(tB)**(1/3) *(miu_fluid(tB)/miu_fluid(tW))**.14,
     /** Average tube wall temp (K) */
-    Tw = (tB, tW = tB, dutyRad = duty_rad) => (dutyRad/At) *(Do/Di)* 
+    Tw = (tB, tW = tB, dutyRad = duty_rad) => (dutyRad/At) *(Do/Di)* 
       (Rfi +1/hi(tB,tW) +(Di*Math.log(Do/Di)/(2*kw_tube(tW))) ) +tB;
 
   const // ******* Heat input to the radiant section ********

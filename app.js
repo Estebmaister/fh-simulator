@@ -1,29 +1,6 @@
-/******************************************************************
- * Exported functions from this file
- ******************************************************************
- * @heaterFunc fuelsObject, options, humidity, airExcess
- * @version  1.00
- * @param   {fuelsObject object} valid i.e. {'CH4': 1}.
- * @return  {result object} flows, products
- * 
- * @author  Esteban Camargo
- * @date    17 Jul 2021
- * @call    node . true true 25 70 80 1e5
- * @callParams verbose, check for changes in csv, t_amb, humidity, air_excess, p_amb
- * 
- * Note: No check is made for NaN or undefined input numbers.
- *
- *****************************************************************/
-const {
-  round,
-  logger, 
-  options, 
-  unitConv, 
-  initSystem,
-  linearApprox, 
-  newtonRaphson, 
-  viscosityApprox,
-  kw_tubes_A312_TP321
+const { round, logger, options, unitConv, 
+  initSystem, linearApprox, newtonRaphson, 
+  viscosityApprox, kw_tubes_A312_TP321
 } = require('./js/utils');
 const data = require('./data/data.json');
 const {radSection} = require('./js/heaterSections/rad');
@@ -84,8 +61,6 @@ const createParams = (opts) => {
       x1: t_in,  y1: kw_fluid_in,
       x2: t_out, y2: kw_fluid_out
     }),                     // (kJ/h-m-C)
-
-    // m_fuel: 100,         // (kg/h)
     
     /** Mechanic variables for heater */
     Material: 'A-312 TP321',
@@ -169,7 +144,6 @@ const externalCycle = (params) => {
       shld: shieldSection(params, noLog),
       conv: convSection(  params, noLog)
     };
-    //HACK: if (int_rlt.conv.tg_out <= int_rlt.conv.t_in) int_rlt.conv.Q_fluid*=2;
     const duty_calc = Math.abs(int_rlt.rad.Q_fluid) + 
     Math.abs(int_rlt.shld.Q_fluid) + Math.abs(int_rlt.conv.Q_fluid);
 
