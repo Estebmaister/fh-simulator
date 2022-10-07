@@ -307,7 +307,7 @@ Datos de entrada
   )}
 
   Eficiencia térmica (NHV): ${round(result_obj.rad_result.eff_thermal_val, 2)}%
-  Eficiencia térmica (GCV): ${round(result_obj.rad_result.eff_gcv_val, 2)}%
+  Eficiencia térmica (GHV): ${round(result_obj.rad_result.eff_gcv_val, 2)}%
 
   Emisiones de CO2: ${round(
     ((result_obj.products["CO2"] * 44.01) / result_obj.flows["fuel_MW"]) *
@@ -417,7 +417,7 @@ Input Data
     result_obj.rad_result.eff_thermal_val,
     2
   )}%
-  Heater Thermal Efficiency (GCV): ${round(
+  Heater Thermal Efficiency (GHV): ${round(
     result_obj.rad_result.eff_gcv_val,
     2
   )}%
@@ -507,24 +507,14 @@ const stringCompactResult = (
     <td class="tg-simple" colspan="3">Residuo atmosférico</td>
   </tr>
   <tr>
-    <td class="tg-simple">▪ Flujo volumétrico, ${unit.barrel_flowC(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">▪ Flujo volumétrico, ${unit.barrel_flowC(0,0,0,true)}</td>
     <td class="tg-simple">${unit.barrel_flowC(opt.mFluid, 0, true)}</td>
     <td class="tg-simple">${
       validMod ? unit.barrel_flowC(modOpt.mFluid, 0, true) : ""
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">▪ Temperatura de entrada, ${unit.tempC(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">▪ Temperatura de entrada, ${unit.tempC(0,0,0,true)}</td>
     <td class="tg-simple">${unit.tempC(
       baseResult.conv_result.t_in_given,
       0,
@@ -535,12 +525,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">▪ Temperatura de salida, ${unit.tempC(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">▪ Temperatura de salida, ${unit.tempC(0,0,0,true)}</td>
     <td class="tg-simple">${unit.tempC(
       baseResult.rad_result.t_out,
       0,
@@ -556,12 +541,7 @@ const stringCompactResult = (
     <td class="tg-simple">${validMod ? modResult.debug_data.spGrav : ""}</td>
   </tr>
   <tr>
-    <td class="tg-simple">▪ Calor absorbido total, ${unit.heat_flow(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">▪ Calor absorbido total, ${unit.heat_flow(0,0,0,true)}</td>
     <td class="tg-simple">${unit.heat_flow(
       baseResult.rad_result.duty_total,
       3,
@@ -577,12 +557,7 @@ const stringCompactResult = (
     <td class="tg-simple"></td>
   </tr>
   <tr>
-    <td class="tg-simple">· Rfi (interno) radiante, ${unit.fouling_factor(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">· Rfi (interno) radiante, ${unit.fouling_factor(0,0,0,true)}</td>
     <td class="tg-simple">${unit.fouling_factor(
       baseResult.rad_result.rfi,
       3,
@@ -593,12 +568,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">· Rfi interno escudo/convectivo, ${unit.fouling_factor(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">· Rfi interno escudo/convectivo, ${unit.fouling_factor(0,0,0,true)}</td>
     <td class="tg-simple">${unit.fouling_factor(
       baseResult.conv_result.rfi,
       3,
@@ -609,12 +579,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">· Rfo externo escudo/convectivo, ${unit.fouling_factor(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">· Rfo externo escudo/convectivo, ${unit.fouling_factor(0,0,0,true)}</td>
     <td class="tg-simple">${unit.fouling_factor(
       baseResult.conv_result.rfo,
       3,
@@ -642,12 +607,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">Temperatura del aire de combustión, ${unit.tempC(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">Temperatura del aire de combustión, ${unit.tempC(0,0,0,true)}</td>
     <td class="tg-simple">${unit.tempC(opt.tAir, 0, true)}</td>
     <td class="tg-simple">${
       validMod ? unit.tempC(modOpt.tAir, 0, true) : ""
@@ -669,12 +629,7 @@ const stringCompactResult = (
     <td class="tg-mqa1" colspan="3">Características del Combustible</td>
   </tr>
   <tr>
-    <td class="tg-simple">Peso molecular, ${unit["mass/mol"](
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">Peso molecular, ${unit["mass/mol"](0,0,0,true)}</td>
     <td class="tg-simple">${unit["mass/mol"](
       baseResult.flows.fuel_MW,
       3,
@@ -692,12 +647,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">Poder Calorífico Neto (NCV), ${unit["energy/mass"](
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">Poder Calorífico Neto (NCV), ${unit["energy/mass"](0,0,0,true)}</td>
     <td class="tg-simple">${unit["energy/mass"](
       baseResult.flows.NCV_val,
       0,
@@ -708,12 +658,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">Poder Calorífico Bruto (GCV), ${unit["energy/mass"](
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">Poder Calorífico Bruto (GCV), ${unit["energy/mass"](0,0,0,true)}</td>
     <td class="tg-simple">${unit["energy/mass"](
       baseResult.flows.GCV_val,
       0,
@@ -759,12 +704,7 @@ const stringCompactResult = (
   </tr>
   <tr><td colspan="3"></td></tr>
   <tr>
-    <td class="tg-simple">▪ Humedad del aire, ${unit.moist(
-      0,
-      0,
-      0,
-      true
-    )} aire seco</td>
+    <td class="tg-simple">▪ Humedad del aire, ${unit.moist(0,0,0,true)} aire seco</td>
     <td class="tg-simple">${unit.moist(
       baseResult.flows.moisture_val,
       3,
@@ -790,12 +730,7 @@ const stringCompactResult = (
   </tr>
   <tr><td colspan="3"></td></tr>
   <tr>
-    <td class="tg-simple">▪ Suministro Térmico Combustible, ${unit.heat_flow(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">▪ Suministro Térmico Combustible, ${unit.heat_flow(0,0,0,true)}</td>
     <td class="tg-simple">${unit.heat_flow(
       baseResult.rad_result.Q_rls,
       3,
@@ -806,12 +741,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   <tr>
-    <td class="tg-simple">▪ Suministro Térmico Total, ${unit.heat_flow(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">▪ Suministro Térmico Total, ${unit.heat_flow(0,0,0,true)}</td>
     <td class="tg-simple">${unit.heat_flow(
       baseResult.rad_result.Q_in,
       3,
@@ -823,12 +753,7 @@ const stringCompactResult = (
   </tr>
   <tr><td colspan="3"></td></tr>
   <tr>
-    <td class="tg-simple">▪ Calor Absorbido, ${unit.heat_flow(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">▪ Calor Absorbido, ${unit.heat_flow(0,0,0,true)}</td>
     <td class="tg-simple"></td>
     <td class="tg-simple"></td>
   </tr>
@@ -974,12 +899,7 @@ const stringCompactResult = (
   </tr>
   <tr><td colspan="3"></td></tr>
   <tr>
-    <td class="tg-simple">▪ Pérdidas de calor, ${unit.heat_flow(
-      0,
-      0,
-      0,
-      true
-    )}</td>
+    <td class="tg-simple">▪ Pérdidas de calor, ${unit.heat_flow(0,0,0,true)}</td>
     <td class="tg-simple"></td>
     <td class="tg-simple"></td>
   </tr>

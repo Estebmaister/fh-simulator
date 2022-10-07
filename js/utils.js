@@ -376,7 +376,7 @@ const englishSystem = { //(US Customary)
   power:    (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h", n *3.4121416331),
   moist:    (n,d,nU,oU) => dualSystem(oU,nU,d,"÷10³ lb H2O/lb", n*1e3),
   thermal:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft-°F", unitConv.kJtoBTU(n)/unitConv.KtoR()/unitConv.mtoft()),
-  convect:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft²-°F", unitConv.kJtoBTU(n)/unitConv.KtoR()/(unitConv.mtoft()**2)),
+  convect:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft²-°F", unitConv.kJtoBTU(n)/unitConv.KtoR()/(unitConv.m2toft2())),
   viscosity:(n,d,nU,oU) => dualSystem(oU,nU,d,"cP", n),
   system:   {en: "English", es: "Inglés"}
 };
