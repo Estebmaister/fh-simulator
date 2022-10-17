@@ -36,7 +36,7 @@
     <nav id="navbar">
       <ul id="nav-list">
         <li class="nav-sec">
-          <a class="nav-link" href="./index.html">Instructions</a>
+          <a class="nav-link" href="">Instructions</a>
         </li>
         <li class="nav-sec">
           <a class="nav-link" href="./inputEN.html">Data</a>
@@ -46,21 +46,55 @@
         </li>
       </ul>
     </nav>
-    <!-- <a id="lang" onclick="window.location.href = window.location.href.replace('/es/','/en/')">EN | <span>ES</span></a> -->
+    <a id="lang" href="../es">EN | <span>ES</span></a>
   </header>
   <main>
     <section id="data-sect">
       <h1>Fire heater natural draft simulator</h1>
-      <p>Instructions, uses and limitations.</p>
+      <p>Scope, uses and limitations.</p>
     </section>
     <section class="justify-text vertical-margins side-margins" id="algorithm">
       <h3>Algorithm</h3>
 
-      <p>...</p>
+      <p>As it is conceived, the algorithm of this simulator, elaborated on the basis of a cabin-type natural draft furnace, which originally processes an atmospheric residue and whose heat absorbed in normal operating conditions is 20.9 MW (71.5 MMBtu/h), is capable of performing calculations over a wide range of process conditions.</p>
+      <p>Its versatility is such that if the required properties are introduced, it is also capable of "processing" crude oils, other residues, heating oils, and other non-vaporizing liquid loads. However, by including changes in some variables without considering the operational and/or mechanical limitations of the furnace, the results may not make real sense.</p>
     </section>
     <section class="justify-text vertical-margins side-margins" id="heater">
       <h3>Heater</h3>
-      <p>...</p>
+      <p>Operating conditions</p>
+      <ul>
+        <li>
+          <strong>Design</strong>: 23.0 MW (78.79 MMBtu/h) - Maximum processing capacity.
+        </li>
+        <li>
+          <strong>Normal</strong>: 20.9 MW (71.5 MMBtu/h) [90.75% of Design] - Normal furnace operation.
+        </li>
+        <li>
+          <strong>Turndown</strong>: 10.45 MW (35.77 MBtu/h) [45.4% of Design] - Minimum capacity condition.
+          It is not equivalent to a burner turndown condition since it could be achieved with a number of burners operating normally and other burners simply off.
+        </li>
+      </ul>
+
+      <p>Specific Gravity @ 60°F (15.6°C) [0.84] - 
+        This specific gravity is for an atmospheric residue. If this data is changed, the nature of the process fluid will be modified, which is unusual from an operational perspective.
+      </p>
+    </section>
+    <section class="justify-text vertical-margins side-margins" id="interface">
+
+      <h3>Interface</h3>
+
+      <p>When entering the <strong>DATA</strong> section you can edit the process variables to access the detailed calculation of all the variables considered by the simulator and also for the elaboration of a series of graphs with the trends of the most important operational variables.</p>
+
+      <p>To edit the fuel, you must press the "edit" option found on both data entry screens:</p>
+      <img class="instructions" src="../img/fuel_edit_es.png" alt="Reference image fuel edition">
+      
+      <p>Fuel is defined from the molar composition of its individual components. The sum of these components must equal 100%.</p>
+
+      <p>To access the <strong>Graphs</strong> screen and edit the comparison variable, you must press the "variables" option on the +DATA entry screen:</p>
+      <img class="instructions" src="../img/graph_edit_es.png" alt="Graphic editing reference image">
+
+      <p>After editing the options, the graph view is accessed by pressing "Graph"</p>
+      <img class="instructions" src="../img/graph_action_es.png" alt="Graphic action reference image">
     </section>
   </main>
 	<footer>

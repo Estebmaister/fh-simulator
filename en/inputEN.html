@@ -68,14 +68,27 @@
       </p> -->
 
       <hr>
-      <h3>Process conditions</h3>
+      <div class="toggle-inside">
+        <h3>Process conditions</h3>
+        <div id="content-editor" class="toggle-inside">
+          <p></p>
+          <label class="switch" for="full-edit-allow">
+            <input id="full-edit-allow" type="checkbox"/>
+            <div class="slider round"></div>
+          </label>
+          <p>Enable fields</p>
+        </div>
+      </div>
       <div class="form-div">
         <p id="sub-duty" class="project-info">
           Input flow <input step="1" min="40000" max="150000" name="m_fluid" type="number" value="90000"> BPD 
           <sub><span>~</span> lb/hr</sub>
         </p>
         <p class="project-info">
-          Spec. Grav. SG <input id="sp-grav" step="0.001" min="0.806" max="1.076" name="sp_grav" type="number" value="0.840" disabled> <sub><em>@ 60°F</em></sub>
+          Spec. Grav. SG 
+          <input class="readonly" id="sp-grav" type="number" lang="en" readonly
+          step="0.001" min="0.806" max="1.076" name="sp_grav" value="0.840">
+          <sub><em>@ 60°F</em></sub>
         </p>
         <p class="project-info">
           Heat absorption ("duty"): 
@@ -88,7 +101,7 @@
           <div class="form-div"> 
             <div class="form-block flex-evenly"> 
               <p class="project-info sub-temp">
-                Inlet temp T<sub>in</sub>  <input id="t_in" step="1" min="300" max="694" name="t_in"  type="number" value="678"> °F
+                Inlet temp T<sub>in</sub>  <input id="t_in" step="1" min="400" max="694" name="t_in"  type="number" value="678"> °F
                 <sub><span>~</span> °C</sub> 
               </p>
               <p class="project-info sub-temp">
@@ -98,11 +111,15 @@
             </div>
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Heat capacity Cp<sub>in</sub> <input id="cp_in" step="0.001" min="0" name="cp_in" type="number" value="0.676" readonly> 
+                Heat capacity Cp<sub>in</sub> 
+                <input class="readonly" id="cp_in" readonly type="number" lang="en"
+                  step="0.001" min="0.001" max="1" name="cp_in" value="0.676">
                 <sub>Btu/lb-°F</sub>
               </p>
               <p class="project-info">
-                Heat capacity Cp<sub>out</sub><input id="cp_out"step="0.001"min="0"name="cp_out" type="number" value="0.703" readonly> 
+                Heat capacity Cp<sub>out</sub>
+                <input class="readonly" id="cp_out" readonly type="number" lang="en"
+                  step="0.001" min="0.001" max="1" name="cp_out"value="0.703">
                 <sub>Btu/lb-°F</sub>
               </p>
             </div>
@@ -112,18 +129,26 @@
           <div class="form-div">
             <div class="form-block flex-evenly"> 
               <p class="project-info">
-                Viscosity - μ<sub>in</sub> <input id="miu_in" step="0.01" min="0" name="miu_in" type="number" value="1.45" readonly> cp
+                Viscosity - μ<sub>in</sub> 
+                <input class="readonly" id="miu_in" readonly type="number" lang="en"
+                  step="0.01" min="1.1" max="2.5" name="miu_in" value="1.45"> cp
               <p class="project-info">
-                Viscosity - μ<sub>out</sub><input id="miu_out" step="0.01" min="0" name="miu_out" type="number" value="0.96" readonly> cp
+                Viscosity - μ<sub>out</sub>
+                <input class="readonly" id="miu_out" readonly type="number" lang="en"
+                  step="0.01" min="0.01" max="1.5"name="miu_out" value="0.96"> cp
               </p>
             </div>
             <div class="form-block flex-evenly">
               <p class="project-info">
-                Therm. cond. k<sub>in</sub> <input id="kw_in" step="0.001" min="0" name="kw_in" type="number" value="0.038" readonly>
+                Therm. cond. k<sub>in</sub> 
+                <input class="readonly" id="kw_in" readonly type="number" lang="en"
+                  step="0.001" min="0.038" max="0.1" name="kw_in" value="0.038">
               <sub>Btu/h.ft.°F</sub>
               </p>
               <p class="project-info">
-                Therm. cond k<sub>out</sub> <input id="kw_out" step="0.001" min="0" name="kw_out" type="number" value="0.035" readonly>
+                Therm. cond k<sub>out</sub> 
+                <input class="readonly" id="kw_out" readonly type="number" lang="en"
+                  step="0.001" min="0.001" max="0.1" name="kw_out"  value="0.035">
               <sub>Btu/h.ft.°F</sub>
               </p>
             </div>
@@ -189,7 +214,8 @@
               Relative Humidity RH <input step="0.1" min="0" max="100" name="humidity" type="number" value="50.0"> %
             </p>
             <p class="project-info">
-              Atmospheric Pressure <input step="0.1" min="0.9" max="1.1" name="p_atm" type="number" placeholder="1.0" disabled> 
+              Atmospheric Pressure 
+              <input class="readonly" step="0.1" min="0.9" max="1.1" name="p_atm" type="number" value="1.0" readonly> 
               <sub>atm</sub>
             </p>
             <p class="project-info">

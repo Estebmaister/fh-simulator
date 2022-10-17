@@ -270,12 +270,27 @@ const miu = viscosityApprox({
   t2: tOut.value, v2: miuOut ? +miuOut.value :0
 });
 
+// Allowing to edit all the input fields disabled
+let fullEditAllow = document.getElementById("full-edit-allow");
+if (fullEditAllow) {
+  const elementsToAllow = [...document.getElementsByClassName("readonly")]
+  fullEditAllow.addEventListener('input', () => {
+      if (fullEditAllow.checked) {
+        elementsToAllow.forEach((el) => el.removeAttribute("readonly"))
+      } else {
+        elementsToAllow.forEach((el) => el.setAttribute("readonly",true))
+      }
+    }
+  );
+} else {fullEditAllow = {}}
+
 // -- Updating temp input values to show, from fahrenheit to celsius.
 function updateTemp(_ev) {
   if (subDuty && spanDutyField) updateDuty();
   if (spanDutyField) updateFlow();
   if (this.getElementsByTagName("input") && 
-    this.getElementsByTagName("input")[0]) {
+    this.getElementsByTagName("input")[0] &&
+    fullEditAllow && !fullEditAllow.checked ) {
     let tInput = this.getElementsByTagName("input")[0];
     if (tInput.id.includes("in")) {
       if (cpIn) cpIn.value = round(cp(tInput.value),3);
@@ -293,7 +308,8 @@ function updateTemp(_ev) {
   if (inputField == undefined || spanField == undefined) return;
   if (inputField.type == "range") {
     spanField.innerHTML = inputField.value; 
-    if (spanField.innerHTML.length == 1) spanField.innerHTML = "0"+spanField.innerHTML; 
+    if (spanField.innerHTML.length == 1) 
+      spanField.innerHTML = "0"+spanField.innerHTML; 
     return;
   }
   spanField.innerHTML = round((+inputField.value -32) *(5/9), 1);
