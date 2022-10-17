@@ -32,8 +32,9 @@ const checkFuelData = (fuels, compounds, result = {}) => {
     Object.keys(fuels).length);
   const check1 = badFuels === 0;
   if (!check1) {
-    logger.error(`[some fuels aren't in the database, #badFuels: ${badFuels}],`);
-    result.err += `[some fuels aren't in the database, #badFuels: ${badFuels}],`;
+    logger.error(`fuels not found in the database: ${badFuels}`);
+    result.err += 
+      `[some fuels aren't in the database, #badFuels: ${badFuels}],`;
   }
   return check1;
 };
@@ -56,7 +57,8 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult, noLog) => {
       `${Substance}, no data found"`);
       return 0;
     }
-    if (molResult) return MW*(c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)
+    if (molResult) return MW *(
+      c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3);
     return (c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)
   }
 };
@@ -118,7 +120,8 @@ const pressureH2OinAir = (temperature, relativeHumidity) => {
 /** Temperature should be in K, humidity %[0,100] */
 const moistAirWeightRatio = (temperature, relativeHumidity) => {
   const pw = pressureH2OinAir(temperature, relativeHumidity)
-  // returned value is the weight ratio of water vapour and dry air. (kg-w_vap/kg-dry_a)
+  // returned value is the weight ratio of water vapour and dry air. 
+  // (kg-w_vap/kg-dry_a)
   return data[31].MW * pw / 
   ( MW_multicomp(dryAir) * (options.pAtm - pw ) );
   // a simplification can be: 0.62 * 1e-5 * pw
@@ -354,8 +357,10 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
 
   /** Adding results in parameters to be used in following sections */
 
-  params.m_flue_ratio = totalPerMol * flows.flue_MW/MW_multicomp(normalFuel);  // kg/h
-  params.m_air_ratio  = o2excess / air.O2 * MW_multicomp(air)/MW_multicomp(normalFuel); // kg/h
+  params.m_flue_ratio = totalPerMol * 
+    flows.flue_MW/MW_multicomp(normalFuel);  // kg/h
+  params.m_air_ratio  = o2excess / air.O2 * 
+    MW_multicomp(air)/MW_multicomp(normalFuel); // kg/h
 
   params.Pco2 = products['CO2']/totalPerMol; // fraction
   params.Ph2o = products['H2O']/totalPerMol; // fraction
@@ -371,8 +376,10 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
   flows.Cp_flue  = units.cp(flows.Cp_flue(params.t_air));
   flows.flue_MW  = units["mass/mol"](flows.flue_MW);
 
-  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb)/MW_multicomp(normalFuel); // kJ/kg
-  params.GCV = -ncv(normalFuel, products, compounds, params.t_amb, true)/MW_multicomp(normalFuel); // kJ/kg
+  params.NCV = -ncv(normalFuel, products, compounds, params.t_amb)/
+    MW_multicomp(normalFuel); // kJ/kg
+  params.GCV = -ncv(normalFuel, products, compounds, params.t_amb, true)/
+    MW_multicomp(normalFuel); // kJ/kg
   flows.NCV = units["energy/mass"](params.NCV,0);
   flows.GCV = units["energy/mass"](params.GCV,0);
   flows.NCV_val = params.NCV;
@@ -386,7 +393,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
 
   roundDict(products);
   if (debug_data.err == "") delete debug_data.err;
-  return {flows, products, debug_data};
+  return {flows, products, debug_data, fuel: normalFuel};
 };
 
 module.exports = {

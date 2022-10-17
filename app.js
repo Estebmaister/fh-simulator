@@ -159,10 +159,13 @@ const externalCycle = (params) => {
   if (rad_dist_final >0.1 && rad_dist_final <1) { 
     params.duty_rad_dist = rad_dist_final; 
   } else {
-    logger.error('external cycle broken, error in rad_dist estimation, using: '+
-    params.duty_rad_dist);
+    logger.error(
+      'external cycle broken, error in rad_dist estimation, using: '+
+      params.duty_rad_dist
+    );
   }
-  logger.info(`duty_rad_dist: ${round(100*rad_dist_final,2)}, ext_cycle_reps: ${cycle}`);
+  logger.info(`duty_rad_dist: ${
+    round(100*rad_dist_final,2) }, ext_cycle_reps: ${cycle}`);
 }
 
 const combustionCycle = (params, fuels) => {

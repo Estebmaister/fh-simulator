@@ -19,7 +19,8 @@ const shieldSection = (params, noLog) => {
     Cp_fluid = (tIn,tOut=tIn) => params.Cp_fluid(Tb(tIn, tOut)), // (kJ/kg.K).
     Cp_flue  = (tG,tG_out=tG) => params.Cp_flue(Tb(tG, tG_out)), // (kJ/kg.K).
     kw_fluid = (temp) => params.kw_fluid(temp),// (kJ/h-m-C) fluid thermal cndct.
-    kw_tube  = (temp) => params.kw_tube(temp),// (kJ/h-m-C ->J/s-m-C-3.6) tube thermal cndct.
+    kw_tube  = (temp) => params.kw_tube(temp),
+    // (kJ/h-m-C ->J/s-m-C-3.6) tube thermal cndct.
     kw_flue  = (temp) => params.kw_flue(temp),// (kJ/h-m-C) flue thermal cndct.
     miu_fluid= (temp) => params.miu_fluid(temp),//(cP - g/m-s) fluid Viscosity.
     miu_flue = (temp) => params.miu_flue(temp); //(cP - g/m-s) flue Viscosity.
@@ -33,18 +34,22 @@ const shieldSection = (params, noLog) => {
     Di = params.Do_shld - params.Sch_sh_cnv*2,// (m) int diameter shld sect.
     S_tube = params.Pitch_sh_cnv, // (m) Tube spacing.
 
-    At = N *Math.PI *Do *L,   // (m2) Area of tubes in bank, total outside surface area, m2
+    At = N *Math.PI *Do *L,   
+    // (m2) Area of tubes in bank, total outside surface area, m2
     Ai = Math.PI *(Di**2) /2, // (m2) Inside tube surface area, m2
     An = N/2 *(S_tube -Do)*L, // Free area for flue flow at shld sect
     
     cnv_fact = 3_600 * 1e-3; // (g/s -> kg/h) secondsToHours * 1/k.
 
   const // Process Functions
-    prandtl = (t) => miu_fluid(t)*cnv_fact *Cp_fluid(t)/kw_fluid(t),// (-) miu*Cp/kw.
-    prandtl_flue = (t)=> miu_flue(t)*cnv_fact*Cp_flue(t)/kw_flue(t),// (-) miu_fle*Cp_flue/kw_flue.
+    prandtl = (t) => miu_fluid(t)*cnv_fact *Cp_fluid(t)/kw_fluid(t),
+    // (-) miu*Cp/kw.
+    prandtl_flue = (t)=> miu_flue(t)*cnv_fact*Cp_flue(t)/kw_flue(t),
+    // (-) miu_fle*Cp_flue/kw_flue.
     G = (m_fluid/cnv_fact) /Ai, // Fluid mass flow per area unit inside tubes.
     reynolds = (t) => G * Di/miu_fluid(t), // (-) G*Di/miu.
-    Gn = (m_flue/cnv_fact) /An, // Gn it's the mass speed based on the free area for the gas flow.
+    Gn = (m_flue/cnv_fact) /An, 
+    // Gn it's the mass speed based on the free area for the gas flow.
     reynolds_flue = (t) => Gn * Do/miu_flue(t), // (-) Gn*Do/miu_flue.
       
     /** (kJ/m²h-°C) internal heat transfer coff */
@@ -53,9 +58,11 @@ const shieldSection = (params, noLog) => {
     /** (kJ/m²h-°C) effective radiative coff wall tube */
     hr = (tG_b) => .092 * tG_b - 34,
     /** (kJ/m²h-°C) * film heat transfer coff */
-    hc = (tG_b) => .33 *(kw_flue(tG_b) /Do) *prandtl_flue(tG_b)**(1/3) *reynolds_flue(tG_b)**.6,
+    hc = (tG_b) => .33 *(kw_flue(tG_b) /Do) *prandtl_flue(tG_b)**(1/3) *
+      reynolds_flue(tG_b)**.6,
     /** (kJ/m²h-°C) external heat transfer coff */
-    ho = (tG_out, tG_in = tg_in) => 1/(1/(hc(Tb(tG_out, tG_in)) + hr(Tb(tG_out, tG_in))) +Rfo);
+    ho = (tG_out, tG_in = tg_in) => 1/(1/(hc(Tb(tG_out, tG_in)) + 
+      hr(Tb(tG_out, tG_in))) +Rfo);
   
   const
     duty_sh = (tIn) => m_fluid *Cp_fluid(tIn) *(t_out -tIn),
@@ -68,51 +75,67 @@ const shieldSection = (params, noLog) => {
     R_tube= (tW) => Do * Math.log(Do/Di) / (2*kw_tube(tW)),  // Tube wall
     R_ext = (tG_out, tG_in = tg_in) => 1/ho(tG_out, tG_in),  // Outside
     
-    R_sum = (tG_out, tG_in, tB, tW) => R_ext(tG_out, tG_in) + R_tube(tW) + R_int(tB,tW),
+    R_sum = (tG_out, tG_in, tB, tW) => 
+      R_ext(tG_out, tG_in) + R_tube(tW) + R_int(tB,tW),
     Uo  = (tG_out, tG_in, tB, tW) => 1 / R_sum(tG_out, tG_in, tB, tW);
   
-  const Q_rad = params.q_rad_sh;  // (kJ/h) Q_rad = sigma*(alpha*Acp)*F*(Tg**4 - Tw**4)
+  /** (kJ/h) Q_rad = sigma*(alpha*Acp)*F*(Tg**4 - Tw**4) */
+  const Q_rad = params.q_rad_sh;  
   /** Q_conv = Uo . Ao . LMTD */
-  const Q_conv = (tIn, tG_in, tG_out, tB, tW) => Uo(tG_out, tG_in, tB, tW)*At*LMTD(tIn, t_out, tG_in, tG_out)
+  const Q_conv = (tIn, tG_in, tG_out, tB, tW) => 
+    Uo(tG_out, tG_in, tB, tW)*At*LMTD(tIn, t_out, tG_in, tG_out)
   /** Q_R = Q_conv + Q_rad */
-  const Q_R = (tIn, tG_in, tG_out, tB, tW) => Q_rad + Q_conv(tIn, tG_in, tG_out, tB, tW);
+  const Q_R = (tIn, tG_in, tG_out, tB, tW) => Q_rad + 
+    Q_conv(tIn, tG_in, tG_out, tB, tW);
   /** Q_fluid =  M . Cp . deltaT */
-  const Q_fluid = (tIn, tOut = t_out) => m_fluid * Cp_fluid(tIn, tOut) * (tOut - tIn);
+  const Q_fluid = (tIn, tOut = t_out) => m_fluid * 
+    Cp_fluid(tIn, tOut) * (tOut - tIn);
   /** Q_flue =  M . Cp . deltaT */
-  const Q_flue = (tG_in,tG_out=tg_out) => m_flue * Cp_flue(tG_in, tG_out) * (tG_in - tG_out);
+  const Q_flue = (tG_in,tG_out=tg_out) => m_flue * 
+    Cp_flue(tG_in, tG_out) * (tG_in - tG_out);
   
-  const tg_out_func = (tG_out) => Q_flue(tg_in, tG_out) + Q_rad - Q_fluid(t_in, t_out);
-  const Tin_sh_func = (tIn) => Q_fluid(tIn) - Q_R(tIn, tg_in, tg_out, Tb(tIn), Tw( Tb(tIn),Tw(Tb(tIn)) ));
+  const tg_out_func = (tG_out) => Q_flue(tg_in, tG_out) + 
+    Q_rad - Q_fluid(t_in, t_out);
+  const Tin_sh_func = (tIn) => Q_fluid(tIn) - 
+    Q_R(tIn, tg_in, tg_out, Tb(tIn), Tw( Tb(tIn),Tw(Tb(tIn)) ));
   // -------- 1st estimation of tg_out   #.#.#.#.#
-  tg_out = newtonRaphson(tg_out_func, (tg_in - 100), params.NROptions, "Tg_out_shield-1",noLog);
-  t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-1",noLog);
+  tg_out = newtonRaphson(tg_out_func, 
+    (tg_in - 100), params.NROptions, "Tg_out_shield-1",noLog);
+  t_in_calc = newtonRaphson(Tin_sh_func, 
+    t_in, params.NROptions, "T_in_shield-1",noLog);
 
   let iter = 1;
   const 
     normalized_error = 1e-3, // 0.1%
     normalized_diff = (tG_out) => Math.abs((Q_flue(tg_in, tG_out) -
-      Q_conv(t_in,tg_in,tG_out,Tb(t_in),Tw(Tb(t_in),Tw(Tb(t_in)))) )/ Q_flue(tg_in, tg_out));
+      Q_conv(t_in,tg_in,tG_out,Tb(t_in),Tw(Tb(t_in),Tw(Tb(t_in)))) )/ 
+      Q_flue(tg_in, tg_out));
   while (normalized_diff(tg_out) - normalized_error > 0) {
     if (t_in_calc) { t_in = t_in_calc; } else {
       logger.error("Invalid t_in_calc at shield sect");
       break;
     }
     
-    t_in_calc = newtonRaphson(Tin_sh_func, t_in, params.NROptions, "T_in_shield-2",true);
-    tg_out = newtonRaphson(tg_out_func, (tg_in - 58), params.NROptions, "Tg_out_shield-2",true);
+    t_in_calc = newtonRaphson(Tin_sh_func, 
+      t_in, params.NROptions, "T_in_shield-2",true);
+    tg_out = newtonRaphson(tg_out_func, 
+      (tg_in - 58), params.NROptions, "Tg_out_shield-2",true);
 
     // Forced break of loop
     iter++;
     if (iter > 35) {
-      logger.debug(`"Tin_shield",  "t_in_sh_calc": ${round(t_in_calc)}, "t_in_sh_sup": ${round(t_in)}`);
-      if (!noLog) logger.info(`diff vs error: ${normalized_diff(tg_out)}-${normalized_error}`);
+      logger.debug(`"Tin_shield",  "t_in_sh_calc": ${
+        round(t_in_calc)}, "t_in_sh_sup": ${round(t_in)}`);
+      if (!noLog) logger.info(`diff vs error: ${
+        normalized_diff(tg_out)}-${normalized_error}`);
       logger.error("Max iterations reached for inlet temp calc at shield sect");
       break;
     }
   }
   
-  if (!noLog) logger.default(`SHLD, cycles: ${iter}, T_in_calc: ${params.units.tempC(t_in)}, `+
-    `Tg_out: ${params.units.tempC(tg_out)}`)
+  if (!noLog) logger.default(`SHLD, cycles: ${iter},` +
+    ` T_in_calc: ${params.units.tempC(t_in)},` +
+    ` Tg_out: ${params.units.tempC(tg_out)}`)
 
   params.t_in_sh = t_in;
   params.tg_sh = tg_out;
