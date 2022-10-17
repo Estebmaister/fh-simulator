@@ -482,6 +482,35 @@ Flue gas moles and components (per mol of fuel)
   return outputString;
 };
 
+const tableStr = {
+  row3: (title, base, mod, arg, validMod, mult = 1, rn = 2) => {
+    let basi = isNaN(base[arg]) ? base[arg] : round(base[arg]*mult,rn);
+    if (basi === undefined) basi = 0;
+    let modi = "";
+    if (validMod) modi = isNaN(mod[arg]) ? mod[arg] : round(mod[arg]*mult,rn);
+    if (modi === undefined) modi = 0;
+    return `<tr>
+    <td class="tg-simple">${title}</td>
+    <td class="tg-simple">${basi}</td>
+    <td class="tg-simple">${modi}</td>
+  </tr>`},
+  row3val: (title, baseVal, modVal, validMod) => {
+    let modi = "";
+    if (validMod) modi = modVal;
+    return `<tr>
+    <td class="tg-simple">${title}</td>
+    <td class="tg-simple">${baseVal}</td>
+    <td class="tg-simple">${modi}</td>
+  </tr>`},
+  emptyRow3: `<tr><td colspan="3"></td></tr>`,
+  titleRow3: (title) =>
+    `<tr><td class="tg-mqa1" colspan="3">${title}</td></tr>`,
+  fullRow3: (title) =>
+    `<tr><td colspan="3">${title}</td></tr>`,
+  fullStrongRow3: (title) =>
+    `<tr><td colspan="3"><b>${title}</b></td></tr>`
+}
+
 const stringCompactResult = (
   uSystem,
   baseResult,
@@ -500,12 +529,9 @@ const stringCompactResult = (
   </tr>
 </thead>
 <tbody>
-  <tr>
-    <td class="tg-mqa1" colspan="3">Condiciones de Proceso</td>
-  </tr>
-  <tr>
-    <td class="tg-simple" colspan="3">Residuo atmosférico</td>
-  </tr>
+  ${tableStr.titleRow3("Condiciones de Proceso")}
+  
+  ${tableStr.fullRow3("Residuo atmosférico")}
   <tr>
     <td class="tg-simple">▪ Flujo volumétrico, ${unit.barrel_flowC(0,0,0,true)}</td>
     <td class="tg-simple">${unit.barrel_flowC(opt.mFluid, 0, true)}</td>
@@ -551,11 +577,7 @@ const stringCompactResult = (
       validMod ? unit.heat_flow(modResult.rad_result.duty_total, 3, true) : ""
     }</td>
   </tr>
-  <tr>
-    <td class="tg-simple">▪ Factores de ensuciamiento</td>
-    <td class="tg-simple"></td>
-    <td class="tg-simple"></td>
-  </tr>
+  ${tableStr.fullRow3("▪ Factores de ensuciamiento")}
   <tr>
     <td class="tg-simple">· Rfi (interno) radiante, ${unit.fouling_factor(0,0,0,true)}</td>
     <td class="tg-simple">${unit.fouling_factor(
@@ -589,9 +611,8 @@ const stringCompactResult = (
       validMod ? unit.fouling_factor(modResult.conv_result.rfo, 3, true) : ""
     }</td>
   </tr>
-  <tr>
-    <td class="tg-mqa1" colspan="3">Condiciones de Combustión</td>
-  </tr>
+  
+  ${tableStr.titleRow3("Condiciones de Combustión")}
   <tr>
     <td class="tg-simple">Exceso de Oxígeno, % (BH)</td>
     <td class="tg-simple">${round(baseResult.flows["O2_%"], 2)}</td>
@@ -613,21 +634,37 @@ const stringCompactResult = (
       validMod ? unit.tempC(modOpt.tAir, 0, true) : ""
     }</td>
   </tr>
-  <tr>
-    <td class="tg-simple">Humedad relativa, %</td>
-    <td class="tg-simple">${round(baseResult.debug_data["humidity_%"], 0)}</td>
-    <td class="tg-simple">${
-      validMod ? round(modResult.debug_data["humidity_%"], 0) : ""
-    }</td>
-  </tr>
-  <tr>
-    <td class="tg-simple">Pérdidas por radiación al ambiente, %</td>
-    <td class="tg-simple">${round(opt.hLoss * 100, 1)}</td>
-    <td class="tg-simple">${validMod ? round(modOpt.hLoss * 100, 1) : ""}</td>
-  </tr>
-  <tr>
-    <td class="tg-mqa1" colspan="3">Características del Combustible</td>
-  </tr>
+  ${tableStr.row3("Humedad relativa, %", baseResult.debug_data,
+    modResult.debug_data, "humidity_%", validMod, 1, 0)}
+  ${tableStr.row3("Pérdidas por radiación al ambiente, %", opt,
+    modOpt, "hLoss", validMod, 100, 1)}
+  
+  ${tableStr.titleRow3("Características del Combustible")}
+  ${tableStr.fullStrongRow3("Composición (100%)")}
+  ${tableStr.row3("Metano (CH4)", baseResult.fuel,
+    modResult.fuel, "CH4", validMod, 100)}
+  ${tableStr.row3("Etano (C2H6)", baseResult.fuel,
+    modResult.fuel, "C2H6", validMod, 100)}
+  ${tableStr.row3("Propano (C3H8)", baseResult.fuel,
+    modResult.fuel, "C3H8", validMod, 100)}
+  ${tableStr.row3("n-Butano (C4H10)", baseResult.fuel,
+    modResult.fuel, "C4H10", validMod, 100)}
+  ${tableStr.row3("i-Butano (C4H10)", baseResult.fuel,
+    modResult.fuel, "iC4H10", validMod, 100)}
+  ${tableStr.row3("Etileno (C2H4)", baseResult.fuel,
+    modResult.fuel, "C2H4", validMod, 100)}
+  ${tableStr.row3("Propileno (C3H6)", baseResult.fuel,
+    modResult.fuel, "C3H6", validMod, 100)}
+  ${tableStr.row3("Monóxido de Carbono (CO)", baseResult.fuel,
+    modResult.fuel, "CO", validMod, 100)}
+  ${tableStr.row3("Hidrógeno (H2)", baseResult.fuel,
+    modResult.fuel, "H2", validMod, 100)}
+  ${tableStr.row3("Nitrógeno (N2)", baseResult.fuel,
+    modResult.fuel, "N2", validMod, 100)}
+  ${tableStr.row3("Dióxido de Carbono (CO2)", baseResult.fuel,
+    modResult.fuel, "CO2", validMod, 100)}
+  ${tableStr.emptyRow3 //tableStr.row3val("Total", 100, 100, validMod)
+  }
   <tr>
     <td class="tg-simple">Peso molecular, ${unit["mass/mol"](0,0,0,true)}</td>
     <td class="tg-simple">${unit["mass/mol"](

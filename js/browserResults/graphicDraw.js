@@ -11,7 +11,7 @@ function draw(data = [], opts = {}) {
   let graphPerRow = svgWidth > 1300 ? 2 : 1;
   let heightMulti = graphPerRow == 1 ? 2 : 3;
   
-  const margin = { top: 150, right: 0, bottom: 100, left: 45 };
+  const margin = { top: 150, right: 0, bottom: 100, left: 50 };
   const innerHeight = (svgHeight -margin.top  -margin.bottom)/heightMulti;
   const innerWidth  = (svgWidth  -1.5*margin.left -margin.right)/graphPerRow;
 
@@ -117,8 +117,8 @@ function innerDraw(
   switch (yVar) {
     case 'co2_emiss':
       yTitle = opts.lang == "es" ? 
-        'Emisiones de CO2' :
-        'CO2 Emissions';
+        'Emisiones de CO₂' :
+        'CO₂ Emissions';
       yAxisLabel = opts.lang == "es" ? 
         `[t/año]` :
         `[t/year]`;

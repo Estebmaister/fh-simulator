@@ -16,7 +16,7 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
       baseOpt = opt;
       baseResult = result;
       localResult = JSON.parse(localStorage.getItem(MODIFIED));
-      if (clearOldLocalResult(localResult, MODIFIED)) localResult = {};
+      if (clearOldLocalResult(localResult, MODIFIED)) localResult = false;
       modOpt = localResult ? localResult.opt : {};
       modResult = localResult ? localResult.result : {};
       break;
@@ -24,7 +24,7 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
       modOpt = opt;
       modResult = result;
       localResult = JSON.parse(localStorage.getItem(BASE));
-      if (clearOldLocalResult(localResult, BASE)) localResult = {};
+      if (clearOldLocalResult(localResult, BASE)) localResult = false;
       if (!localResult) {
         const defaultResult = comb(fuel, defaultOpt);
         localResult = {result:defaultResult, opt:defaultOpt};
@@ -42,7 +42,7 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
 }
 
 const clearOldLocalResult = ( storageResult = {}, caseName = '' ) => {
-  const noTimeDiff  = !storageResult || !storageResult.time;
+  const noTimeDiff  = !storageResult || !storageResult.time || storageResult.time.date;
   const threeDays = 1e3*60*60*24*3;
 
   if (noTimeDiff || Date.now() - storageResult.time.date > threeDays) {

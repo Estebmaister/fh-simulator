@@ -5,7 +5,8 @@ const logByLevel = (...stringsList) => {
   }
   switch (stringsList[0]) {
     case "DEBUG":
-      if (options.verbose) console.debug(JSON.parse(`{"${stringsList[0]}": ${finalText}}`));
+      if (options.verbose) 
+        console.debug(JSON.parse(`{"${stringsList[0]}": ${finalText}}`));
       break;
     case "INFO": 
       console.info( `%c${stringsList[0]}`,'color: lime;', `'${finalText}'`,);
@@ -29,7 +30,8 @@ const logger = {
   default:(...stringsList) => logByLevel("DEFAULT", stringsList),
 };
 
-/** Receives a function, optional the derivate, a seed and the options object, finally an identifier name */
+/** Receives a function, optional the derivate, a seed and the options object, 
+ * finally an identifier name */
 const newtonRaphson = (f, fp, x0, nrOptions, name, noLog) => {
   let x1, y, yp, iter, yph, ymh, yp2h, ym2h;
 
@@ -67,9 +69,11 @@ const newtonRaphson = (f, fp, x0, nrOptions, name, noLog) => {
       yp = ((ym2h - yp2h) + 8 * (yph - ymh)) * hr / 12;
     }
 
-    // Check for badly conditioned update (extremely small first deriv relative to function):
+    // Check for badly conditioned update 
+    // (extremely small first deriv relative to function):
     if (Math.abs(yp) <= eps * Math.abs(y)) {
-      logger.error(`Newton-Raphson (${name}): failed to converged due to nearly zero first derivative`);
+      logger.error(`Newton-Raphson (${
+        name}): failed to converged due to nearly zero first derivative`);
       return false;
     }
 
@@ -86,7 +90,8 @@ const newtonRaphson = (f, fp, x0, nrOptions, name, noLog) => {
     // Transfer update to the new guess:
     x0 = x1;
   }
-  logger.error(`Newton-Raphson (${name}): Maximum iterations reached (${maxIter})`);
+  logger.error(`Newton-Raphson (${
+    name}): Maximum iterations reached (${maxIter})`);
 
   return false;
 };
@@ -202,10 +207,14 @@ const getOptions = () => {
   return optObject;
 };
 const options = getOptions();
-if (options.verbose) logger.debug(`"options","args":${JSON.stringify(options, null, 2)}`);
+if (options.verbose) 
+  logger.debug(`"options","args":${JSON.stringify(options, null, 2)}`);
 
-const round = (number, dec = 3) => number !== undefined ? (number).
-  toLocaleString(undefined,{minimumFractionDigits: dec, maximumFractionDigits: dec}) : NaN;
+const round = (number, dec = 3) => number !== undefined ? 
+  (number).toLocaleString(
+    undefined,
+    {minimumFractionDigits: dec, maximumFractionDigits: dec}
+  ) : NaN;
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
     if(!isNaN(value) && value !== "") object[key] = round(value);
@@ -341,8 +350,9 @@ const LMTD = (t_cold_in, t_cold_out, t_hot_in, t_hot_out, co_current) => {
     delta_t2 = t_hot_in - t_cold_out;
   }
     
-  // ( (t_hot_in - t_cold_out) - (t_hot_out - t_cold_in) ) / ln( (t_hot_in - t_cold_out) / (t_hot_out-t_cold_in) )
-  return Math.abs((delta_t1 - delta_t2) /Math.log(Math.abs(delta_t1 / delta_t2)) );
+  // ( (t_hot_in - t_cold_out) - (t_hot_out - t_cold_in) ) 
+  // / ln( (t_hot_in - t_cold_out) / (t_hot_out-t_cold_in) )
+  return Math.abs((delta_t1 - delta_t2) /Math.log(Math.abs(delta_t1/delta_t2)));
 };
 
 const dualSystem = (onlyUnit, noUnit, decimal=3 ,units="", number=0) => {
@@ -353,11 +363,16 @@ const dualSystem = (onlyUnit, noUnit, decimal=3 ,units="", number=0) => {
 const englishSystem = { //(US Customary)
   "energy/mol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/mol", unitConv.kJtoBTU(n)),
   "mass/mol":     (n,d,nU,oU) => dualSystem(oU,nU,d,"lb/lbmol", n),
-  heat_flow :     (n,d,nU,oU) => dualSystem(oU,nU,d,"MMBtu/h", unitConv.kJtoBTU(n)*1e-6),
-  heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h-ft²",unitConv.kJtoBTU(n) /unitConv.m2toft2()),
-  fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"h-ft²-°F/Btu", unitConv.m2toft2(n)*unitConv.KtoR()/unitConv.kJtoBTU()),
-  "energy/mass":  (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb", unitConv.kJtoBTU(n) / unitConv.kgtolb()),
-  "energy/vol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/ft³", unitConv.kJtoBTU(n) / unitConv.mtoft()**3),
+  heat_flow :     (n,d,nU,oU) => dualSystem(oU,nU,d,"MMBtu/h", 
+    unitConv.kJtoBTU(n)*1e-6),
+  heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h-ft²",
+    unitConv.kJtoBTU(n) /unitConv.m2toft2()),
+  fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"h-ft²-°F/Btu", 
+    unitConv.m2toft2(n)*unitConv.KtoR()/unitConv.kJtoBTU()),
+  "energy/mass":  (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb", 
+    unitConv.kJtoBTU(n) / unitConv.kgtolb()),
+  "energy/vol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/ft³", 
+    unitConv.kJtoBTU(n) / unitConv.mtoft()**3),
 
   area:     (n,d,nU,oU) => dualSystem(oU,nU,d,"ft²", unitConv.m2toft2(n)),
   length:   (n,d,nU,oU) => dualSystem(oU,nU,d,"ft", unitConv.mtoft(n)),
@@ -368,15 +383,18 @@ const englishSystem = { //(US Customary)
   pressure: (n,d,nU,oU) => dualSystem(oU,nU,d,"psi", n *1.450377e-4),
   mass:     (n,d,nU,oU) => dualSystem(oU,nU,d,"lb", unitConv.kgtolb(n)),
   mass_flow:(n,_d,nU,oU) => dualSystem(oU,nU,0,"lb/h", unitConv.kgtolb(n)),
-  barrel_flow:(n,d,nU,oU,spG = spGrav) => dualSystem(oU,nU,d,"x10³ BPD", unitConv.kgtolb(n)/ unitConv.BPDtolb_h(1,spG) /1e3),
+  barrel_flow:(n,d,nU,oU,spG = spGrav) => dualSystem(oU,nU,d,"x10³ BPD", 
+    unitConv.kgtolb(n)/ unitConv.BPDtolb_h(1,spG) /1e3),  
   barrel_flowC:(n,d,nU,oU) => dualSystem(oU,nU,d,"BPD", n),
   vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"ft³/h", unitConv.mtoft(n)**3),
   cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-°F", n *.238845896627),
   cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-mol-°F", n *.238845896627),
   power:    (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h", n *3.4121416331),
   moist:    (n,d,nU,oU) => dualSystem(oU,nU,d,"÷10³ lb H2O/lb", n*1e3),
-  thermal:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft-°F", unitConv.kJtoBTU(n)/unitConv.KtoR()/unitConv.mtoft()),
-  convect:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft²-°F", unitConv.kJtoBTU(n)/unitConv.KtoR()/(unitConv.m2toft2())),
+  thermal:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft-°F", 
+    unitConv.kJtoBTU(n)/unitConv.KtoR()/unitConv.mtoft()),
+  convect:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft²-°F", 
+    unitConv.kJtoBTU(n)/unitConv.KtoR()/(unitConv.m2toft2())),
   viscosity:(n,d,nU,oU) => dualSystem(oU,nU,d,"cP", n),
   system:   {en: "English", es: "Inglés"}
 };
@@ -387,9 +405,9 @@ const siSystem = {
   heat_flow:      (n,d,nU,oU) => dualSystem(oU,nU,d,"MW", n*1e-6 /3.6),
   heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"W/m²", n /3600),
   fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"m²-K/W ÷10³", n*3.6e3),
-
   "energy/mass":  (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/kg", n),
   "energy/vol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"kJ/m³", n),
+  
   area:       (n,d,nU,oU)  => dualSystem(oU,nU,d,"m²", n),
   length:     (n,d,nU,oU)  => dualSystem(oU,nU,d,"m", n),
   lengthC:    (n,d,nU,oU)  => dualSystem(oU,nU,d,"cm", n*1e2),
