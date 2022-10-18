@@ -210,6 +210,12 @@ const options = getOptions();
 if (options.verbose) 
   logger.debug(`"options","args":${JSON.stringify(options, null, 2)}`);
 
+const defaultFuel = { 
+  H2:     .1142, N2:   .0068, CO:   .0066, CO2: .0254, 
+  CH4:    .5647, C2H6: .1515, C3H8: .0622, C4H10: .0176, 
+  iC4H10: .0075, C2H4: .0158, C3H6: .0277,
+};
+
 const round = (number, dec = 3) => number !== undefined ? 
   (number).toLocaleString(
     undefined,
@@ -451,18 +457,9 @@ const initSystem = (unitSystem) => {
 };
 
 module.exports = {
-  options,
-  unitConv,
-  newtonRaphson,
-  logger,
-  round,
-  roundDict,
-  linearApprox,
-  viscosityApprox,
-  initSystem,
-  normalize,
-  flueViscosity,
-  flueThermalCond,
-  kw_tubes_A312_TP321,
-  LMTD
+  logger, options, unitConv, defaultFuel,
+  round, roundDict, normalize, initSystem,
+  linearApprox, newtonRaphson, flueViscosity,
+  viscosityApprox, flueThermalCond,
+  kw_tubes_A312_TP321, LMTD
 };

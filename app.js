@@ -1,4 +1,4 @@
-const { round, logger, options, unitConv, 
+const { round, defaultFuel, logger, options, unitConv, 
   initSystem, linearApprox, newtonRaphson, 
   viscosityApprox, kw_tubes_A312_TP321
 } = require('./js/utils');
@@ -192,11 +192,7 @@ const combustionCycle = (params, fuels) => {
     `'comb_cycle_reps': ${cycle}`);
 }
 
-let fuelsObject = { 
-  H2:     .1142, N2:   .0068, CO:   .0066, CO2: .0254, 
-  CH4:    .5647, C2H6: .1515, C3H8: .0622, C4H10: .0176, 
-  iC4H10: .0075, C2H4: .0158, C3H6: .0277,
-};
+let fuelsObject = {...defaultFuel};
 // Fuel for debugging purpose
 // fuelsObject ={
 //   CH4: 1,

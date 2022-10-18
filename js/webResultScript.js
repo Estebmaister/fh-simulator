@@ -4,7 +4,7 @@ window.onload = function(){
         // Creating and adding the script element in the html file
         const scriptElement = document.createElement('script');
         scriptElement.type = 'text/javascript';
-        scriptElement.src = "../js/bundle.js";
+        scriptElement.src = "../js/bundleV2.js";
 
         // Before appending the script, calls attention to see the console in case of a failure in the script
         const outputElement = document.getElementById("output-com");

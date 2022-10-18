@@ -1,5 +1,5 @@
 const {stringCompactResult} = require('./resultsToString');
-const {logger} = require('./../utils');
+const {logger, defaultFuel} = require('./../utils');
 const BASE = 'base', MODIFIED = 'modified';
 
 const compactResult = ( comb, fuel, opt, defaultOpt ) => {
@@ -26,7 +26,7 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
       localResult = JSON.parse(localStorage.getItem(BASE));
       if (clearOldLocalResult(localResult, BASE)) localResult = false;
       if (!localResult) {
-        const defaultResult = comb(fuel, defaultOpt);
+        const defaultResult = comb(defaultFuel, defaultOpt);
         localResult = {result:defaultResult, opt:defaultOpt};
       }
       baseOpt = localResult ? localResult.opt : {};
@@ -42,7 +42,8 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
 }
 
 const clearOldLocalResult = ( storageResult = {}, caseName = '' ) => {
-  const noTimeDiff  = !storageResult || !storageResult.time || storageResult.time.date;
+  const noTimeDiff  = !storageResult || !storageResult.time || !storageResult.time.date;
+  console.log(noTimeDiff)
   const threeDays = 1e3*60*60*24*3;
 
   if (noTimeDiff || Date.now() - storageResult.time.date > threeDays) {
