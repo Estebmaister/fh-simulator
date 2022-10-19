@@ -323,6 +323,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     totalPerMol += products[product];
     if (product !== 'H2O') totalPerM_Dry += products[product];
   }
+  debug_data["CO2"]  = products["CO2"]
   const flows = {
     total_flow: totalPerMol,
     dry_total_flow: totalPerM_Dry,
