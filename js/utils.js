@@ -219,7 +219,7 @@ const defaultFuel = {
 const round = (number, dec = 3) => number !== undefined ? 
   (number).toLocaleString(
     undefined,
-    {minimumFractionDigits: dec, maximumFractionDigits: dec, roundingPriority: "morePrecision",}
+    {minimumFractionDigits: dec, maximumFractionDigits: dec,}
   ) : undefined;
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
