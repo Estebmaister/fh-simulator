@@ -65,14 +65,16 @@ const graphicData = ( comb, fuel, opt ) => {
   const points = opt.graphPoints, range = opt.graphRange;
   let initVar = opt[graphVar] - range/2;
   if (initVar < 0) initVar = 0;
-  savedLogger.info(`Var: ${graphVar}, centerValue: ${opt[graphVar]}, range: ${range}, points: ${points}`);
+  savedLogger.info(`Var: ${graphVar}, centerValue: ${opt[graphVar]},`+
+    ` range: ${range}, points: ${points}`);
   for (let index = 0; index < points; index++) {
     opt[graphVar] = initVar + index*range/points;
     const runResult = comb(fuel, opt);
     browserResult[index] = {
 
       // --- Input vars
-      m_fluid:    unitConv.lb_htoBPD(unitConv.kgtolb(runResult.rad_result.m_fluid))*1e-3,
+      m_fluid:    unitConv.lb_htoBPD(unitConv.kgtolb(
+        runResult.rad_result.m_fluid )) *1e-3,
       m_fluid_si: unitConv.BarrelsTom3(
           unitConv.lb_htoBPD(
             unitConv.kgtolb(runResult.rad_result.m_fluid)
@@ -82,7 +84,8 @@ const graphicData = ( comb, fuel, opt ) => {
       t_out_si: unitConv.KtoC(runResult.rad_result.t_out),
       
       o2_excess:  runResult.flows['O2_%'] < 11 ? runResult.flows['O2_%'] : 11,
-      air_excess: runResult.flows['air_excess_%'] > 0 ? runResult.flows['air_excess_%'] : 0,
+      air_excess: runResult.flows['air_excess_%'] > 0 ? 
+        runResult.flows['air_excess_%'] : 0,
       humidity:   runResult.debug_data['humidity_%'],
       
       // --- Output vars
@@ -91,7 +94,7 @@ const graphicData = ( comb, fuel, opt ) => {
       cnv_tg_out: unitConv.KtoF(runResult.conv_result.tg_out),
       cnv_tg_out_si: unitConv.KtoC(runResult.conv_result.tg_out),
       
-      // m_flue:     runResult.shld_result.m_flue ? runResult.shld_result.m_flue : 0,
+      // m_flue:runResult.shld_result.m_flue ? runResult.shld_result.m_flue : 0,
       m_fuel:     runResult.rad_result.m_fuel ? 
         unitConv.kgtolb(runResult.rad_result.m_fuel) : 0,
       m_fuel_si:  runResult.rad_result.m_fuel ? 
@@ -106,10 +109,7 @@ const graphicData = ( comb, fuel, opt ) => {
       rad_cnv_dist: runResult.conv_result['%'] != 0 ? 
         runResult.rad_result['%'] / runResult.conv_result['%'] : 0,
       // shl_duty:  runResult.shld_result.duty,
-      co2_emiss: Math.round(1e2 *
-        runResult.products["CO2"] * (44.01 / runResult.flows["fuel_MW"]) *
-        runResult.rad_result.m_fuel * (1e-3 * 24 * 365)
-      ) / 1e2,
+      co2_emiss: Math.round(1e2 *runResult.rad_result.co2_emiss) /1e2,
 
     }
   }

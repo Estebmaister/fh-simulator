@@ -281,8 +281,8 @@ const radSection = (params, noLog) => {
 
     Alpha:    alpha,
     MBL:      round(MBL),
-    Pco2:     round(params.Pco2),
-    Ph2o:     round(params.Ph2o),
+    Pco2:     params.Pco2,
+    Ph2o:     params.Ph2o,
     PL:       round(PL),
     F:        round(F(tg_out)),
     emiss:    round(emissivity(PL)(tg_out)),

@@ -139,7 +139,7 @@ const unitConv = {
   BtuHtoW: (n=1) => n/3.4121416331,
 };
 
-/** Example call from terminal: node . false ENGLISH 26.6667 50 0 20 1.01325e5 */ 
+/** Ex. call from terminal: node . false ENGLISH 26.6667 50 0 20 1.01325e5 */ 
 const getOptions = () => {
   const optObject = {
     // constants
@@ -219,8 +219,8 @@ const defaultFuel = {
 const round = (number, dec = 3) => number !== undefined ? 
   (number).toLocaleString(
     undefined,
-    {minimumFractionDigits: dec, maximumFractionDigits: dec}
-  ) : NaN;
+    {minimumFractionDigits: dec, maximumFractionDigits: dec,}
+  ) : undefined;
 const roundDict = (object = {}) => {
   for (const [key, value] of Object.entries(object)) {
     if(!isNaN(value) && value !== "") object[key] = round(value);
@@ -367,11 +367,11 @@ const dualSystem = (onlyUnit, noUnit, decimal=3 ,units="", number=0) => {
 }
 
 const englishSystem = { //(US Customary)
-  "energy/mol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/mol", unitConv.kJtoBTU(n)),
-  "mass/mol":     (n,d,nU,oU) => dualSystem(oU,nU,d,"lb/lbmol", n),
-  heat_flow :     (n,d,nU,oU) => dualSystem(oU,nU,d,"MMBtu/h", 
+  "energy/mol": (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/mol",unitConv.kJtoBTU(n)),
+  "mass/mol":   (n,d,nU,oU) => dualSystem(oU,nU,d,"lb/lbmol", n),
+  heat_flow :   (n,d,nU,oU) => dualSystem(oU,nU,d,"MMBtu/h", 
     unitConv.kJtoBTU(n)*1e-6),
-  heat_flux:      (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h-ft²",
+  heat_flux:    (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h-ft²",
     unitConv.kJtoBTU(n) /unitConv.m2toft2()),
   fouling_factor: (n,d,nU,oU) => dualSystem(oU,nU,d,"h-ft²-°F/Btu", 
     unitConv.m2toft2(n)*unitConv.KtoR()/unitConv.kJtoBTU()),
@@ -394,7 +394,7 @@ const englishSystem = { //(US Customary)
   barrel_flowC:(n,d,nU,oU) => dualSystem(oU,nU,d,"BPD", n),
   vol_flow: (n,d,nU,oU) => dualSystem(oU,nU,d,"ft³/h", unitConv.mtoft(n)**3),
   cp:       (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-°F", n *.238845896627),
-  cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-mol-°F", n *.238845896627),
+  cp_mol:   (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/lb-mol-°F", n*.238845896627),
   power:    (n,d,nU,oU) => dualSystem(oU,nU,d,"Btu/h", n *3.4121416331),
   moist:    (n,d,nU,oU) => dualSystem(oU,nU,d,"÷10³ lb H2O/lb", n*1e3),
   thermal:  (n,d,nU,oU) => dualSystem(oU,nU,d,"BTU/h-ft-°F", 

@@ -38,12 +38,13 @@ const compactResult = ( comb, fuel, opt, defaultOpt ) => {
   if (loader) loader.remove();
 
   const outComb = document.getElementById('output-com');
-  if (outComb) outComb.innerHTML = stringCompactResult(opt.unitSystem, baseResult, baseOpt, modResult, modOpt);
+  if (outComb) outComb.innerHTML = stringCompactResult(
+    opt.unitSystem, baseResult, baseOpt, modResult, modOpt);
 }
 
 const clearOldLocalResult = ( storageResult = {}, caseName = '' ) => {
-  const noTimeDiff  = !storageResult || !storageResult.time || !storageResult.time.date;
-  console.log(noTimeDiff)
+  const noTimeDiff  = 
+    !storageResult || !storageResult.time || !storageResult.time.date;
   const threeDays = 1e3*60*60*24*3;
 
   if (noTimeDiff || Date.now() - storageResult.time.date > threeDays) {

@@ -127,6 +127,9 @@ const heaterFunc = (fuels, opts) => {
     heat_result.rad_result.eff_thermal(heat_result.conv_result.Q_stack);
   heat_result.rad_result.eff_gcv_val = 
     heat_result.rad_result.eff_gcv(heat_result.conv_result.Q_stack);
+    heat_result.rad_result.co2_emiss =
+    +heat_result.debug_data.CO2 *(44.01 /heat_result.flows["fuel_MW"])
+    *heat_result.rad_result.m_fuel *(1e-3 *24 *365);
 
   return heat_result
 }
