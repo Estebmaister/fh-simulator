@@ -285,7 +285,7 @@ Datos de entrada
 
   Cp (Tb) promedio (residuo): ${result_obj.debug_data.cpFluidTb}
 
-  Gravedad específica (residuo): ${result_obj.debug_data.spGrav}
+  Gravedad específica (residuo): ${round(result_obj.debug_data.spGrav,2)}
   Flujo másico (residuo):        ${unit.mass_flow(
     result_obj.rad_result.m_fluid,1)}
 
@@ -377,7 +377,7 @@ Input Data
 
   Process fluid Sp. Heat, Cp(Tb): ${result_obj.debug_data.cpFluidTb}
 
-  Process fluid Sp Grav:   ${result_obj.debug_data.spGrav}
+  Process fluid Sp Grav:   ${round(result_obj.debug_data.spGrav,2)}
   Process fluid Mass Flow: ${unit.mass_flow(result_obj.rad_result.m_fluid, 1)}
 
   Required Duty:   ${unit.heat_flow(result_obj.rad_result.duty_total)}
