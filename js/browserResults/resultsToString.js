@@ -513,7 +513,7 @@ const stringCompactResult = (
   </tr>
   ${tableStr.row3val("▪ Gravedad específica", 
   round(baseResult.debug_data.spGrav,2), 
-  round(modResult.debug_data.spGrav,2), validMod)}
+  validMod ? round(modResult.debug_data.spGrav,2) :"", validMod)}
   <tr>
     <td class="tg-simple">▪ Calor absorbido total, ${
       unit.heat_flow(0,0,0,true)}</td>
@@ -571,7 +571,7 @@ const stringCompactResult = (
       unit.tempC(modOpt.tAir, 0, true) : "" }</td>
   </tr>
   ${tableStr.row3("Humedad relativa, %", baseResult.debug_data,
-    modResult.debug_data, "humidity_%", validMod, 1, 0)}
+  validMod ? modResult.debug_data : {}, "humidity_%", validMod, 1, 0)}
   ${tableStr.row3("Pérdidas por radiación al ambiente, %", opt,
     modOpt, "hLoss", validMod, 100, 1)}
   
@@ -795,7 +795,7 @@ const stringCompactResult = (
   ${tableStr.emptyRow3}
   ${tableStr.row3val("▪ Emisiones de CO2, ton/año", 
   round(baseResult.rad_result.co2_emiss, 0), 
-  round(modResult.rad_result.co2_emiss, 0), validMod)}
+  validMod ? round(modResult.rad_result.co2_emiss, 0) :"", validMod)}
   ${tableStr.emptyRow3}
 
   ${tableStr.fullRow3(`▪ Pérdidas de calor, ${unit.heat_flow(0,0,0,true)}`)}
