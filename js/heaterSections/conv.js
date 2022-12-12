@@ -83,11 +83,9 @@ const convSection = (params, noLog) => {
     reynolds_flue(tG_b)**.6; // (kJ/m²h-°C)
 
   const
-    ho = (tG_b, tW) => 1/( 1/(hc(tG_b, tW) +hr(tG_b,tW)) +Rfo ), 
     // (kJ/m²h-°C) external heat transfer coff
-    /** Fin's Efficiency */
-    Kw_fin = 1.36* kw_tube(Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))),
-    // Practical  implementation
+    ho = (tG_b, tW) => 1/( 1/(hc(tG_b, tW) +hr(tG_b,tW)) +Rfo ), 
+    Kw_fin = 100, // Fin's thermal conductivity (kJ/m-h-°C) 11.5-13.5Cr
     B = L_fin + (Th_fin /2),
     m = (ho(Tb(tg_in,tg_out), Tw(Tb(t_in,t_out), Tw(Tb(t_in,t_out)))) / 
     (6 * Kw_fin * Th_fin))**0.5,
@@ -96,8 +94,8 @@ const convSection = (params, noLog) => {
     Df = Do + 2*L_fin,
     Ef  = y * (0.45 * Math.log(Df / Do) * (y - 1) + 1),    // (-) Fin efficiency
     he = (tG_b, tW) => ho(tG_b, tW) *(Ef*Afo + Apo) / Ao,  // (kJ/m²h-°C)
-    j = (tG_b, tW) => colburnFactor(reynolds_flue, params, m, B)(tG_b, tW);   
     // Colburn factor
+    j = (tG_b, tW) => colburnFactor(reynolds_flue, params, m, B)(tG_b, tW);   
 
   hc = (tG_b, tW) => j(tG_b, tW) *Gn *Cp_flue(tG_b) *prandtl_flue(tG_b)**(-.67); 
   // (kJ/m²h-°C) film heat transfer coff
