@@ -215,7 +215,8 @@ const radSection = (params, noLog) => {
   }
 
   // **************************************************
-  if (!noLog) logger.default(`RADI, T_in_calc: ${params.units.tempC(t_in)},`+
+  if (!noLog) logger.default(
+    `RADI, T_in_calc: ${params.units.tempC(t_in)},`+
     ` M_fuel: ${params.units.mass_flow(m_fuel)},`+
     ` Tg_out: ${params.units.tempC(tg_out)}`);
 

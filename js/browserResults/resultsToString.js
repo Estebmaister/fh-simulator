@@ -47,11 +47,11 @@ const stringRadResult = (lang, result_obj, unitSystem) => {
   hi:     ${unit.convect(result_obj.hi)}
   h_conv:   ${unit.convect(result_obj.h_conv)}
 
-  MBL:      ${result_obj.MBL} ft
-  GPpres:   ${round(result_obj.Pco2 * 1 + result_obj.Ph2o * 1)} atm
-  PL:       ${result_obj.PL} atm-ft
-  GEmiss:   ${result_obj.emiss}
-  F:        ${result_obj.F}
+  MBL:       ${result_obj.MBL} ft
+  P co₂+h₂o: ${round(+result_obj.Pco2 * 1 + result_obj.Ph2o * 1)} atm
+  PL:        ${result_obj.PL} atm-ft
+  GEmiss:    ${result_obj.emiss}
+  F:         ${result_obj.F}
 
   kw_tube:  ${unit.thermal(result_obj.kw_tube)}
   kw_fluid: ${unit.thermal(result_obj.kw_fluid)}
@@ -105,7 +105,7 @@ const stringShldResult = (lang, result_obj, unitSystem) => {
   DeltaA:     ${unit.temp(result_obj.DeltaA)}
   DeltaB:     ${unit.temp(result_obj.DeltaB)}
   DeltaA-B:   ${unit.temp(result_obj.DeltaA - result_obj.DeltaB)}
-  Log(A/B):   ${round(Math.log(result_obj.DeltaA / result_obj.DeltaB))}
+  Log(A/B):   ${round(Math.log(result_obj.DeltaA / result_obj.DeltaB),1,true)}
 
   Q_flue:   ${unit.heat_flow(result_obj.Q_flue)}
     M_fuel xCp x(Tg_in-Tg_out)
@@ -298,39 +298,39 @@ Datos de entrada
   Eficiencia térmica (NHV): ${round(result_obj.rad_result.eff_thermal_val, 2)}%
   Eficiencia térmica (GHV): ${round(result_obj.rad_result.eff_gcv_val, 2)}%
 
-  Emisiones de CO2: ${round(result_obj.rad_result.co2_emiss, 0)} ton/año
+  Emisiones de CO2: ${round(result_obj.rad_result.co2_emiss, 0)} toneladas/año
 
-Moles de gases de combustión por mol de combustible
+  Moles de gases de combustión por mol de combustible
+    Moles totales:               ${round(result_obj.flows["total_flow"], 3)}
+    Moles totales (a base seca): ${round(result_obj.flows["dry_total_flow"], 3)}
 
-  Moles totales:               ${round(result_obj.flows["total_flow"], 3)}
-  Moles totales (a base seca): ${round(result_obj.flows["dry_total_flow"], 3)}
+    Componentes
+      N2:   ${result_obj.products["N2"]}
+      O2:   ${result_obj.products["O2"]}
+      H2O:  ${result_obj.products["H2O"]}
+      CO2:  ${result_obj.products["CO2"]}
+      SO2:  ${result_obj.products["SO2"]}
 
-  Componentes
-    N2:   ${result_obj.products["N2"]}
-    O2:   ${result_obj.products["O2"]}
-    H2O:  ${result_obj.products["H2O"]}
-    CO2:  ${result_obj.products["CO2"]}
-    SO2:  ${result_obj.products["SO2"]}
+    Porcentajes molares en base húmeda
+      N2:  ${round(result_obj.flows["N2_%"])} %
+      O2:  ${round(result_obj.flows["O2_%"])} %
+      H2O: ${round(result_obj.flows["H2O_%"])} %
+      CO2: ${round(result_obj.flows["CO2_%"])} %
+      SO2: ${result_obj.flows["SO2_%"] || "0.000"} %
 
-  Porcentajes molares en base húmeda
-    N2:  ${round(result_obj.flows["N2_%"])} %
-    O2:  ${round(result_obj.flows["O2_%"])} %
-    H2O: ${round(result_obj.flows["H2O_%"])} %
-    CO2: ${round(result_obj.flows["CO2_%"])} %
-    SO2: ${result_obj.flows["SO2_%"] || "0.000"} %
-
-  Exceso de aire: ${round(result_obj.flows["air_excess_%"], 2)} %
+  Exceso de aire en combustión: ${round(result_obj.flows["air_excess_%"], 2)} %
   Moles O2 estequiométrico/mol combustible: ${round(
     result_obj.flows["O2_mol_req_theor"], 3 )}
 
-  Relaciones Aire/Combustible (A/C):
+  Relaciones Aire/Combustible (A/C)
+    A/C molar húmeda:  ${round(result_obj.flows["AC"], 3)}
+    A/C másica húmeda: ${round(result_obj.flows["AC_mass"], 3)}
+    A/C molar estequiométrica (aire seco):    ${round(
+      result_obj.flows["AC_theor_dryAir"], 3 )}
+    A/C másica estequiométrica (aire húmedo): ${round(
+      result_obj.flows["AC_mass_theor_moistAir"], 3 )}
 
-  A/C molar húmeda:  ${round(result_obj.flows["AC"], 3)}
-  A/C másica húmeda: ${round(result_obj.flows["AC_mass"], 3)}
-  A/C molar estequiométrica (aire seco):    ${round(
-    result_obj.flows["AC_theor_dryAir"], 3 )}
-  A/C másica estequiométrica (aire húmedo): ${round(
-    result_obj.flows["AC_mass_theor_moistAir"], 3 )}
+  Temperatura de llama adiabática: ${unit.temp(result_obj.flows.adFlame)}
 
   Poder Calorífico Neto  (NCV): ${result_obj.flows["NCV"]}
   Poder Calorífico Bruto (GCV): ${result_obj.flows["GCV"]}
@@ -342,8 +342,8 @@ Moles de gases de combustión por mol de combustible
   Peso molecular (combustible): ${unit["mass/mol"](result_obj.flows["fuel_MW"])}
   Peso molecular (gases):       ${result_obj.flows["flue_MW"]}
 
-  Calor específico, Cp(T_comb) combustible: ${result_obj.flows["Cp_fuel"]}
-  Calor específico, Cp(T_comb) gases:       ${result_obj.flows["Cp_flue"]}
+  Calor específico, Cp(Tcomb) comb.: ${result_obj.flows["Cp_fuel"]}
+  Calor específico, Cp(Tcomb) gases: ${result_obj.flows["Cp_flue"]}
 `;
   } else {
     outputString = `
@@ -389,38 +389,39 @@ Input Data
   Heater Thermal Efficiency (GHV): ${round(
     result_obj.rad_result.eff_gcv_val, 2 )}%
 
-  CO2 Emissions: ${round(result_obj.rad_result.co2_emiss, 0 )} ton/year
+  CO2 Emissions: ${round(result_obj.rad_result.co2_emiss, 0 )} metric-ton/year
 
-Flue gas moles and components (per mol of fuel)
+  Flue gas moles and components (per mol of fuel)
+    Total moles:     ${round(result_obj.flows["total_flow"], 3)}
+    Total moles dry: ${round(result_obj.flows["dry_total_flow"], 3)}
 
-  Total moles:     ${round(result_obj.flows["total_flow"], 3)}
-  Total moles dry: ${round(result_obj.flows["dry_total_flow"], 3)}
+    Components
+      N2:  ${result_obj.products["N2"]}
+      O2:  ${result_obj.products["O2"]}
+      H2O: ${result_obj.products["H2O"]}
+      CO2: ${result_obj.products["CO2"]}
+      SO2: ${result_obj.products["SO2"]}
 
-  Components
-    N2:  ${result_obj.products["N2"]}
-    O2:  ${result_obj.products["O2"]}
-    H2O: ${result_obj.products["H2O"]}
-    CO2: ${result_obj.products["CO2"]}
-    SO2: ${result_obj.products["SO2"]}
+    Components (Wet basis)
+      N2:  ${round(result_obj.flows["N2_%"], 3)} %
+      O2:  ${round(result_obj.flows["O2_%"], 3)} %
+      H2O: ${round(result_obj.flows["H2O_%"], 3)} %
+      CO2: ${round(result_obj.flows["CO2_%"], 3)} %
+      SO2: ${result_obj.flows["SO2_%"] || "0.000"} %
 
-  Components (Wet basis)
-    N2:  ${round(result_obj.flows["N2_%"], 3)} %
-    O2:  ${round(result_obj.flows["O2_%"], 3)} %
-    H2O: ${round(result_obj.flows["H2O_%"], 3)} %
-    CO2: ${round(result_obj.flows["CO2_%"], 3)} %
-    SO2: ${result_obj.flows["SO2_%"] || "0.000"} %
-
-  Air excess: ${round(result_obj.flows["air_excess_%"], 3)} %
+  Air excess in combustion: ${round(result_obj.flows["air_excess_%"], 3)} %
   Moles O2 stoichiometric/mol of fuel: ${round(
     result_obj.flows["O2_mol_req_theor"], 3 )}
 
-  A/F Ratios
-  A/C molar (wet basis):   ${round(result_obj.flows["AC"], 3)}
-  A/C mass (wet basis):    ${round(result_obj.flows["AC_mass"], 3)}
-  A/C molar stoichiometric (dry basis): ${round(
-    result_obj.flows["AC_theor_dryAir"], 3 )}
-  A/C mass stoichiometric (dry basis):  ${round(
-    result_obj.flows["AC_mass_theor_moistAir"], 3 )}
+  Air/Fuel Ratios (A/F)
+    A/F molar (wet basis):   ${round(result_obj.flows["AC"], 3)}
+    A/F mass (wet basis):    ${round(result_obj.flows["AC_mass"], 3)}
+    A/F molar stoichiometric (dry basis): ${round(
+      result_obj.flows["AC_theor_dryAir"], 3 )}
+    A/F mass stoichiometric (dry basis):  ${round(
+      result_obj.flows["AC_mass_theor_moistAir"], 3 )}
+
+  Adiabatic Flame Temperature: ${unit.temp(result_obj.flows.adFlame)}
 
   Fuel Mass Flow:           ${unit.mass_flow(result_obj.rad_result.m_fuel, 1)}
   Flue Gas Mass Flow:       ${unit.mass_flow(result_obj.shld_result.m_flue, 1)}
@@ -793,7 +794,7 @@ const stringCompactResult = (
       round(modResult.flows["H2O_%"], 2) : "" }</td>
   </tr>
   ${tableStr.emptyRow3}
-  ${tableStr.row3val("▪ Emisiones de CO2, ton/año", 
+  ${tableStr.row3val("▪ Emisiones de CO2, toneladas/año", 
   round(baseResult.rad_result.co2_emiss, 0), 
   validMod ? round(modResult.rad_result.co2_emiss, 0) :"", validMod)}
   ${tableStr.emptyRow3}

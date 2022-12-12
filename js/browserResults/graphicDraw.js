@@ -209,7 +209,8 @@ function innerDraw(
     .tickPadding(10);
   
   const graphic = svg.append("g")
-    .attr("transform", `translate(${xDisplace+margin.left*1.25},${yDisplace+margin.top/2})`)
+    .attr("transform",
+      `translate(${xDisplace+margin.left*1.25},${yDisplace+margin.top/2})`)
 
 
   const xAxisG = graphic.append('g').call(xAxis)
@@ -217,7 +218,7 @@ function innerDraw(
   xAxisG.select('.domain').remove();
   xAxisG.selectAll('.tick').selectAll('line')
     .attr("stroke-dasharray", 3)
-    .attr("stroke-width", 0.1);
+    .attr("stroke-width", 0.2);
   xAxisG.selectAll('.tick').selectAll('text')
     .attr('fill','#646a6c')
     .attr("font-size", xAxisTickSize);
@@ -234,7 +235,7 @@ function innerDraw(
   yAxisG.selectAll('.domain').remove();
   yAxisG.selectAll('.tick').selectAll('line')
     .attr("stroke-dasharray", 3)
-    .attr("stroke-width", 0.1);
+    .attr("stroke-width", 0.2);
   yAxisG.selectAll('.tick').selectAll('text')
     .attr('fill','#646a6c')
     .attr("font-size", yAxisTickSize);

@@ -45,12 +45,12 @@ const checkFuelData = (fuels, compounds, result = {}) => {
  */
 const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult, noLog) => {
   // Cp equation from table A.6 Van Wylen
-  // Teta = T(Kelvin)
-  return (teta) => {
+  // temp = T [Kelvin]
+  return (temp) => {
     // Approximate equation valid from 250 K to 1200 K.
-    if (teta < 250 && !noLog) logger.debug(`"Cp0", "temp": "${round(teta)}",`+
+    if (temp < 250 && !noLog) logger.debug(`"Cp0", "temp": "${round(temp)}",`+
       `"Msg": "${Substance} bellow range for Cp0 formula"`);
-    if (teta > 1200&& !noLog) logger.debug(`"Cp0", "temp": "${round(teta)}",`+
+    if (temp > 1200&& !noLog) logger.debug(`"Cp0", "temp": "${round(temp)}",`+
       `"Msg": "${Substance} above range for Cp0 formula"`);
     if (c0 === "-") {
       logger.debug(`"Cp0", "Msg": "Wrong use, called for compound `+
@@ -58,8 +58,8 @@ const Cp0 = ({c0, c1, c2, c3, MW, Substance}, molResult, noLog) => {
       return 0;
     }
     if (molResult) return MW *(
-      c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3);
-    return (c0 + c1*(teta*.001) + c2*(teta*.001)**2 + c3*(teta*.001)**3)
+      c0 + c1*(temp*.001) + c2*(temp*.001)**2 + c3*(temp*.001)**3);
+    return (c0 + c1*(temp*.001) + c2*(temp*.001)**2 + c3*(temp*.001)**3)
   }
 };
 
@@ -112,7 +112,9 @@ const pressureH2OinAir = (temperature, relativeHumidity) => {
   // This eq uses temp in °C
   const temp = temperature - options.tempToK;
   // ps is the saturation vapour pressure, in pascals,
-  const ps = 610.78*Math.exp(temp/(temp+238.3)*17.2694);
+  let ps = 610.78*Math.exp(temp/(temp+238.3)*17.2694);
+  // correction for ice temperature:
+  if (temp <= 0) ps = -4.86 + 0.855*ps + 0.000244*ps**2;
   // result pw is the actual water vapour pressure.
   return ps * relativeHumidity * 0.01;
 };
@@ -158,7 +160,7 @@ const deltaH = (compound, t) => {
   * returns a function if no temp is passed */
 const combustionH = (compound, t, tIni, liquidWater = false) => {
   // hrp = HP - HR // H = H0 + deltaH  // H0 = n(hf)
-  // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
+  // SumR n_i*(hf + deltaH)_i = SumP n_e*(hf + deltaH)_e
 
   const 
     co2_H = deltaH( data[6]  ),
@@ -174,7 +176,7 @@ const combustionH = (compound, t, tIni, liquidWater = false) => {
     + compound.SO2*so2_H(tempParam) +compound.H2O*h2o_H(tempParam)
     - deltaH(compound)(tIni) - compound.O2*o2_H(tIni);
   
-  // SR ni*(hf + deltaH)i = SP ne*(hf + deltaH)e
+  // SumR n_i*(hf + deltaH)_i = SumP n_e*(hf + deltaH)_e
   return ( compound.CO2*co2_H(t) +compound.SO2*so2_H(t) +compound.H2O*h2o_H(t)
     - deltaH(compound)(tIni) - compound.O2*o2_H(tIni) );
 };
@@ -391,6 +393,7 @@ const combSection = (airExcess, fuels, params, onlyO2) => {
     2000, params.NROptions, "fuel_adFlame");
   logger.info( `Adiabatic flame temp: [${round(params.adFlame)} K]`+
     ` ${units.tempC(params.adFlame)}`);
+  flows.adFlame = params.adFlame;
 
   roundDict(products);
   if (debug_data.err == "") delete debug_data.err;
