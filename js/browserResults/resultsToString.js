@@ -522,7 +522,7 @@ const stringCompactResult = (
 </thead>
 <tbody>
   ${tableStr.titleRow3("Condiciones de Proceso")}
-  
+
   ${tableStr.fullRow3("Residuo atmosférico")}
   <tr>
     <td class="tg-simple">▪ Flujo volumétrico, ${unit.barrel_flowC(
@@ -639,7 +639,7 @@ const stringCompactResult = (
       validMod ? unit.fouling_factor(modResult.conv_result.rfo, 3, true) : ""
     }</td>
   </tr>
-  
+
   ${tableStr.titleRow3("Condiciones de Combustión")}
   <tr>
     <td class="tg-simple">Exceso de Oxígeno, % (BH)</td>
@@ -685,7 +685,7 @@ const stringCompactResult = (
     100,
     1
   )}
-  
+
   ${tableStr.titleRow3("Características del Combustible")}
   ${tableStr.fullStrongRow3("Composición (100%)")}
   ${tableStr.row3(
