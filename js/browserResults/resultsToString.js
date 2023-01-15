@@ -516,7 +516,7 @@ const stringCompactResult = (
   round(baseResult.debug_data.spGrav,2), 
   validMod ? round(modResult.debug_data.spGrav,2) :"", validMod)}
   <tr>
-    <td class="tg-simple">▪ Calor absorbido total, ${
+    <td class="tg-simple">▪ Calor absorbido estimado, ${
       unit.heat_flow(0,0,0,true)}</td>
     <td class="tg-simple">${unit.heat_flow(
       baseResult.rad_result.duty_total, 3,true)}</td>
@@ -709,7 +709,7 @@ const stringCompactResult = (
     }</td>
   </tr>
   ${tableStr.emptyRow3}
-  ${tableStr.fullRow3(`▪ Calor Absorbido, ${unit.heat_flow(0,0,0,true)}`)}
+  ${tableStr.fullRow3(`▪ Distribución del calor absorbido, ${unit.heat_flow(0,0,0,true)}`)}
   <tr>
     <td class="tg-simple">· Sección Radiante - (%)</td>
     <td class="tg-simple">${unit.heat_flow(
